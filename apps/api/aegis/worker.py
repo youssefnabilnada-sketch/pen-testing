@@ -22,7 +22,12 @@ celery.conf.beat_schedule={
  'retry-outbox':{'task':'aegis.dispatch_outbox','schedule':30.0},
  'sync-advisory-sources':{'task':'aegis.intelligence_tick','schedule':300.0},
 }
-celery.conf.update(task_serializer='json',accept_content=['json'],result_serializer='json',task_acks_late=True,worker_prefetch_multiplier=1,task_time_limit=300,task_soft_time_limit=280,broker_connection_retry_on_startup=True,task_reject_on_worker_lost=False)
+# Alert delivery and periodic email dispatch are confined to the notifier queue.
+# Scanner workers never require SMTP secrets; sending remains opt-in.
+celery.conf.update(task_routes={
+ 'aegis.send_alert':{'queue':'notifications'},
+ 'aegis.email_tick':{'queue':'notifications'},
+},task_serializer='json',accept_content=['json'],result_serializer='json',task_acks_late=True,worker_prefetch_multiplier=1,task_time_limit=300,task_soft_time_limit=280,broker_connection_retry_on_startup=True,task_reject_on_worker_lost=False)
 TERMINAL=('completed','partially_completed','failed','cancelled')
 
 class Cancelled(Exception):pass

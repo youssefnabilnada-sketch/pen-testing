@@ -51,12 +51,16 @@ HTTP validation reach Caddy.
 
 ## Runtime secrets
 
-Create system users `aegis-api`, `aegis-web`, `aegis-scanner`, `aegis-intelligence` and
-`aegis-scheduler`. They need read access to `/srv/aegis` but must not own or modify code.
+Create system users `aegis-api`, `aegis-web`, `aegis-scanner`, `aegis-intelligence`,
+`aegis-notifier` and `aegis-scheduler`. They need read access to `/srv/aegis` but must not own or modify code.
 Create `/etc/aegis` as root. Install `production.env.example` as `api.env`, replace every
 placeholder and set `WEB_ORIGIN` to the exact HTTPS origin with no trailing slash.
 Install copies of `worker.env.example` as `scanner.env`, `intelligence.env` and
-`scheduler.env`; configure the same database/queue/origin. Each file must be root-owned,
+`scheduler.env`; configure the same database/queue/origin. **Do not put Firebase,
+SMTP or MFA secrets in these worker files.** Create `notifier.env` from
+`notifier.env.example` with its own authenticated SMTP credentials; only the
+`aegis-notifier` user should read it. Email alerts route to the `notifications`
+queue; without the notifier service opt-in notifications will remain pending. Each file must be root-owned,
 group-owned by its respective service user, mode 0640. Give `web.env` only:
 
 ```text
@@ -81,7 +85,7 @@ install -m 644 infrastructure/deployment/aegis@.service /etc/systemd/system/
 install -m 644 infrastructure/deployment/aegis-migrate.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl start aegis-migrate.service
-systemctl enable --now aegis@api aegis@web aegis@scanner aegis@intelligence aegis@scheduler
+systemctl enable --now aegis@api aegis@web aegis@scanner aegis@intelligence aegis@notifier aegis@scheduler
 ```
 
 Do not start services if migration fails. Install the supplied Caddyfile, set
@@ -110,6 +114,8 @@ restart services and repeat readiness. Do not automatically downgrade a database
 ## Verification boundaries
 
 Runtime guard and SMTP tests are executable in tests/test_production_runtime.py.
+The complete end-to-end notification queue on the deployed notifier must be tested with an opted-in account, and actual SMTP acceptance checked. Production roles are verified independently; API requires Firebase/MFA/SMTP secrets, notifier only SMTP, scanner/intelligence/scheduler no identity/email secrets.
+
 The full native systemd/Caddy/PostgreSQL/Firebase installation has not been run in the
 build environment. No live deployment, DNS setup or cloud authentication is claimed.
 Worker code enforces public-IP pinning and authorization; OS/network egress policy and

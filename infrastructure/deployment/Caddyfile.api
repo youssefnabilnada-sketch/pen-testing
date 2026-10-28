@@ -1,5 +1,10 @@
 # For a Vercel frontend, publish only the API on this separate hostname.
 {$AEGIS_API_DOMAIN} {
-    header Strict-Transport-Security "max-age=31536000"
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
     reverse_proxy 127.0.0.1:8000
 }

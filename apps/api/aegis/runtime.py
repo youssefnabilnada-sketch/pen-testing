@@ -3,9 +3,17 @@ import os
 from urllib.parse import urlsplit
 from .db import connection_url
 
-def validate_runtime():
+def validate_runtime(role=None):
+    """Fail closed for production while keeping credentials limited to roles that use them.
+
+    API handles identity/account email/MFA; notifier handles alert SMTP;
+    scanners, intelligence and scheduler do not need those secrets.
+    """
     if os.getenv('AEGIS_ENV')!='production':return
+    role=role or os.getenv('AEGIS_SERVICE_ROLE','api')
     problems=[]
+    if role not in {'api','migrate','scanner','intelligence','scheduler','notifier'}:
+        problems.append('unknown AEGIS production service role')
     if os.getenv('FIREBASE_AUTH_EMULATOR_HOST') or os.getenv('AEGIS_FIREBASE_EMULATOR')=='true':problems.append('Firebase emulator forbidden in production')
     if connection_url().get_backend_name()!='postgresql':problems.append('PostgreSQL required')
     origin=urlsplit(os.getenv('WEB_ORIGIN',''))
@@ -30,14 +38,21 @@ def validate_runtime():
             problems.append('Redis port is invalid')
     except ValueError:
         problems.append('Redis URL is invalid')
-    if (os.getenv('FIREBASE_AUTH_ENABLED')!='true' or not all(os.getenv(k) for k in
-        ('FIREBASE_PROJECT_ID','FIREBASE_WEB_API_KEY','FIREBASE_WEB_APP_ID'))):
-        problems.append('Firebase authentication and public app configuration required')
-    if os.getenv('SMTP_TLS') not in ('starttls','implicit') or not os.getenv('SMTP_HOST') or not os.getenv('MAIL_FROM'):
-        problems.append('authenticated-domain transactional SMTP configuration required')
-    try:
-        from cryptography.fernet import Fernet
-        Fernet(os.environ.get('MFA_ENCRYPTION_KEY','').encode())
-    except (ValueError, KeyError):
-        problems.append('valid MFA encryption key required')
+    if role in ('api','migrate'):
+        if (os.getenv('FIREBASE_AUTH_ENABLED')!='true' or not all(os.getenv(k) for k in
+            ('FIREBASE_PROJECT_ID','FIREBASE_WEB_API_KEY','FIREBASE_WEB_APP_ID'))):
+            problems.append('Firebase authentication and public app configuration required')
+        try:
+            from cryptography.fernet import Fernet
+            Fernet(os.environ.get('MFA_ENCRYPTION_KEY','').encode())
+        except (ValueError, KeyError):
+            problems.append('valid MFA encryption key required')
+    if role in ('api','migrate','notifier'):
+        if (os.getenv('SMTP_TLS') not in ('starttls','implicit')
+            or not os.getenv('SMTP_HOST') or os.getenv('SMTP_HOST')=='disabled'
+            or not os.getenv('MAIL_FROM')):
+            problems.append('encrypted transactional SMTP configuration required')
+    if (os.getenv('AI_ASSISTANT_ENABLED','false')!='false'
+        or os.getenv('AI_PROVIDER_ENABLED','false')!='false'):
+        problems.append('AI services must remain disabled for this release')
     if problems:raise RuntimeError('Deployment configuration rejected: '+ '; '.join(problems))
