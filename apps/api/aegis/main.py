@@ -754,3 +754,6 @@ from .crm import router as crm_router
 from .evidence_vault import router as evidence_vault_router
 app.include_router(crm_router)
 app.include_router(evidence_vault_router)
+
+from .fastfix import router as fastfix_router
+app.include_router(fastfix_router)

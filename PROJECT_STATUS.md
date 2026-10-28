@@ -1,3 +1,7 @@
+# Current audit/FastFix checkpoint
+
+Continue from the latest audit branch and docs/testing/fastfix-audit/STATUS.md. Only FastFix may receive major expansion; elsewhere fix reproduced defects only. New config parser regression fix and evidence-bound guided remediation UI/API are focused-tested. Universal FastFix and the whole-platform audit are NOT complete. Candidate CI must be reviewed. Older continuation scopes below are historical and superseded where conflicting.
+
 # Latest engineering checkpoint — 2026-10-28 (SmartVerify/AutoFix/CI)
 
 **This is NOT a public-release-ready build.** Staging AutoFix evidence now requires exact observed paths and rejects contradictory detector records. The CI release gate requires eight jobs, including fresh separate-process services and desktop/mobile Chromium smoke. A read-only staged HTTPS probe was added but NOT run against live infrastructure. **84 isolated Python unit tests passed**, along with PHP contract, SQLite migration round-trip through 017 and CI YAML structure. Full pytest collection remains blocked by missing Celery, and PostgreSQL/Redis/Next dependencies/WordPress runtime are unavailable here. See `docs/testing/current/SMARTVERIFY_AUTOFIX_CLOUD_VALIDATION_2026-10-28.md`. No real hosting, WordPress or provider deployment has been certified.

@@ -93,8 +93,15 @@ def repositories(cid:str,page:int=1,u=Depends(current),db=Depends(database)):
 
 def propose_nosniff(content):
     """Single reviewed transformation. Never evaluates JS or executes repo scripts."""
-    if len(content)>65536:raise ValueError('Configuration too large.')
-    config=json.loads(content or '{}')
+    if not isinstance(content,str) or len(content.encode('utf-8'))>65536:raise ValueError('Configuration too large.')
+    def unique_object(pairs):
+        obj={}
+        for key,value in pairs:
+            if key in obj:raise ValueError('Duplicate JSON keys require manual review.')
+            obj[key]=value
+        return obj
+    def reject_constant(value):raise ValueError('Non-finite JSON values require manual review.')
+    config=json.loads(content or '{}',object_pairs_hook=unique_object,parse_constant=reject_constant)
     if not isinstance(config,dict):raise ValueError('Expected a JSON object.')
     headers=config.setdefault('headers',[])
     if not isinstance(headers,list):raise ValueError('Invalid headers configuration.')
