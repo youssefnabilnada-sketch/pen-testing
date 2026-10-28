@@ -86,6 +86,10 @@ def assess(job_id):
             checkpoint(db,job,'processing_results',60)
             if db.get(Authorization,job.authorization_id).scope!=scope:raise ValueError('Scope changed during execution.')
             observations,manifest=(results[0][1],results[0][2]) if scope['paths']==['/'] else combine(results)
+            # A completed root-only assessment also needs an explicit observed-path
+            # manifest. Staging verification must never infer coverage from a
+            # missing field or treat a partial response as a verified fix.
+            manifest={**manifest,'paths':[path for path,_,_ in results]}
             # Stage all findings plus immutable report snapshot in one transaction.
             job.observations=observations
             seen={o['rule'] for o in observations}
