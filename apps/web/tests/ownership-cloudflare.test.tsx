@@ -21,11 +21,13 @@ it('previews a single Cloudflare TXT proof and requires explicit approval before
  render(<OwnershipGuide assetId="asset1" api={api} onVerified={async()=>{}} />);
  const cloudflare=await screen.findByText(/Publish this TXT proof using Cloudflare/);
  await user.click(cloudflare);
- const publish=screen.getByRole('button',{name:'Publish this single TXT record'});
- expect((publish as HTMLButtonElement).disabled).toBe(true);
+ // The publish controls must remain hidden until the customer reviews the exact DNS change.
+ expect(screen.queryByRole('button',{name:'Publish this single TXT record'})).toBeNull();
  expect(calls.filter(c=>c.url.endsWith('/cloudflare/publish'))).toHaveLength(0);
  await user.click(screen.getByRole('button',{name:'Review exact DNS change'}));
  expect(await screen.findByText(/Record: _aegis.example.test/)).toBeTruthy();
+ const publish=screen.getByRole('button',{name:'Publish this single TXT record'});
+ expect((publish as HTMLButtonElement).disabled).toBe(true);
  await user.type(screen.getByLabelText('Cloudflare zone ID'),'f'.repeat(32));
  await user.type(screen.getByLabelText('Scoped Cloudflare API token'),'temporary-token-for-my-zone');
  expect((publish as HTMLButtonElement).disabled).toBe(true);
