@@ -2,6 +2,11 @@ name: local-core-quality
 on: [push, pull_request]
 permissions:
   contents: read
+# Only the newest push on a branch needs the full release gate. Prevent
+# superseded CI runs from consuming credits or delaying current evidence.
+concurrency:
+  group: aegis-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   backend:
     runs-on: ubuntu-latest
