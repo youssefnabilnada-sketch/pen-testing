@@ -28,9 +28,11 @@ def queue_status():
                                  socket_connect_timeout=2,socket_timeout=2) as client:
             client.ping()
             return {'status':'ready','pending_assessments':client.llen('celery'),
-                    'pending_intelligence':client.llen('intelligence')}
+                    'pending_intelligence':client.llen('intelligence'),
+                    'pending_notifications':client.llen('notifications')}
     except Exception:
-        return {'status':'unavailable','pending_assessments':None,'pending_intelligence':None}
+        return {'status':'unavailable','pending_assessments':None,'pending_intelligence':None,
+                'pending_notifications':None}
 
 def firebase_status():
     if os.getenv('FIREBASE_AUTH_ENABLED')!='true':
@@ -65,11 +67,15 @@ def worker_status():
         from .worker import celery
         replies=celery.control.inspect(timeout=2).ping() or {}
         names=[name for name,reply in replies.items() if reply.get('ok')=='pong']
-        return {'status':'ready' if any(name.startswith('scanner@') for name in names) else 'unavailable',
-                'scanner_available':any(name.startswith('scanner@') for name in names),
-                'intelligence_available':any(name.startswith('intelligence@') for name in names)}
+        active={role:any(name.startswith(role+'@') for name in names)
+                for role in ('scanner','intelligence','notifier')}
+        return {'status':'ready' if active['scanner'] else 'unavailable',
+                'scanner_available':active['scanner'],
+                'intelligence_available':active['intelligence'],
+                'notifier_available':active['notifier']}
     except Exception:
-        return {'status':'unavailable','scanner_available':False,'intelligence_available':False}
+        return {'status':'unavailable','scanner_available':False,
+                'intelligence_available':False,'notifier_available':False}
 
 def readiness():
     db=database_status();queue=queue_status()
@@ -81,9 +87,16 @@ def diagnose():
     state=readiness()
     state.update(firebase=firebase_status(),email=email_status(),ai=provider_state(),
                  workers=worker_status() if state['queue']['status']=='ready' else
-                 {'status':'unavailable','scanner_available':False,'intelligence_available':False},
+                 {'status':'unavailable','scanner_available':False,'intelligence_available':False,
+                  'notifier_available':False},
                  checked_at=time.time())
-    state['ready']=state['ready'] and state['workers']['status']=='ready' and state['email']['status']=='ready' and state['firebase']['status'] in ('ready','disabled')
+    prod=os.getenv('AEGIS_ENV')=='production'
+    state['ready']=(state['ready'] and state['workers']['status']=='ready'
+        and state['email']['status']=='ready'
+        and (state['firebase']['status']=='ready' if prod
+             else state['firebase']['status'] in ('ready','disabled'))
+        and (not prod or (state['workers']['intelligence_available']
+                          and state['workers']['notifier_available'])))
     return state
 
 if __name__=='__main__':
