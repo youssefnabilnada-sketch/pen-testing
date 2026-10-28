@@ -1,0 +1,37 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/attachments-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/mfa.test.tsx (3 tests) 648ms
+   ✓ requires confirmation before enabling and displays recovery codes once  471ms
+ ✓ tests/team.test.tsx (3 tests) 566ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  342ms
+ ✓ tests/support.test.tsx (2 tests) 597ms
+   ✓ lets a viewer read without creating or replying  369ms
+ ✓ tests/ownership.test.tsx (2 tests) 652ms
+   ✓ recovers a challenge and prepares a link without claiming verification  621ms
+ ✓ tests/firebase.test.tsx (3 tests) 725ms
+   ✓ creates only with explicit mode and recovery password before session exchange  518ms
+ ✓ tests/intelligence.test.tsx (3 tests) 551ms
+   ✓ separates advisory data and requires monitoring consent  480ms
+ ✓ tests/console.test.tsx (5 tests) 1107ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  434ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  328ms
+ ✓ tests/account-link.test.tsx (2 tests) 5ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 11ms
+ ✓ tests/deployment.test.tsx (2 tests) 15ms
+ ✓ tests/connections.test.tsx (2 tests) 310ms
+ ✓ tests/retest.test.tsx (2 tests) 341ms
+   ✓ recovers evidence and approval target without manually copying identifiers  320ms
+ ✓ tests/attachments.test.tsx (3 tests) 284ms
+
+ Test Files  13 passed (13)
+      Tests  34 passed (34)
+   Start at  20:13:41
+   Duration  3.49s (transform 969ms, setup 0ms, collect 3.87s, tests 5.81s, environment 9.19s, prepare 993ms)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/attachments-frontend.xml

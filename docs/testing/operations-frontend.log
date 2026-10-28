@@ -1,0 +1,41 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/attachments.test.tsx (3 tests) 313ms
+ ✓ tests/account.test.tsx (2 tests) 485ms
+   ✓ saves a display name through the authenticated API  330ms
+ ✓ tests/mfa.test.tsx (3 tests) 543ms
+   ✓ requires confirmation before enabling and displays recovery codes once  415ms
+ ✓ tests/support.test.tsx (2 tests) 519ms
+   ✓ lets a viewer read without creating or replying  316ms
+ ✓ tests/firebase.test.tsx (3 tests) 593ms
+   ✓ creates only with explicit mode and recovery password before session exchange  428ms
+ ✓ tests/intelligence.test.tsx (4 tests) 573ms
+   ✓ separates advisory data and requires monitoring consent  388ms
+ ✓ tests/console.test.tsx (5 tests) 809ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  303ms
+ ✓ tests/operations.test.tsx (2 tests) 332ms
+   ✓ paginates and refreshes real records  319ms
+ ✓ tests/team.test.tsx (3 tests) 367ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 408ms
+   ✓ requires selection and consent before submitting confirmed ownership  407ms
+ ✓ tests/retest.test.tsx (2 tests) 327ms
+   ✓ recovers evidence and approval target without manually copying identifiers  307ms
+ ✓ tests/ownership.test.tsx (2 tests) 429ms
+   ✓ recovers a challenge and prepares a link without claiming verification  418ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 301ms
+ ✓ tests/connections.test.tsx (2 tests) 229ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 5ms
+ ✓ tests/account-link.test.tsx (2 tests) 5ms
+ ✓ tests/deployment.test.tsx (2 tests) 4ms
+
+ Test Files  17 passed (17)
+      Tests  42 passed (42)
+   Start at  09:27:10
+   Duration  3.75s (transform 944ms, setup 0ms, collect 3.72s, tests 6.24s, environment 10.07s, prepare 1.12s)
+

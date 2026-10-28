@@ -1,0 +1,2 @@
+Live CISA retrieval not verified: UnsafeTarget
+Deterministic feed tests do not establish live connectivity.

@@ -1,0 +1,8 @@
+test_revocation_and_deletion_fail_closed (__main__.DiscoveryGrantTests.test_revocation_and_deletion_fail_closed) ... ok
+test_scope_origin_user_and_team_drift_fail_closed (__main__.DiscoveryGrantTests.test_scope_origin_user_and_team_drift_fail_closed) ... ok
+test_valid_grant (__main__.DiscoveryGrantTests.test_valid_grant) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

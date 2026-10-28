@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:2252) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [desktop] › e2e\firebase-local.spec.ts:2:5 › local Firebase registration, email verification, workspace and logout (4.0s)
+(node:14108) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 2 [mobile] › e2e\firebase-local.spec.ts:2:5 › local Firebase registration, email verification, workspace and logout (4.8s)
+
+  2 passed (12.1s)

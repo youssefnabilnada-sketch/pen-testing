@@ -1,0 +1,13 @@
+(node:18380) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/asus/Documents/Codex/2026-10-28/files-mentioned-by-the-user-aegis/work/aegis/apps/web/vitest.config.ts?fresh-import-dvx8yhyjh75=0,file:///C:/Users/asus/Documents/Codex/2026-10-28/files-mentioned-by-the-user-aegis/work/aegis/apps/web/vitest.config.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\asus\Documents\Codex\2026-10-28\files-mentioned-by-the-user-aegis\work\aegis\apps\web\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.12 C:/Users/asus/Documents/Codex/2026-10-28/files-mentioned-by-the-user-aegis/work/aegis/apps/web
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  08:44:19
+   Duration  2.08s (transform 35ms, setup 0ms, import 283ms, tests 801ms, environment 829ms)
+

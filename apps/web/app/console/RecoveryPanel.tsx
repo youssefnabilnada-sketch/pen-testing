@@ -1,0 +1,8 @@
+'use client';
+import {useState} from 'react';
+export default function RecoveryPanel({api,patchId,onChanged}:{api:(p:string,m?:string,d?:unknown)=>Promise<any>;patchId:string;onChanged:()=>Promise<void>}){
+ const [preview,setPreview]=useState<any>(null),[job,setJob]=useState(''),[consent,setConsent]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ async function run(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
+ return <section><h4>AutoFix recovery and staging</h4><p>The encrypted backup covers the original vercel.json. A local byte-for-byte restoration check does not validate database recovery or a whole-site rollback.</p>{error&&<p role="alert">{error}</p>}<button disabled={busy} onClick={()=>run(async()=>setPreview(await api(`/repository-patches/${patchId}/rollback-preview`,'POST')))}>Verify backup and preview rollback</button>{preview&&<><pre className="code">{preview.diff}</pre><p>{preview.warning} No rollback was applied.</p></>}
+ <form className="form" onSubmit={e=>{e.preventDefault();run(async()=>{await api(`/repository-patches/${patchId}/staging-evidence`,'POST',{job_id:job,accepted:consent});setConsent(false);await onChanged()})}}><label>Completed staging assessment ID<input value={job} onChange={e=>{setJob(e.target.value);setConsent(false)}}/></label><label className="check"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>Link this new assessment of a separate staging asset as response evidence for this proposal.</label><button disabled={busy||!job||!consent}>Validate staging evidence</button></form></section>
+}

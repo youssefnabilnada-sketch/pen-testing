@@ -1,0 +1,32 @@
+[Unit]
+Description=AEGIS %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aegis-%i
+Group=aegis-%i
+WorkingDirectory=/srv/aegis
+EnvironmentFile=/etc/aegis/%i.env
+ExecStart=/srv/aegis/.venv/bin/python /srv/aegis/scripts/server-process.py %i
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+UMask=0077
+StateDirectory=aegis-%i
+ReadWritePaths=/var/lib/aegis-%i
+MemoryMax=768M
+CPUQuota=100%
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

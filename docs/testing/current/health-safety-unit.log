@@ -1,0 +1,8 @@
+test_broker_failure_does_not_block_other_due_monitors (__main__.HealthCleanupTests.test_broker_failure_does_not_block_other_due_monitors) ... ok
+test_deleted_monitor_does_not_raise_or_recreate (__main__.HealthCleanupTests.test_deleted_monitor_does_not_raise_or_recreate) ... ok
+test_withdrawn_grant_blocks_existing_monitor (__main__.HealthCleanupTests.test_withdrawn_grant_blocks_existing_monitor) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK

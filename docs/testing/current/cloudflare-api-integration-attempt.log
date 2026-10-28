@@ -1,0 +1,12 @@
+ImportError while loading conftest '/mnt/data/aegis_current/tests/conftest.py'.
+tests/conftest.py:17: in <module>
+    from aegis.main import app
+apps/api/aegis/main.py:636: in <module>
+    from .intelligence.routes import router as intelligence_router
+apps/api/aegis/intelligence/routes.py:13: in <module>
+    from ..monitoring import enqueue, dispatch_outbox, sync_intelligence, CADENCE
+apps/api/aegis/monitoring.py:7: in <module>
+    from .worker import celery
+apps/api/aegis/worker.py:5: in <module>
+    from celery import Celery
+E   ModuleNotFoundError: No module named 'celery'

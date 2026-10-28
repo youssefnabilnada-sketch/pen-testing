@@ -1,0 +1,353 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/windows-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/team.test.tsx (3 tests) 2447ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  1622ms
+   ✓ shows email failure without claiming an invitation was sent  775ms
+ ✓ tests/support.test.tsx (2 tests) 2616ms
+   ✓ lets a viewer read without creating or replying  663ms
+   ✓ shows a failed creation without inventing a ticket  1942ms
+ ✓ tests/attachments.test.tsx (3 tests) 3603ms
+   ✓ shows authorized download links without upload controls to viewers  1905ms
+   ✓ uploads decoded text and refreshes persisted attachments  943ms
+   ✓ shows upload failure without claiming persistence  752ms
+ ✓ tests/firebase.test.tsx (3 tests) 4152ms
+   ✓ creates only with explicit mode and recovery password before session exchange  3397ms
+   ✓ links only with current AEGIS password and shows provider failure  595ms
+ ✓ tests/account.test.tsx (2 tests) 4929ms
+   ✓ saves a display name through the authenticated API  3469ms
+   ✓ requires explicit deactivation confirmation and displays server refusal  1451ms
+ ✓ tests/mfa.test.tsx (3 tests) 3887ms
+   ✓ requires confirmation before enabling and displays recovery codes once  2948ms
+   ✓ signs out after disable without using the revoked session again  853ms
+ ✓ tests/console.test.tsx (5 tests) 8966ms
+   ✓ Workspace behavior with isolated API fixtures > prefills an emailed verification link, removes the fragment, and waits for consent  1988ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  3179ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  3508ms
+ ✓ tests/ownership.test.tsx (2 tests) 2470ms
+   ✓ recovers a challenge and prepares a link without claiming verification  2411ms
+ ❯ tests/intelligence.test.tsx (3 tests | 1 failed) 1105ms
+   × separates advisory data and requires monitoring consent 993ms
+     → expected "spy" to be called with arguments: [ '/assets/a/schedule', 'POST', …(1) ]
+
+Received: 
+
+  1st spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/advisories?q=&exploited=false",
+  ]
+
+  2nd spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/sources",
+  ]
+
+  3rd spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/organizations/org/intelligence",
+  ]
+
+  4th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/rules",
+  ]
+
+  5th spy call:
+
+@@ -3,9 +3,11 @@
+    "POST",
+    {
+      "accepted": true,
+      "cadence": "weekly",
+      "consent_days": 30,
++     "end_hour_utc": 24,
+      "on_advisory": false,
+      "reverify": true,
++     "start_hour_utc": 0,
+    },
+  ]
+
+  6th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/advisories?q=&exploited=false",
+  ]
+
+  7th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/sources",
+  ]
+
+  8th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/organizations/org/intelligence",
+  ]
+
+  9th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/rules",
+  ]
+
+
+Number of calls: 9
+
+   ✓ shows source failure without success 43ms
+   ✓ cannot launch reassessment without a recorded pending change 66ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 1371ms
+   ✓ requires selection and consent before submitting confirmed ownership  1367ms
+ ✓ tests/retest.test.tsx (2 tests) 1892ms
+   ✓ recovers evidence and approval target without manually copying identifiers  1749ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 18ms
+ ✓ tests/connections.test.tsx (2 tests) 1579ms
+   ✓ does not claim a connection until a real diagnostic response is requested  1448ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 1455ms
+   ✓ saves personal categories and refreshes the alert list  1340ms
+ ✓ tests/account-link.test.tsx (2 tests) 14ms
+ ✓ tests/deployment.test.tsx (2 tests) 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/intelligence.test.tsx > separates advisory data and requires monitoring consent
+AssertionError: expected "spy" to be called with arguments: [ '/assets/a/schedule', 'POST', …(1) ]
+
+Received: 
+
+  1st spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/advisories?q=&exploited=false",
+  ]
+
+  2nd spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/sources",
+  ]
+
+  3rd spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/organizations/org/intelligence",
+  ]
+
+  4th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/rules",
+  ]
+
+  5th spy call:
+
+@@ -3,9 +3,11 @@
+    "POST",
+    {
+      "accepted": true,
+      "cadence": "weekly",
+      "consent_days": 30,
++     "end_hour_utc": 24,
+      "on_advisory": false,
+      "reverify": true,
++     "start_hour_utc": 0,
+    },
+  ]
+
+  6th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/advisories?q=&exploited=false",
+  ]
+
+  7th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/sources",
+  ]
+
+  8th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/organizations/org/intelligence",
+  ]
+
+  9th spy call:
+
+  [
+-   "/assets/a/schedule",
+-   "POST",
+-   {
+-     "accepted": true,
+-     "cadence": "weekly",
+-     "consent_days": 30,
+-     "on_advisory": false,
+-     "reverify": true,
+-   },
++   "/intelligence/rules",
+  ]
+
+
+Number of calls: 9
+
+ ❯ tests/intelligence.test.tsx:18:14
+     16|  expect((screen.getByRole('button',{name:'Approve monitoring schedule'…
+     17|  await user.click(screen.getByRole('button',{name:'Approve monitoring …
+     18|  expect(api).toHaveBeenCalledWith('/assets/a/schedule','POST',{cadence…
+       |              ^
+     19| });
+     20| it('shows source failure without success',async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 15 passed (16)
+      Tests  1 failed | 38 passed (39)
+   Start at  23:23:34
+   Duration  27.87s (transform 3.34s, setup 0ms, collect 14.96s, tests 40.52s, environment 94.91s, prepare 7.76s)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/windows-frontend.xml

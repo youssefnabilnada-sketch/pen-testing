@@ -1,0 +1,6 @@
+Isolated SQLite DB: /tmp/aegis-check-20261028.db
+alembic upgrade head -> 016_crm_vault: PASS
+alembic downgrade 013_agency -> 013_agency: PASS
+alembic upgrade head -> 016_crm_vault: PASS
+alembic check -> No new upgrade operations detected
+Required tables: alert_subscriptions, email_deliveries, patch_backups, leads, evidence_seals all present: PASS

@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-26",
+  "backend": {
+    "collected": 167,
+    "passed": 166,
+    "skipped": 1,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 83.184,
+    "coverage_percent": 91.60012775471095,
+    "covered_lines": 2868,
+    "statements": 3131,
+    "coverage_scope": "aegis Python statements; configured CLI exclusions"
+  },
+  "real_redis_tests": {
+    "passed": 2,
+    "seconds": 3.83,
+    "note": "Previous integration result; not repeated in this change"
+  },
+  "frontend_tests": 49,
+  "typescript": "pass",
+  "next_build": "pass",
+  "console_first_load_js_kb": 130,
+  "ruff": "pass configured rule subset",
+  "browser_visual": "blocked/unexecuted; prior browser access denied",
+  "postgres_concurrency": "unexecuted",
+  "firebase_cloud_acceptance": "unexecuted; server credentials not configured",
+  "live_ai_provider": "unexecuted; disabled by default",
+  "full_25_step_browser_acceptance": "unexecuted",
+  "payments_enabled": false,
+  "release": "incomplete engineering source; no final release",
+  "evidence": "SELECTION-RESULTS.md"
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=AEGIS database migrations
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=aegis-api
+Group=aegis-api
+WorkingDirectory=/srv/aegis
+EnvironmentFile=/etc/aegis/api.env
+ExecStart=/srv/aegis/.venv/bin/python /srv/aegis/scripts/server-process.py migrate
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+PrivateTmp=true

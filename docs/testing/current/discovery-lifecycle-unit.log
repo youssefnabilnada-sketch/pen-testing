@@ -1,0 +1,11 @@
+test_recursive_rejects_revoked_grant_after_crawler_returns (__main__.DiscoveryLifecycleTests.test_recursive_rejects_revoked_grant_after_crawler_returns) ... ok
+test_recursive_rejects_scope_tamper_during_run (__main__.DiscoveryLifecycleTests.test_recursive_rejects_scope_tamper_during_run) ... ok
+test_recursive_success_restriction_persists (__main__.DiscoveryLifecycleTests.test_recursive_success_restriction_persists) ... ok
+test_root_rejects_ownership_drift_during_request (__main__.DiscoveryLifecycleTests.test_root_rejects_ownership_drift_during_request) ... ok
+test_root_rejects_revoked_grant_during_request (__main__.DiscoveryLifecycleTests.test_root_rejects_revoked_grant_during_request) ... ok
+test_root_success_revokes_one_use_grant (__main__.DiscoveryLifecycleTests.test_root_success_revokes_one_use_grant) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.177s
+
+OK

@@ -1,0 +1,16 @@
+# Optional Firebase App Hosting template. Requires Blaze; NOT deployed.
+# Select apps/web as the app root. Create the secret before using this file.
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 40
+  cpu: 1
+  memoryMiB: 512
+env:
+  - variable: API_INTERNAL_URL
+    secret: aegis-api-origin
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_TELEMETRY_DISABLED
+    value: '1'

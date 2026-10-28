@@ -1,0 +1,51 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/windows-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/firebase.test.tsx (3 tests) 1805ms
+   ✓ creates only with explicit mode and recovery password before session exchange  1311ms
+   ✓ links only with current AEGIS password and shows provider failure  433ms
+ ✓ tests/account.test.tsx (2 tests) 2234ms
+   ✓ saves a display name through the authenticated API  1841ms
+   ✓ requires explicit deactivation confirmation and displays server refusal  378ms
+ ✓ tests/intelligence.test.tsx (3 tests) 1206ms
+   ✓ separates advisory data and requires monitoring consent  1072ms
+ ✓ tests/mfa.test.tsx (3 tests) 1808ms
+   ✓ requires confirmation before enabling and displays recovery codes once  1411ms
+   ✓ signs out after disable without using the revoked session again  354ms
+ ✓ tests/support.test.tsx (2 tests) 1776ms
+   ✓ lets a viewer read without creating or replying  1231ms
+   ✓ shows a failed creation without inventing a ticket  542ms
+ ✓ tests/attachments.test.tsx (3 tests) 2013ms
+   ✓ shows authorized download links without upload controls to viewers  1141ms
+   ✓ uploads decoded text and refreshes persisted attachments  631ms
+ ✓ tests/retest.test.tsx (2 tests) 615ms
+   ✓ recovers evidence and approval target without manually copying identifiers  572ms
+ ✓ tests/ownership.test.tsx (2 tests) 1495ms
+   ✓ recovers a challenge and prepares a link without claiming verification  1440ms
+ ✓ tests/console.test.tsx (5 tests) 3207ms
+   ✓ Workspace behavior with isolated API fixtures > prefills an emailed verification link, removes the fragment, and waits for consent  868ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  1045ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  1086ms
+ ✓ tests/team.test.tsx (3 tests) 782ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  507ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 808ms
+   ✓ saves personal categories and refreshes the alert list  731ms
+ ✓ tests/account-link.test.tsx (2 tests) 6ms
+ ✓ tests/deployment.test.tsx (2 tests) 12ms
+ ✓ tests/connections.test.tsx (2 tests) 696ms
+   ✓ does not claim a connection until a real diagnostic response is requested  646ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 19ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 1756ms
+   ✓ requires selection and consent before submitting confirmed ownership  1751ms
+
+ Test Files  16 passed (16)
+      Tests  39 passed (39)
+   Start at  23:24:41
+   Duration  25.74s (transform 2.91s, setup 0ms, collect 16.40s, tests 20.24s, environment 118.33s, prepare 4.88s)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/windows-frontend.xml

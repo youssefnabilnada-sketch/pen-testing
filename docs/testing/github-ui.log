@@ -1,0 +1,60 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/notification-preferences.test.tsx (2 tests) 1245ms
+   ✓ saves personal categories and refreshes the alert list  1115ms
+ ✓ tests/team.test.tsx (3 tests) 1475ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  884ms
+   ✓ shows email failure without claiming an invitation was sent  558ms
+ ✓ tests/mfa.test.tsx (3 tests) 1584ms
+   ✓ requires confirmation before enabling and displays recovery codes once  941ms
+   ✓ signs out after disable without using the revoked session again  601ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 1184ms
+   ✓ submits explicit selected scope without claiming a repair  846ms
+ ✓ tests/intelligence.test.tsx (4 tests) 1893ms
+   ✓ separates advisory data and requires monitoring consent  1324ms
+   ✓ requires explicit per-detector review and refreshes activation state  420ms
+ ✓ tests/support.test.tsx (2 tests) 2019ms
+   ✓ lets a viewer read without creating or replying  1369ms
+   ✓ shows a failed creation without inventing a ticket  641ms
+ ✓ tests/firebase.test.tsx (3 tests) 1426ms
+   ✓ creates only with explicit mode and recovery password before session exchange  1078ms
+ ✓ tests/repositories.test.tsx (3 tests) 1518ms
+   ✓ publishing requires exact diff approval and MFA input  1022ms
+   ✓ changing repository selection clears prior analysis consent  342ms
+ ✓ tests/findings.test.tsx (3 tests) 1584ms
+   ✓ searches server data and prevents viewer mutations  1465ms
+ ✓ tests/console.test.tsx (6 tests) 5118ms
+   ✓ Workspace behavior with isolated API fixtures > prefills an emailed verification link, removes the fragment, and waits for consent  795ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  2268ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  1139ms
+   ✓ browses older remediation pages and resets pagination for filters  704ms
+ ✓ tests/account.test.tsx (2 tests) 1709ms
+   ✓ saves a display name through the authenticated API  1198ms
+   ✓ requires explicit deactivation confirmation and displays server refusal  508ms
+ ✓ tests/ownership.test.tsx (2 tests) 1647ms
+   ✓ recovers a challenge and prepares a link without claiming verification  1585ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 1593ms
+   ✓ requires selection and consent before submitting confirmed ownership  1589ms
+ ✓ tests/operations.test.tsx (2 tests) 1245ms
+   ✓ paginates and refreshes real records  1186ms
+ ✓ tests/connections.test.tsx (2 tests) 1628ms
+   ✓ does not claim a connection until a real diagnostic response is requested  1419ms
+ ✓ tests/retest.test.tsx (2 tests) 1408ms
+   ✓ recovers evidence and approval target without manually copying identifiers  1323ms
+ ✓ tests/deployment.test.tsx (2 tests) 34ms
+ ✓ tests/attachments.test.tsx (4 tests) 944ms
+   ✓ shows authorized download links without upload controls to viewers  530ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 14ms
+ ✓ tests/account-link.test.tsx (2 tests) 11ms
+
+ Test Files  20 passed (20)
+      Tests  53 passed (53)
+   Start at  13:31:59
+   Duration  19.99s (transform 3.32s, setup 0ms, collect 18.61s, tests 29.28s, environment 61.69s, prepare 6.81s)
+

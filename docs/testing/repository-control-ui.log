@@ -1,0 +1,56 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/connections.test.tsx (2 tests) 496ms
+   ✓ does not claim a connection until a real diagnostic response is requested  456ms
+ ✓ tests/account.test.tsx (2 tests) 704ms
+   ✓ saves a display name through the authenticated API  497ms
+ ✓ tests/operations.test.tsx (2 tests) 529ms
+   ✓ paginates and refreshes real records  500ms
+ ✓ tests/mfa.test.tsx (3 tests) 584ms
+   ✓ requires confirmation before enabling and displays recovery codes once  412ms
+ ✓ tests/intelligence.test.tsx (4 tests) 823ms
+   ✓ separates advisory data and requires monitoring consent  571ms
+ ✓ tests/firebase.test.tsx (3 tests) 805ms
+   ✓ creates only with explicit mode and recovery password before session exchange  583ms
+ ✓ tests/console.test.tsx (6 tests) 1252ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  405ms
+ ✓ tests/support.test.tsx (2 tests) 534ms
+   ✓ lets a viewer read without creating or replying  324ms
+ ✓ tests/findings.test.tsx (3 tests) 699ms
+   ✓ searches server data and prevents viewer mutations  600ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 548ms
+   ✓ requires selection and consent before submitting confirmed ownership  547ms
+ ✓ tests/repositories.test.tsx (3 tests) 531ms
+   ✓ publishing requires exact diff approval and MFA input  396ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 394ms
+   ✓ saves personal categories and refreshes the alert list  348ms
+ ✓ tests/team.test.tsx (3 tests) 583ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  378ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 5ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 474ms
+   ✓ submits explicit selected scope without claiming a repair  360ms
+ ✓ tests/attachments.test.tsx (4 tests) 419ms
+ ✓ tests/retest.test.tsx (2 tests) 408ms
+   ✓ recovers evidence and approval target without manually copying identifiers  383ms
+ ✓ tests/ownership.test.tsx (2 tests) 503ms
+   ✓ recovers a challenge and prepares a link without claiming verification  487ms
+ ✓ tests/deployment.test.tsx (2 tests) 6ms
+ ✓ tests/account-link.test.tsx (2 tests) 3ms
+ ✓ tests/repository-control.test.tsx (2 tests) 184ms
+
+ Test Files  21 passed (21)
+      Tests  55 passed (55)
+   Start at  00:31:49
+   Duration  7.03s (transform 1.40s, setup 0ms, collect 6.49s, tests 10.49s, environment 20.91s, prepare 2.17s)
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 typecheck
+> tsc --noEmit
+

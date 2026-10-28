@@ -1,0 +1,14 @@
+{
+  "project_id": "aegis-d034c",
+  "project_state": "ACTIVE",
+  "cli_authenticated": true,
+  "project_access_verified": true,
+  "web_app_id_matches": true,
+  "project_id_matches": true,
+  "public_api_key_matches": true,
+  "method": "Firebase CLI projects:list and apps:sdkconfig, authenticated read-only requests",
+  "application_sign_in_tested": false,
+  "server_admin_credentials_tested": false,
+  "deployment_performed": false,
+  "billing_changed": false
+}

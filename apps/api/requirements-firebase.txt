@@ -1,0 +1,2 @@
+# Optional. Install only in the API image when configuring Firebase identity.
+firebase-admin==7.7.0

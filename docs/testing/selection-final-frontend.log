@@ -1,0 +1,36 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/selection-final-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/support.test.tsx (2 tests) 489ms
+ ✓ tests/account.test.tsx (2 tests) 538ms
+   ✓ saves a display name through the authenticated API  390ms
+ ✓ tests/mfa.test.tsx (3 tests) 544ms
+   ✓ requires confirmation before enabling and displays recovery codes once  407ms
+ ✓ tests/findings.test.tsx (3 tests) 524ms
+   ✓ searches server data and prevents viewer mutations  445ms
+ ✓ tests/firebase.test.tsx (3 tests) 598ms
+   ✓ creates only with explicit mode and recovery password before session exchange  407ms
+ ✓ tests/intelligence.test.tsx (4 tests) 586ms
+   ✓ separates advisory data and requires monitoring consent  397ms
+ ✓ tests/console.test.tsx (6 tests) 1202ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  381ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  304ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 573ms
+   ✓ submits explicit selected scope without claiming a repair  418ms
+ ✓ tests/team.test.tsx (3 tests) 623ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  382ms
+ ✓ tests/ownership.test.tsx (2 tests) 574ms
+   ✓ recovers a challenge and prepares a link without claiming verification  551ms
+ ✓ tests/operations.test.tsx (2 tests) 475ms
+   ✓ paginates and refreshes real records  448ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 621ms
+   ✓ requires selection and consent before submitting confirmed ownership  620ms
+ ✓ tests/attachments.test.tsx (3 tests) 457ms
+ ✓ tests/retest.test.tsx (2 tests) 391ms
+   ✓ recovers evidence and approval target without manually copying identifiers  365ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 6ms

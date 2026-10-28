@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.7.0
+rootdir: /workspace/scratch/1f23d267138b/aegis-security-cloud
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.15.1, cov-7.1.0, platformdirs-4.13.5
+collected 74 items
+
+tests/test_assessment.py ......                                          [  8%]
+tests/test_foundation.py .......                                         [ 17%]
+tests/test_intelligence.py ....................                          [ 44%]
+tests/test_live_fixture.py ..                                            [ 47%]
+tests/test_migrations.py .                                               [ 48%]
+tests/test_monitoring_regression.py .........                            [ 60%]
+tests/test_queue.py .                                                    [ 62%]
+tests/test_remediation.py ..                                             [ 64%]
+tests/test_safety.py ..........................                          [100%]
+
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /workspace/scratch/1f23d267138b/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/junit.xml -
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.14-final-0 _______________
+
+Name                                      Stmts   Miss  Cover
+-------------------------------------------------------------
+apps/api/aegis/__init__.py                    0      0   100%
+apps/api/aegis/analyst.py                     8      0   100%
+apps/api/aegis/auth.py                       43      8    81%
+apps/api/aegis/billing.py                    30      0   100%
+apps/api/aegis/checks.py                     32      1    97%
+apps/api/aegis/db.py                         15      0   100%
+apps/api/aegis/intelligence/__init__.py       0      0   100%
+apps/api/aegis/intelligence/feeds.py        132     44    67%
+apps/api/aegis/intelligence/routes.py       226     39    83%
+apps/api/aegis/intelligence/service.py      174     10    94%
+apps/api/aegis/main.py                      469     65    86%
+apps/api/aegis/models.py                    235      0   100%
+apps/api/aegis/monitoring.py                 77      5    94%
+apps/api/aegis/regression.py                 59      2    97%
+apps/api/aegis/reporting.py                  78      3    96%
+apps/api/aegis/safety.py                     89     13    85%
+apps/api/aegis/verification.py               28      3    89%
+apps/api/aegis/worker.py                     92      7    92%
+-------------------------------------------------------------
+TOTAL                                      1787    200    89%
+Coverage JSON written to file docs/testing/coverage.json
+======================== 74 passed, 1 warning in 33.07s ========================

@@ -1,0 +1,9 @@
+test_elapsed_time_blocks_next_request (__main__.DiscoveryDeadlineTests.test_elapsed_time_blocks_next_request) ... ok
+test_pinned_discovery_transport_uses_remaining_timeout (__main__.DiscoveryDeadlineTests.test_pinned_discovery_transport_uses_remaining_timeout) ... ok
+test_short_timeout_is_discovery_only (__main__.DiscoveryDeadlineTests.test_short_timeout_is_discovery_only) ... ok
+test_timeout_budget_reduces_before_followup_request (__main__.DiscoveryDeadlineTests.test_timeout_budget_reduces_before_followup_request) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+OK

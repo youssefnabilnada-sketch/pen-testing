@@ -1,0 +1,23 @@
+import React from 'react';
+import {render,screen,cleanup} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {afterEach,it,expect,vi} from 'vitest';
+import RecursiveDiscovery from '../app/console/RecursiveDiscovery';
+afterEach(cleanup);
+it('binds recursive consent to edited scope and keeps assessment approval separate',async()=>{
+ const api=vi.fn(async()=>({paths:['/','/docs','/docs/guide','/last'],records:[],requests_performed:4,budget_exhausted:false})),select=vi.fn();
+ render(<RecursiveDiscovery assetId="a" verified api={api} onSelect={select}/>);
+ const user=userEvent.setup(),button=screen.getByRole('button',{name:'Discover nested pages'}) as HTMLButtonElement;
+ expect(button.disabled).toBe(true);
+ await user.click(screen.getByLabelText(/I authorize recursive/));
+ await user.clear(screen.getByLabelText('Maximum discovery requests'));
+ await user.type(screen.getByLabelText('Maximum discovery requests'),'8');
+ expect(button.disabled).toBe(true);
+ await user.click(screen.getByLabelText(/I authorize recursive/));await user.click(button);
+ await screen.findByText(/4 candidate paths/);
+ expect(api).toHaveBeenCalledWith('/assets/a/discover-recursive','POST',expect.objectContaining({max_pages:8,accepted:true,prefixes:['/']}));
+ expect(select).not.toHaveBeenCalled();
+ for(const path of ['/','/docs','/docs/guide','/last'])await user.click(screen.getByLabelText(path,{exact:true}));
+ await user.click(screen.getByRole('button',{name:'Use discovered paths for review'}));
+ expect(select).toHaveBeenCalledWith(['/','/docs','/docs/guide','/last']);
+});

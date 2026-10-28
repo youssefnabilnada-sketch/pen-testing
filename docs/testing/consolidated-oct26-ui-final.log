@@ -1,0 +1,59 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/ownership-transfer.test.tsx (1 test) 1730ms
+   ✓ requires selection and consent before submitting confirmed ownership  1722ms
+ ✓ tests/findings.test.tsx (3 tests) 1940ms
+   ✓ searches server data and prevents viewer mutations  1666ms
+ ✓ tests/firebase.test.tsx (3 tests) 1919ms
+   ✓ creates only with explicit mode and recovery password before session exchange  1407ms
+   ✓ links only with current AEGIS password and shows provider failure  432ms
+ ✓ tests/mfa.test.tsx (3 tests) 2161ms
+   ✓ requires confirmation before enabling and displays recovery codes once  1779ms
+   ✓ signs out after disable without using the revoked session again  337ms
+ ✓ tests/account.test.tsx (2 tests) 1890ms
+   ✓ saves a display name through the authenticated API  1371ms
+   ✓ requires explicit deactivation confirmation and displays server refusal  515ms
+ ✓ tests/intelligence.test.tsx (4 tests) 2110ms
+   ✓ separates advisory data and requires monitoring consent  1300ms
+   ✓ requires explicit per-detector review and refreshes activation state  610ms
+ ✓ tests/console.test.tsx (6 tests) 3487ms
+   ✓ Workspace behavior with isolated API fixtures > prefills an emailed verification link, removes the fragment, and waits for consent  755ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  1049ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  851ms
+   ✓ browses older remediation pages and resets pagination for filters  626ms
+ ✓ tests/attachments.test.tsx (4 tests) 1219ms
+   ✓ shows authorized download links without upload controls to viewers  672ms
+ ✓ tests/ownership.test.tsx (2 tests) 1672ms
+   ✓ recovers a challenge and prepares a link without claiming verification  1587ms
+ ✓ tests/team.test.tsx (3 tests) 2179ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  1405ms
+   ✓ shows email failure without claiming an invitation was sent  710ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 2587ms
+   ✓ submits explicit selected scope without claiming a repair  1966ms
+   ✓ shows an empty selection accurately and prevents viewer writes  369ms
+ ✓ tests/support.test.tsx (2 tests) 2269ms
+   ✓ lets a viewer read without creating or replying  1564ms
+   ✓ shows a failed creation without inventing a ticket  695ms
+ ✓ tests/operations.test.tsx (2 tests) 1641ms
+   ✓ paginates and refreshes real records  1591ms
+ ✓ tests/retest.test.tsx (2 tests) 1262ms
+   ✓ recovers evidence and approval target without manually copying identifiers  1188ms
+ ✓ tests/connections.test.tsx (2 tests) 1657ms
+   ✓ does not claim a connection until a real diagnostic response is requested  1568ms
+ ✓ tests/deployment.test.tsx (2 tests) 19ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 12ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 3268ms
+   ✓ saves personal categories and refreshes the alert list  3156ms
+ ✓ tests/account-link.test.tsx (2 tests) 11ms
+
+ Test Files  19 passed (19)
+      Tests  50 passed (50)
+   Start at  13:06:36
+   Duration  20.59s (transform 2.60s, setup 0ms, collect 15.01s, tests 33.03s, environment 54.41s, prepare 6.32s)
+

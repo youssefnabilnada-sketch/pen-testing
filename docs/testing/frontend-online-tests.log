@@ -1,0 +1,19 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/firebase-client.test.tsx (2 tests) 5ms
+ ✓ tests/connections.test.tsx (2 tests) 313ms
+ ✓ tests/retest.test.tsx (2 tests) 389ms
+   ✓ recovers evidence and approval target without manually copying identifiers  364ms
+ ✓ tests/ownership.test.tsx (2 tests) 465ms
+   ✓ recovers a challenge and prepares a link without claiming verification  440ms
+ ✓ tests/intelligence.test.tsx (3 tests) 422ms
+   ✓ separates advisory data and requires monitoring consent  386ms
+ ✓ tests/firebase.test.tsx (3 tests) 640ms
+   ✓ creates only with explicit mode and recovery password before session exchange  499ms
+ ✓ tests/deployment.test.tsx (2 tests) 5ms

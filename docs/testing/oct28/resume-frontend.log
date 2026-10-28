@@ -1,0 +1,146 @@
+(node:23680) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/asus/Documents/Codex/2026-10-28/files-mentioned-by-the-user-aegis/work/aegis/apps/web/vitest.config.ts?fresh-import-fba9zgcodi8=0,file:///C:/Users/asus/Documents/Codex/2026-10-28/files-mentioned-by-the-user-aegis/work/aegis/apps/web/vitest.config.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\asus\Documents\Codex\2026-10-28\files-mentioned-by-the-user-aegis\work\aegis\apps\web\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.12 C:/Users/asus/Documents/Codex/2026-10-28/files-mentioned-by-the-user-aegis/work/aegis/apps/web
+
+ ❯ tests/account.test.tsx (0 test)
+ ❯ tests/intelligence.test.tsx (0 test)
+ ❯ tests/repositories.test.tsx (0 test)
+ ❯ tests/ownership-transfer.test.tsx (0 test)
+ ❯ tests/console.test.tsx (0 test)
+ ❯ tests/findings.test.tsx (0 test)
+ ❯ tests/ownership.test.tsx (0 test)
+ ❯ tests/firebase.test.tsx (0 test)
+ ❯ tests/support.test.tsx (0 test)
+ ❯ tests/discovery.test.tsx (0 test)
+ ❯ tests/mfa.test.tsx (0 test)
+ ❯ tests/remediation-selection.test.tsx (0 test)
+ ❯ tests/attachments.test.tsx (0 test)
+ ❯ tests/operations.test.tsx (0 test)
+ ❯ tests/retest.test.tsx (0 test)
+ ❯ tests/team.test.tsx (0 test)
+ ❯ tests/connections.test.tsx (0 test)
+ ❯ tests/verification-recommendation.test.tsx (0 test)
+ ❯ tests/agency-launch.test.tsx (0 test)
+ ❯ tests/health-panel.test.tsx (0 test)
+ ❯ tests/recursive-discovery.test.tsx (0 test)
+ ❯ tests/repository-control.test.tsx (0 test)
+ ❯ tests/notification-preferences.test.tsx (0 test)
+ ❯ tests/account-link.test.tsx (0 test)
+ ❯ tests/firebase-client.test.tsx (0 test)
+ ❯ tests/deployment.test.tsx (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 26 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/account-link.test.tsx [ tests/account-link.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192771242-fb2yopxctw' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\01f73b01fede55d56b359d2119b727c03c188049'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/26]⎯
+
+ FAIL  tests/account.test.tsx [ tests/account.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766519-6yl2r3cvm0y' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\856ff82b6727a54e208a9d51f1769bc681a7cf78'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/26]⎯
+
+ FAIL  tests/agency-launch.test.tsx [ tests/agency-launch.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769896-y9hwau2h6nj' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\772bf5b89e215149959a9aafcef16a4ccc2837f6'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/26]⎯
+
+ FAIL  tests/attachments.test.tsx [ tests/attachments.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769515-1epy7taem5d' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\35518f3b950c1e0e863e3f125c63ed2138c0e4d2'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/26]⎯
+
+ FAIL  tests/connections.test.tsx [ tests/connections.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769812-jpgegu6zfnl' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\dd11ef295b1eec193758894d9ee3d65aecbe8917'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/26]⎯
+
+ FAIL  tests/console.test.tsx [ tests/console.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766601-jpekatbmqje' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\507c530f51fb41f460d294baaa2df0f4bd93e48d'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/26]⎯
+
+ FAIL  tests/deployment.test.tsx [ tests/deployment.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192771292-2e71hixmzpq' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\31878c433d06db91e19248a894635cb23916cda0'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/26]⎯
+
+ FAIL  tests/discovery.test.tsx [ tests/discovery.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766594-ob6clez0meb' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\53183870d50254f01d70b1421a8201c4b27483d5'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/26]⎯
+
+ FAIL  tests/findings.test.tsx [ tests/findings.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766610-5y12j3bw86l' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\70507f2585a9f1847b3a103c80ad2c4e97154c22'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/26]⎯
+
+ FAIL  tests/firebase-client.test.tsx [ tests/firebase-client.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192771245-1op5acbvuaz' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\a74bf9f6903203735a2a4da411095cc937f2c4b7'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/26]⎯
+
+ FAIL  tests/firebase.test.tsx [ tests/firebase.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766607-tdqco369r2i' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\f330582ec539443caa63a41019f21265080594ae'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/26]⎯
+
+ FAIL  tests/health-panel.test.tsx [ tests/health-panel.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769913-mmu7rqtdj7' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\60cb0db3d8d387c29d3d24e8173e2597b44c3493'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/26]⎯
+
+ FAIL  tests/intelligence.test.tsx [ tests/intelligence.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766524-yrlei66ttpg' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\b7ab51d5bf8122cc708c8a6aca6a513fb3ad08bf'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/26]⎯
+
+ FAIL  tests/mfa.test.tsx [ tests/mfa.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766611-yyeh8s6bcfj' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\42ecf38b379646a5185c2f62fadcd90eaf4e4969'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/26]⎯
+
+ FAIL  tests/notification-preferences.test.tsx [ tests/notification-preferences.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192771188-prcb3h0uy6' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\7b3e18bc7518b468625102578cdeed0728ecf418'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/26]⎯
+
+ FAIL  tests/operations.test.tsx [ tests/operations.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769533-jc6bmuspkx' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\6333b80e062131552ed7ed76fd8f72a08af05cf8'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/26]⎯
+
+ FAIL  tests/ownership-transfer.test.tsx [ tests/ownership-transfer.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766605-jeozewra3pn' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\331927c46b535e0a9d53a4017ac34405c574ab2c'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/26]⎯
+
+ FAIL  tests/ownership.test.tsx [ tests/ownership.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766596-l99ilwhm5l' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\f45dee50ad97a192712e6af2018522fc36ec6c90'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/26]⎯
+
+ FAIL  tests/recursive-discovery.test.tsx [ tests/recursive-discovery.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769959-4cj2k6kqsz' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\ea3c808444eabc5fdb9da742bb15e9191ea14ef9'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/26]⎯
+
+ FAIL  tests/remediation-selection.test.tsx [ tests/remediation-selection.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769470-kdn28gnhmhn' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\6cc65b5c4591d21382cc1fba7d8d51fce0cc9b85'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/26]⎯
+
+ FAIL  tests/repositories.test.tsx [ tests/repositories.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766527-rlnvo117d9' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\af0e7c2d85d429cd287552cd38bfcf09871b2ad1'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/26]⎯
+
+ FAIL  tests/repository-control.test.tsx [ tests/repository-control.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769957-goicm0pj56' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\693ecbf67477903683b7b624c0cd6c4a71f2c4d3'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/26]⎯
+
+ FAIL  tests/retest.test.tsx [ tests/retest.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769681-w31886e9w1e' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\a8384b93cb8507f3860e8594089575cdbc649744'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/26]⎯
+
+ FAIL  tests/support.test.tsx [ tests/support.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192766606-leohnct36qd' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\7c7de3fdc164c183845cf846eab867b50739dc0f'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/26]⎯
+
+ FAIL  tests/team.test.tsx [ tests/team.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769742-9x0wb23zsls' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\add6efc06c7a1ac79c6b41a752a085596b70eb93'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/26]⎯
+
+ FAIL  tests/verification-recommendation.test.tsx [ tests/verification-recommendation.test.tsx ]
+Error: EPERM: operation not permitted, rename 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\.tmp-1793192769849-6npokpxr6t' -> 'C:\Users\asus\AppData\Local\Packages\sandbox.{bdcbec46-bc72-4dd5-a544-5f5cf1bacc87}\AC\Temp\LiVnj7DTjmBtkkC_EQBGk\client\b17d32d3092584f77055706a144abccc347dd496'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/26]⎯
+
+
+ Test Files  26 failed (26)
+      Tests  no tests
+   Start at  15:05:44
+   Duration  26.35s (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 258.01s)
+

@@ -1,0 +1,60 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/ownership-transfer.test.tsx (1 test) 520ms
+   ✓ requires selection and consent before submitting confirmed ownership  519ms
+ ✓ tests/account.test.tsx (2 tests) 653ms
+   ✓ saves a display name through the authenticated API  448ms
+ ✓ tests/firebase.test.tsx (3 tests) 680ms
+   ✓ creates only with explicit mode and recovery password before session exchange  451ms
+ ✓ tests/repositories.test.tsx (4 tests) 671ms
+   ✓ publishing requires exact diff approval and MFA input  416ms
+ ✓ tests/mfa.test.tsx (3 tests) 723ms
+   ✓ requires confirmation before enabling and displays recovery codes once  540ms
+ ✓ tests/intelligence.test.tsx (5 tests) 1038ms
+   ✓ separates advisory data and requires monitoring consent  494ms
+stderr | tests/console.test.tsx > Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent
+Encountered two children with the same key, `asset`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+stderr | tests/console.test.tsx > Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent
+Encountered two children with the same key, `asset`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+ ✓ tests/console.test.tsx (6 tests) 1211ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  392ms
+ ✓ tests/findings.test.tsx (3 tests) 500ms
+   ✓ searches server data and prevents viewer mutations  422ms
+ ✓ tests/attachments.test.tsx (4 tests) 382ms
+ ✓ tests/support.test.tsx (2 tests) 508ms
+ ✓ tests/ownership.test.tsx (2 tests) 438ms
+   ✓ recovers a challenge and prepares a link without claiming verification  425ms
+ ✓ tests/team.test.tsx (3 tests) 398ms
+ ✓ tests/operations.test.tsx (2 tests) 416ms
+   ✓ paginates and refreshes real records  398ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 420ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 7ms
+ ✓ tests/connections.test.tsx (2 tests) 345ms
+   ✓ does not claim a connection until a real diagnostic response is requested  313ms
+ ✓ tests/discovery.test.tsx (2 tests) 410ms
+   ✓ requires discovery consent and separately selects paths without launching scans  402ms
+ ✓ tests/repository-control.test.tsx (2 tests) 255ms
+ ✓ tests/retest.test.tsx (2 tests) 452ms
+   ✓ recovers evidence and approval target without manually copying identifiers  416ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 235ms
+ ✓ tests/deployment.test.tsx (2 tests) 4ms
+ ✓ tests/account-link.test.tsx (2 tests) 6ms
+
+ Test Files  22 passed (22)
+      Tests  59 passed (59)
+   Start at  07:52:58
+   Duration  5.47s (transform 1.04s, setup 0ms, collect 4.49s, tests 10.27s, environment 14.58s, prepare 1.64s)
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 typecheck
+> tsc --noEmit
+

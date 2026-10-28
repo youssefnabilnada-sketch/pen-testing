@@ -1,0 +1,63 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/firebase-client.test.tsx (2 tests) 14ms
+ ✓ tests/retest.test.tsx (2 tests) 890ms
+   ✓ recovers evidence and approval target without manually copying identifiers  837ms
+ ✓ tests/firebase.test.tsx (3 tests) 1083ms
+   ✓ creates only with explicit mode and recovery password before session exchange  835ms
+ ✓ tests/ownership.test.tsx (2 tests) 873ms
+   ✓ recovers a challenge and prepares a link without claiming verification  847ms
+ ✓ tests/intelligence.test.tsx (3 tests) 773ms
+   ✓ separates advisory data and requires monitoring consent  703ms
+ ✓ tests/console.test.tsx (4 tests) 1824ms
+   ✓ Workspace behavior with isolated API fixtures > shows honest sign-in and testing access after 401  607ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  720ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  449ms
+
+ Test Files  6 passed (6)
+      Tests  16 passed (16)
+   Start at  10:54:41
+   Duration  6.33s (transform 957ms, setup 0ms, collect 3.91s, tests 5.46s, environment 13.76s, prepare 1.53s)
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 typecheck
+> tsc --noEmit
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.28
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 5.3s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/5) ...
+   Generating static pages (1/5) 
+   Generating static pages (2/5) 
+   Generating static pages (3/5) 
+ ✓ Generating static pages (5/5)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    1.17 kB         107 kB
+├ ○ /_not-found                            990 B         104 kB
+└ ○ /console                             16.7 kB         123 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/255-b1e2483a7e02feee.js       46.6 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)          2.08 kB
+
+
+○  (Static)  prerendered as static content
+

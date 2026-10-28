@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="39" failures="0" errors="0" time="20.236965531">
+    <testsuite name="tests/account-link.test.tsx" timestamp="2026-10-25T22:25:06.955Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="0.006103634">
+        <testcase classname="tests/account-link.test.tsx" name="opens only known token actions without performing an account mutation" time="0.003323829">
+        </testcase>
+        <testcase classname="tests/account-link.test.tsx" name="rejects ambiguous, injected or malformed link parameters" time="0.001380566">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/account.test.tsx" timestamp="2026-10-25T22:25:06.966Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="2.23442233">
+        <testcase classname="tests/account.test.tsx" name="saves a display name through the authenticated API" time="1.84081506">
+        </testcase>
+        <testcase classname="tests/account.test.tsx" name="requires explicit deactivation confirmation and displays server refusal" time="0.377861164">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/attachments.test.tsx" timestamp="2026-10-25T22:25:06.967Z" hostname="8aa2517cecfa" tests="3" failures="0" errors="0" skipped="0" time="2.0127679">
+        <testcase classname="tests/attachments.test.tsx" name="shows authorized download links without upload controls to viewers" time="1.141211961">
+        </testcase>
+        <testcase classname="tests/attachments.test.tsx" name="uploads decoded text and refreshes persisted attachments" time="0.630525055">
+        </testcase>
+        <testcase classname="tests/attachments.test.tsx" name="shows upload failure without claiming persistence" time="0.23486555">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/connections.test.tsx" timestamp="2026-10-25T22:25:06.971Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="0.696130602">
+        <testcase classname="tests/connections.test.tsx" name="does not claim a connection until a real diagnostic response is requested" time="0.646366224">
+        </testcase>
+        <testcase classname="tests/connections.test.tsx" name="reports server errors without a success banner" time="0.047937093">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/console.test.tsx" timestamp="2026-10-25T22:25:06.973Z" hostname="8aa2517cecfa" tests="5" failures="0" errors="0" skipped="0" time="3.20694313">
+        <testcase classname="tests/console.test.tsx" name="Workspace behavior with isolated API fixtures &gt; prefills an emailed verification link, removes the fragment, and waits for consent" time="0.868213225">
+        </testcase>
+        <testcase classname="tests/console.test.tsx" name="Workspace behavior with isolated API fixtures &gt; shows honest sign-in and testing access after 401" time="0.116854025">
+        </testcase>
+        <testcase classname="tests/console.test.tsx" name="Workspace behavior with isolated API fixtures &gt; renders a useful service error instead of success" time="0.086162639">
+        </testcase>
+        <testcase classname="tests/console.test.tsx" name="Workspace behavior with isolated API fixtures &gt; registers and opens verification without pretending email is verified" time="1.044984618">
+        </testcase>
+        <testcase classname="tests/console.test.tsx" name="Workspace behavior with isolated API fixtures &gt; blocks launching an asset until verification and explicit consent" time="1.085583595">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/deployment.test.tsx" timestamp="2026-10-25T22:25:06.976Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="0.011762654">
+        <testcase classname="tests/deployment.test.tsx" name="fails a Vercel build with a missing or local backend instead of publishing a disconnected UI" time="0.006960091">
+        </testcase>
+        <testcase classname="tests/deployment.test.tsx" name="accepts the deployed HTTPS API and normalizes a trailing slash" time="0.001301484">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/firebase-client.test.tsx" timestamp="2026-10-25T22:25:06.977Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="0.019259257">
+        <testcase classname="tests/firebase-client.test.tsx" name="exchanges token in memory and signs SDK out even on API failure" time="0.012922647">
+        </testcase>
+        <testcase classname="tests/firebase-client.test.tsx" name="unverified identity sends verification but cannot exchange" time="0.003634156">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/firebase.test.tsx" timestamp="2026-10-25T22:25:06.978Z" hostname="8aa2517cecfa" tests="3" failures="0" errors="0" skipped="0" time="1.804571326">
+        <testcase classname="tests/firebase.test.tsx" name="hides Firebase login when disabled" time="0.053961812">
+        </testcase>
+        <testcase classname="tests/firebase.test.tsx" name="creates only with explicit mode and recovery password before session exchange" time="1.310652224">
+        </testcase>
+        <testcase classname="tests/firebase.test.tsx" name="links only with current AEGIS password and shows provider failure" time="0.433224692">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/intelligence.test.tsx" timestamp="2026-10-25T22:25:06.980Z" hostname="8aa2517cecfa" tests="3" failures="0" errors="0" skipped="0" time="1.206425505">
+        <testcase classname="tests/intelligence.test.tsx" name="separates advisory data and requires monitoring consent" time="1.072332895">
+        </testcase>
+        <testcase classname="tests/intelligence.test.tsx" name="shows source failure without success" time="0.058263405">
+        </testcase>
+        <testcase classname="tests/intelligence.test.tsx" name="cannot launch reassessment without a recorded pending change" time="0.074208257">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/mfa.test.tsx" timestamp="2026-10-25T22:25:06.981Z" hostname="8aa2517cecfa" tests="3" failures="0" errors="0" skipped="0" time="1.807536496">
+        <testcase classname="tests/mfa.test.tsx" name="requires confirmation before enabling and displays recovery codes once" time="1.410852373">
+        </testcase>
+        <testcase classname="tests/mfa.test.tsx" name="disables enrollment when server encryption is unavailable" time="0.031328452">
+        </testcase>
+        <testcase classname="tests/mfa.test.tsx" name="signs out after disable without using the revoked session again" time="0.354110362">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/notification-preferences.test.tsx" timestamp="2026-10-25T22:25:06.983Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="0.807918911">
+        <testcase classname="tests/notification-preferences.test.tsx" name="saves personal categories and refreshes the alert list" time="0.73142399">
+        </testcase>
+        <testcase classname="tests/notification-preferences.test.tsx" name="reports save failure without claiming success" time="0.074199333">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/ownership-transfer.test.tsx" timestamp="2026-10-25T22:25:06.983Z" hostname="8aa2517cecfa" tests="1" failures="0" errors="0" skipped="0" time="1.755713702">
+        <testcase classname="tests/ownership-transfer.test.tsx" name="requires selection and consent before submitting confirmed ownership" time="1.75076395">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/ownership.test.tsx" timestamp="2026-10-25T22:25:06.984Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="1.494531974">
+        <testcase classname="tests/ownership.test.tsx" name="recovers a challenge and prepares a link without claiming verification" time="1.440405942">
+        </testcase>
+        <testcase classname="tests/ownership.test.tsx" name="shows service failure without a success claim" time="0.049884535">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/retest.test.tsx" timestamp="2026-10-25T22:25:06.985Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="0.614549746">
+        <testcase classname="tests/retest.test.tsx" name="recovers evidence and approval target without manually copying identifiers" time="0.571674359">
+        </testcase>
+        <testcase classname="tests/retest.test.tsx" name="viewer can read evidence but cannot approve or record changes" time="0.04113725">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/support.test.tsx" timestamp="2026-10-25T22:25:06.987Z" hostname="8aa2517cecfa" tests="2" failures="0" errors="0" skipped="0" time="1.776135301">
+        <testcase classname="tests/support.test.tsx" name="lets a viewer read without creating or replying" time="1.231019509">
+        </testcase>
+        <testcase classname="tests/support.test.tsx" name="shows a failed creation without inventing a ticket" time="0.541694696">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/team.test.tsx" timestamp="2026-10-25T22:25:06.988Z" hostname="8aa2517cecfa" tests="3" failures="0" errors="0" skipped="0" time="0.782193063">
+        <testcase classname="tests/team.test.tsx" name="requires explicit acceptance of the displayed incoming workspace" time="0.506595543">
+        </testcase>
+        <testcase classname="tests/team.test.tsx" name="does not show invitation controls to read-only members" time="0.02061775">
+        </testcase>
+        <testcase classname="tests/team.test.tsx" name="shows email failure without claiming an invitation was sent" time="0.25365516">
+        </testcase>
+    </testsuite>
+</testsuites>

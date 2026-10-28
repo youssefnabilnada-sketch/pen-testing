@@ -1,0 +1,39 @@
+'use client';
+import {useEffect,useState} from 'react';
+import VerificationRecommendation from './VerificationRecommendation';
+type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
+export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
+ const [recommendation,setRecommendation]=useState<{method:string;reason:string;source:string}|null>(null),[history,setHistory]=useState<any[]>([]);
+ useEffect(()=>{let active=true;api(`/assets/${assetId}/verification-recommendation`,'POST',{platform:'auto'}).then(r=>{if(active)setRecommendation(r)}).catch(()=>{});return()=>{active=false}},[assetId,api]);
+ const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('file'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const [cfZone,setCfZone]=useState(''),[cfToken,setCfToken]=useState(''),[cfApproved,setCfApproved]=useState(false),[cfMfa,setCfMfa]=useState(''),[cfPreview,setCfPreview]=useState<{name:string;content:string;ttl:number}|null>(null);
+ useEffect(()=>{setCfToken('');setCfZone('');setCfApproved(false);setCfMfa('');setCfPreview(null);let active=true;api(`/assets/${assetId}/challenge`).then(v=>{if(active){setC(v);if(v)setMethod(v.method)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[assetId,api]);
+ async function act(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
+ return <section aria-label="Ownership guide"><p className="subtle">Verify your exact website. GitHub assistance prepares a file for review; ownership is checked after deployment.</p>{error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
+ {recommendation&&<div className="notice"><strong>Suggested method: {recommendation.method}</strong><p>{recommendation.reason} ({recommendation.source})</p><button onClick={()=>{setMethod(recommendation.method);setC(null);setLink('');setCfPreview(null);setCfToken('')}}>Use website suggestion</button></div>}
+ <button onClick={()=>act(async()=>setHistory(await api(`/assets/${assetId}/verification-history`)))}>View verification history</button>
+ {history.map(h=><p key={h.id}>{h.method} · {h.state} · {new Date(h.created*1000).toLocaleString()}</p>)}
+ <VerificationRecommendation onChoose={m=>{setMethod(m);setC(null);setLink('');setCfPreview(null);setCfToken('')}}/>
+ <label className="form">Verification method<select value={method} onChange={e=>{setMethod(e.target.value);setC(null);setLink('');setCfPreview(null);setCfToken('')}}><option value="file">GitHub assistance / verification file</option><option value="dns">DNS TXT record</option><option value="meta">HTML meta tag</option></select></label>
+ <button disabled={busy} onClick={()=>act(async()=>{setC(await api(`/assets/${assetId}/challenge`,'POST',{method}));setLink('');setCfPreview(null);setCfToken('')})}>Get verification instructions</button>
+ {c&&<><div className="code">{c.instruction}</div><p>Expires: {new Date(c.expires*1000).toLocaleString()}. Reopening instructions keeps the same valid token.</p><button disabled={busy} onClick={()=>act(async()=>{await navigator.clipboard.writeText(c.method==='meta'?c.instruction:c.token);setNotice('Copied.')})}>Copy verification value</button>
+ {c.method==='meta'&&c.wordpress&&<details><summary>Use the AEGIS WordPress plugin</summary><p>Install the supplied AEGIS verification plugin as a WordPress administrator. Open Settings → AEGIS verification, paste this challenge, save and clear the page cache. Then check ownership below.</p><pre className="code">{JSON.stringify(c.wordpress)}</pre><button onClick={()=>act(async()=>{await navigator.clipboard.writeText(JSON.stringify(c.wordpress));setNotice('WordPress challenge copied.')})}>Copy WordPress challenge</button></details>}
+ {c.method==='dns'&&<details><summary>Publish this TXT proof using Cloudflare (optional)</summary>
+ <p>This creates one AEGIS TXT record in the Cloudflare zone you control. It cannot edit other DNS records or authorize website scanning. Use a Cloudflare token restricted to this zone with <strong>Zone Read and DNS Write</strong> permissions. The token is used only for this request; it is not stored in your AEGIS account.</p>
+ <button disabled={busy} onClick={()=>act(async()=>setCfPreview(await api(`/assets/${assetId}/challenge/${c.id}/cloudflare/preview`)))}>Review exact DNS change</button>
+ {cfPreview&&<div className="form"><p>Record: {cfPreview.name} · TXT · TTL {cfPreview.ttl}s</p><div className="code">{cfPreview.content}</div>
+ <label>Cloudflare zone ID<input autoComplete="off" maxLength={32} value={cfZone} onChange={e=>setCfZone(e.target.value.trim())} placeholder="32-character zone ID" /></label>
+ <label>Scoped Cloudflare API token<input type="password" autoComplete="off" value={cfToken} onChange={e=>setCfToken(e.target.value)} /></label>
+ <label>Authenticator code (if enabled)<input autoComplete="one-time-code" value={cfMfa} onChange={e=>setCfMfa(e.target.value)} /></label>
+ <label><input type="checkbox" checked={cfApproved} onChange={e=>setCfApproved(e.target.checked)} /> I authorize creating this exact TXT record in the zone I control.</label>
+ <button disabled={busy||!cfApproved||cfZone.length!==32||cfToken.length<12} onClick={()=>act(async()=>{
+ const result=await api(`/assets/${assetId}/challenge/${c.id}/cloudflare/publish`,'POST',{zone_id:cfZone,api_token:cfToken,confirm_dns_change:true,mfa_code:cfMfa});
+ setCfToken('');setCfMfa('');setCfApproved(false);setNotice(result.message)
+ })}>Publish this single TXT record</button>
+ <p>Publishing the record does not verify ownership immediately. Wait for DNS propagation, then select Check ownership below.</p></div>}
+ </details>}
+ {c.method==='file'&&<a className="button" href={`/api/assets/${assetId}/challenge/${c.id}/file`}>Download verification file</a>}
+ {c.method==='file'&&<details><summary>My website deploys from GitHub</summary><div className="form"><label>Repository (owner/name)<input value={repository} placeholder="your-account/your-site" onChange={e=>{setRepository(e.target.value);setLink('')}}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><button disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/challenge/${c.id}/github`,'POST',{repository,directory,branch:'main'});setLink(r.url)})}>Prepare GitHub file</button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">Open prepared file on GitHub ↗</a><p>Review and commit on branch main, wait for hosting deployment, then check ownership below.</p></>}</div></details>}
+ <button disabled={busy} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/verify/${c.id}`,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?'Working…':'Check ownership'}</button></>}
+ <p className="subtle">Ownership verification does not grant scanning or AutoFix permission. Cloudflare assistance can publish only an approved TXT proof; other hosting integrations remain guided/manual.</p></section>
+}

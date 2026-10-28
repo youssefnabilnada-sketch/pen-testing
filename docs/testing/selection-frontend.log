@@ -1,0 +1,51 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/remediation-selection.test.tsx (3 tests) 544ms
+   ✓ submits explicit selected scope without claiming a repair  416ms
+ ✓ tests/support.test.tsx (2 tests) 585ms
+   ✓ lets a viewer read without creating or replying  365ms
+ ✓ tests/account.test.tsx (2 tests) 627ms
+   ✓ saves a display name through the authenticated API  472ms
+ ✓ tests/firebase.test.tsx (3 tests) 668ms
+   ✓ creates only with explicit mode and recovery password before session exchange  468ms
+ ✓ tests/mfa.test.tsx (3 tests) 721ms
+   ✓ requires confirmation before enabling and displays recovery codes once  523ms
+ ✓ tests/intelligence.test.tsx (4 tests) 687ms
+   ✓ separates advisory data and requires monitoring consent  457ms
+ ✓ tests/console.test.tsx (5 tests) 919ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  366ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 511ms
+   ✓ requires selection and consent before submitting confirmed ownership  510ms
+ ✓ tests/attachments.test.tsx (3 tests) 439ms
+ ✓ tests/ownership.test.tsx (2 tests) 545ms
+   ✓ recovers a challenge and prepares a link without claiming verification  527ms
+ ✓ tests/findings.test.tsx (3 tests) 761ms
+   ✓ searches server data and prevents viewer mutations  632ms
+ ✓ tests/team.test.tsx (3 tests) 549ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  327ms
+ ✓ tests/operations.test.tsx (2 tests) 464ms
+   ✓ paginates and refreshes real records  441ms
+ ✓ tests/retest.test.tsx (2 tests) 392ms
+   ✓ recovers evidence and approval target without manually copying identifiers  357ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 6ms
+ ✓ tests/account-link.test.tsx (2 tests) 4ms
+ ✓ tests/deployment.test.tsx (2 tests) 4ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 241ms
+ ✓ tests/connections.test.tsx (2 tests) 252ms
+
+ Test Files  19 passed (19)
+      Tests  48 passed (48)
+   Start at  06:53:16
+   Duration  4.85s (transform 1.07s, setup 0ms, collect 4.41s, tests 8.92s, environment 12.81s, prepare 1.53s)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

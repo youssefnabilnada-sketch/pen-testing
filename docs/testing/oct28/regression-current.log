@@ -1,0 +1,105 @@
+.......................................................F................ [ 24%]
+s..........s..............s............................................. [ 48%]
+.s..................................s................................... [ 72%]
+...s.................................................................... [ 96%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_____________ test_online_template_serves_supplied_identity_config _____________
+
+client = <starlette.testclient.TestClient object at 0x7f75fff22cf0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f75fd7ab980>
+
+    def test_online_template_serves_supplied_identity_config(client,monkeypatch):
+        root=Path(__file__).resolve().parents[1]
+        public=json.loads((root/'packages/configuration/firebase.public.json').read_text())
+        for line in (root/'infrastructure/deployment/production.env.example').read_text().splitlines():
+            if line.startswith('FIREBASE_'):
+                key,value=line.split('=',1);monkeypatch.setenv(key,value)
+        monkeypatch.delenv('FIREBASE_AUTH_EMULATOR_HOST',raising=False)
+        response=client.get('/auth/firebase/config')
+        assert response.status_code==200
+>       assert response.json()=={'enabled':True,'config':{
+            key:public[key] for key in ('projectId','apiKey','appId','authDomain')}}
+E       AssertionError: assert {'enabled': False} == {'enabled': T...baseapp.com'}}
+E         
+E         Differing items:
+E         {'enabled': False} != {'enabled': True}
+E         Right contains 1 more item:
+E         {'config': {'apiKey': '',
+E                     'appId': '1:253957180418:web:17aa8f974057d58feeeb1b',
+E                     'authDomain': 'aegis-d034c.firebaseapp.com',
+E                     'projectId': 'aegis-d034c'}}
+E         Use -v to get more diff
+
+tests/test_deployment_firebase_config.py:14: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /workspace/scratch/1f23d267138b/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.14-final-0 _______________
+
+Name                                          Stmts   Miss  Cover
+-----------------------------------------------------------------
+apps/api/aegis/__init__.py                        0      0   100%
+apps/api/aegis/account.py                        60      0   100%
+apps/api/aegis/agency.py                         75      3    96%
+apps/api/aegis/ai_provider.py                    76      2    97%
+apps/api/aegis/analyst.py                        12      0   100%
+apps/api/aegis/api_assessment.py                 17      1    94%
+apps/api/aegis/attachments.py                    97      3    97%
+apps/api/aegis/auth.py                           70      4    94%
+apps/api/aegis/autofix_recovery.py               60      0   100%
+apps/api/aegis/billing.py                        30      0   100%
+apps/api/aegis/checks.py                         35      1    97%
+apps/api/aegis/connections.py                    73     21    71%
+apps/api/aegis/crawler.py                       122     17    86%
+apps/api/aegis/crm.py                            69      1    99%
+apps/api/aegis/db.py                             30      3    90%
+apps/api/aegis/detectors.py                      49      3    94%
+apps/api/aegis/discovery.py                     110      4    96%
+apps/api/aegis/email_alerts.py                   69      3    96%
+apps/api/aegis/evidence_vault.py                 28      0   100%
+apps/api/aegis/finding_browser.py                31      0   100%
+apps/api/aegis/firebase_identity.py             173     16    91%
+apps/api/aegis/github_client.py                  44     23    48%
+apps/api/aegis/health_monitoring.py             123     11    91%
+apps/api/aegis/image_evidence.py                 14      0   100%
+apps/api/aegis/intelligence/__init__.py           0      0   100%
+apps/api/aegis/intelligence/feeds.py            132     44    67%
+apps/api/aegis/intelligence/php_versions.py      21      0   100%
+apps/api/aegis/intelligence/routes.py           263     45    83%
+apps/api/aegis/intelligence/service.py          180     10    94%
+apps/api/aegis/launch_guard.py                   66      3    95%
+apps/api/aegis/main.py                          651     56    91%
+apps/api/aegis/mfa.py                            99      6    94%
+apps/api/aegis/models.py                        401      0   100%
+apps/api/aegis/monitoring.py                     86      5    94%
+apps/api/aegis/multipath.py                      16      0   100%
+apps/api/aegis/notifications.py                  36      0   100%
+apps/api/aegis/onboarding.py                     16      0   100%
+apps/api/aegis/operations.py                     23      0   100%
+apps/api/aegis/ownership_transfer.py             30      0   100%
+apps/api/aegis/policies.py                        9      0   100%
+apps/api/aegis/regression.py                     70      2    97%
+apps/api/aegis/remediation_browser.py            16      0   100%
+apps/api/aegis/reporting.py                     127      9    93%
+apps/api/aegis/repositories.py                  192      8    96%
+apps/api/aegis/runtime.py                        16      0   100%
+apps/api/aegis/safety.py                        109     12    89%
+apps/api/aegis/scope.py                          16      0   100%
+apps/api/aegis/smartverify.py                    47      1    98%
+apps/api/aegis/support.py                        86      2    98%
+apps/api/aegis/team.py                          100      9    91%
+apps/api/aegis/verification.py                   28      3    89%
+apps/api/aegis/windows.py                        23      1    96%
+apps/api/aegis/worker.py                        123      6    95%
+-----------------------------------------------------------------
+TOTAL                                          4449    338    92%
+Coverage JSON written to file docs/testing/oct28/coverage-current.json
+Required test coverage of 85% reached. Total coverage: 92.40%
+=========================== short test summary info ============================
+FAILED tests/test_deployment_firebase_config.py::test_online_template_serves_supplied_identity_config
+1 failed, 291 passed, 6 skipped, 1 warning in 150.07s (0:02:30)

@@ -1,0 +1,46 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/integrated-final-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/findings.test.tsx (3 tests) 601ms
+   ✓ searches server data and prevents viewer mutations  526ms
+ ✓ tests/mfa.test.tsx (3 tests) 733ms
+   ✓ requires confirmation before enabling and displays recovery codes once  551ms
+ ✓ tests/support.test.tsx (2 tests) 630ms
+   ✓ lets a viewer read without creating or replying  351ms
+ ✓ tests/account.test.tsx (2 tests) 745ms
+   ✓ saves a display name through the authenticated API  502ms
+ ✓ tests/firebase.test.tsx (3 tests) 795ms
+   ✓ creates only with explicit mode and recovery password before session exchange  596ms
+ ✓ tests/intelligence.test.tsx (4 tests) 696ms
+   ✓ separates advisory data and requires monitoring consent  474ms
+ ✓ tests/console.test.tsx (5 tests) 1221ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  511ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  354ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 575ms
+   ✓ requires selection and consent before submitting confirmed ownership  574ms
+ ✓ tests/team.test.tsx (3 tests) 500ms
+ ✓ tests/attachments.test.tsx (3 tests) 529ms
+   ✓ shows authorized download links without upload controls to viewers  300ms
+ ✓ tests/operations.test.tsx (2 tests) 450ms
+   ✓ paginates and refreshes real records  432ms
+ ✓ tests/ownership.test.tsx (2 tests) 560ms
+   ✓ recovers a challenge and prepares a link without claiming verification  542ms
+ ✓ tests/retest.test.tsx (2 tests) 408ms
+   ✓ recovers evidence and approval target without manually copying identifiers  370ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 334ms
+ ✓ tests/deployment.test.tsx (2 tests) 4ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 5ms
+ ✓ tests/account-link.test.tsx (2 tests) 4ms
+ ✓ tests/connections.test.tsx (2 tests) 266ms
+
+ Test Files  18 passed (18)
+      Tests  45 passed (45)
+   Start at  09:35:01
+   Duration  5.06s (transform 1.10s, setup 0ms, collect 4.78s, tests 9.05s, environment 13.20s, prepare 1.69s)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/integrated-final-frontend.xml

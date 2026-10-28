@@ -1,0 +1,38 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/notifications-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/notification-preferences.test.tsx (2 tests) 418ms
+   ✓ saves personal categories and refreshes the alert list  375ms
+ ✓ tests/ownership.test.tsx (2 tests) 519ms
+   ✓ recovers a challenge and prepares a link without claiming verification  506ms
+ ✓ tests/firebase.test.tsx (3 tests) 609ms
+   ✓ creates only with explicit mode and recovery password before session exchange  430ms
+ ✓ tests/mfa.test.tsx (3 tests) 635ms
+   ✓ requires confirmation before enabling and displays recovery codes once  477ms
+ ✓ tests/support.test.tsx (2 tests) 630ms
+   ✓ lets a viewer read without creating or replying  385ms
+ ✓ tests/intelligence.test.tsx (3 tests) 515ms
+   ✓ separates advisory data and requires monitoring consent  452ms
+ ✓ tests/console.test.tsx (5 tests) 944ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  339ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 12ms
+ ✓ tests/account-link.test.tsx (2 tests) 7ms
+ ✓ tests/team.test.tsx (3 tests) 491ms
+ ✓ tests/connections.test.tsx (2 tests) 341ms
+   ✓ does not claim a connection until a real diagnostic response is requested  314ms
+ ✓ tests/attachments.test.tsx (3 tests) 319ms
+ ✓ tests/retest.test.tsx (2 tests) 330ms
+   ✓ recovers evidence and approval target without manually copying identifiers  310ms
+ ✓ tests/deployment.test.tsx (2 tests) 5ms
+
+ Test Files  14 passed (14)
+      Tests  36 passed (36)
+   Start at  20:16:29
+   Duration  3.58s (transform 1.01s, setup 0ms, collect 3.99s, tests 5.78s, environment 9.99s, prepare 1.07s)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/notifications-frontend.xml

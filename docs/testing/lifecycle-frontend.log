@@ -1,0 +1,41 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/lifecycle-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/attachments.test.tsx (3 tests) 437ms
+   ✓ shows authorized download links without upload controls to viewers  311ms
+ ✓ tests/support.test.tsx (2 tests) 455ms
+ ✓ tests/team.test.tsx (3 tests) 480ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  310ms
+ ✓ tests/mfa.test.tsx (3 tests) 508ms
+   ✓ requires confirmation before enabling and displays recovery codes once  390ms
+ ✓ tests/intelligence.test.tsx (3 tests) 372ms
+   ✓ separates advisory data and requires monitoring consent  334ms
+ ✓ tests/firebase.test.tsx (3 tests) 600ms
+   ✓ creates only with explicit mode and recovery password before session exchange  470ms
+ ✓ tests/console.test.tsx (5 tests) 895ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  324ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 8ms
+ ✓ tests/connections.test.tsx (2 tests) 301ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 290ms
+ ✓ tests/retest.test.tsx (2 tests) 347ms
+   ✓ recovers evidence and approval target without manually copying identifiers  323ms
+ ✓ tests/ownership.test.tsx (2 tests) 428ms
+   ✓ recovers a challenge and prepares a link without claiming verification  417ms
+ ✓ tests/account.test.tsx (2 tests) 492ms
+   ✓ saves a display name through the authenticated API  333ms
+ ✓ tests/account-link.test.tsx (2 tests) 5ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 330ms
+   ✓ requires selection and consent before submitting confirmed ownership  329ms
+ ✓ tests/deployment.test.tsx (2 tests) 5ms
+
+ Test Files  16 passed (16)
+      Tests  39 passed (39)
+   Start at  20:21:19
+   Duration  3.91s (transform 863ms, setup 0ms, collect 3.69s, tests 5.95s, environment 10.31s, prepare 1.16s)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/lifecycle-frontend.xml

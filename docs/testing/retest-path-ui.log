@@ -1,0 +1,65 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/ownership-transfer.test.tsx (1 test) 1645ms
+   ✓ requires selection and consent before submitting confirmed ownership  1641ms
+ ✓ tests/findings.test.tsx (3 tests) 1653ms
+   ✓ searches server data and prevents viewer mutations  1384ms
+ ✓ tests/mfa.test.tsx (3 tests) 1899ms
+   ✓ requires confirmation before enabling and displays recovery codes once  1508ms
+   ✓ signs out after disable without using the revoked session again  336ms
+ ✓ tests/account.test.tsx (2 tests) 1680ms
+   ✓ saves a display name through the authenticated API  1306ms
+   ✓ requires explicit deactivation confirmation and displays server refusal  364ms
+ ✓ tests/firebase.test.tsx (3 tests) 2059ms
+   ✓ creates only with explicit mode and recovery password before session exchange  1648ms
+   ✓ links only with current AEGIS password and shows provider failure  339ms
+ ✓ tests/intelligence.test.tsx (4 tests) 1778ms
+   ✓ separates advisory data and requires monitoring consent  1270ms
+   ✓ requires explicit per-detector review and refreshes activation state  389ms
+ ✓ tests/console.test.tsx (6 tests) 3422ms
+   ✓ Workspace behavior with isolated API fixtures > prefills an emailed verification link, removes the fragment, and waits for consent  715ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  1010ms
+   ✓ Workspace behavior with isolated API fixtures > blocks launching an asset until verification and explicit consent  899ms
+   ✓ browses older remediation pages and resets pagination for filters  609ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 1411ms
+   ✓ submits explicit selected scope without claiming a repair  1045ms
+ ✓ tests/support.test.tsx (2 tests) 1385ms
+   ✓ lets a viewer read without creating or replying  844ms
+   ✓ shows a failed creation without inventing a ticket  538ms
+ ✓ tests/ownership.test.tsx (2 tests) 1571ms
+   ✓ recovers a challenge and prepares a link without claiming verification  1502ms
+ ✓ tests/attachments.test.tsx (4 tests) 1512ms
+   ✓ shows authorized download links without upload controls to viewers  807ms
+   ✓ uploads decoded text and refreshes persisted attachments  364ms
+ ✓ tests/team.test.tsx (3 tests) 1584ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  1155ms
+   ✓ shows email failure without claiming an invitation was sent  389ms
+ ✓ tests/operations.test.tsx (2 tests) 1194ms
+   ✓ paginates and refreshes real records  886ms
+   ✓ shows failed loading instead of empty success  301ms
+ ✓ tests/account-link.test.tsx (2 tests) 15ms
+ ✓ tests/retest.test.tsx (2 tests) 1153ms
+   ✓ recovers evidence and approval target without manually copying identifiers  1074ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 27ms
+ ✓ tests/deployment.test.tsx (2 tests) 23ms
+ ✓ tests/connections.test.tsx (2 tests) 943ms
+   ✓ does not claim a connection until a real diagnostic response is requested  895ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 666ms
+   ✓ saves personal categories and refreshes the alert list  601ms
+
+ Test Files  19 passed (19)
+      Tests  50 passed (50)
+   Start at  13:02:28
+   Duration  16.07s (transform 2.72s, setup 0ms, collect 14.03s, tests 25.62s, environment 47.81s, prepare 4.95s)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

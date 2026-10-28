@@ -1,0 +1,47 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/ownership.test.tsx (2 tests) 511ms
+   ✓ recovers a challenge and prepares a link without claiming verification  485ms
+ ✓ tests/remediation-selection.test.tsx (3 tests) 560ms
+   ✓ submits explicit selected scope without claiming a repair  432ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 639ms
+   ✓ requires selection and consent before submitting confirmed ownership  637ms
+ ✓ tests/team.test.tsx (3 tests) 679ms
+   ✓ requires explicit acceptance of the displayed incoming workspace  410ms
+ ✓ tests/firebase.test.tsx (3 tests) 855ms
+   ✓ creates only with explicit mode and recovery password before session exchange  662ms
+ ✓ tests/intelligence.test.tsx (4 tests) 943ms
+   ✓ separates advisory data and requires monitoring consent  629ms
+ ✓ tests/console.test.tsx (6 tests) 1357ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  480ms
+ ✓ tests/mfa.test.tsx (3 tests) 765ms
+   ✓ requires confirmation before enabling and displays recovery codes once  484ms
+ ✓ tests/account.test.tsx (2 tests) 664ms
+   ✓ saves a display name through the authenticated API  419ms
+ ✓ tests/support.test.tsx (2 tests) 781ms
+   ✓ lets a viewer read without creating or replying  327ms
+   ✓ shows a failed creation without inventing a ticket  451ms
+ ✓ tests/findings.test.tsx (3 tests) 883ms
+   ✓ searches server data and prevents viewer mutations  753ms
+ ✓ tests/operations.test.tsx (2 tests) 754ms
+   ✓ paginates and refreshes real records  726ms
+ ✓ tests/attachments.test.tsx (3 tests) 512ms
+ ✓ tests/retest.test.tsx (2 tests) 396ms
+   ✓ recovers evidence and approval target without manually copying identifiers  370ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 9ms
+ ✓ tests/deployment.test.tsx (2 tests) 6ms
+ ✓ tests/account-link.test.tsx (2 tests) 6ms
+ ✓ tests/connections.test.tsx (2 tests) 288ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 297ms
+
+ Test Files  19 passed (19)
+      Tests  49 passed (49)
+   Start at  07:57:55
+   Duration  6.73s (transform 1.42s, setup 0ms, collect 6.44s, tests 10.90s, environment 19.64s, prepare 2.54s)
+

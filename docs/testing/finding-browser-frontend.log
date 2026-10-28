@@ -1,0 +1,43 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run --reporter=default --reporter=junit --outputFile=../../docs/testing/finding-browser-frontend.xml
+
+
+ RUN  v3.2.7 /workspace/scratch/1f23d267138b/aegis-security-cloud/apps/web
+
+ ✓ tests/mfa.test.tsx (3 tests) 559ms
+   ✓ requires confirmation before enabling and displays recovery codes once  411ms
+ ✓ tests/support.test.tsx (2 tests) 430ms
+ ✓ tests/findings.test.tsx (3 tests) 559ms
+   ✓ searches server data and prevents viewer mutations  497ms
+ ✓ tests/account.test.tsx (2 tests) 579ms
+   ✓ saves a display name through the authenticated API  341ms
+ ✓ tests/firebase.test.tsx (3 tests) 610ms
+   ✓ creates only with explicit mode and recovery password before session exchange  414ms
+ ✓ tests/intelligence.test.tsx (4 tests) 676ms
+   ✓ separates advisory data and requires monitoring consent  406ms
+ ✓ tests/console.test.tsx (5 tests) 1008ms
+   ✓ Workspace behavior with isolated API fixtures > registers and opens verification without pretending email is verified  456ms
+ ✓ tests/ownership.test.tsx (2 tests) 478ms
+   ✓ recovers a challenge and prepares a link without claiming verification  458ms
+ ✓ tests/team.test.tsx (3 tests) 456ms
+ ✓ tests/retest.test.tsx (2 tests) 341ms
+   ✓ recovers evidence and approval target without manually copying identifiers  313ms
+ ✓ tests/ownership-transfer.test.tsx (1 test) 509ms
+   ✓ requires selection and consent before submitting confirmed ownership  508ms
+ ✓ tests/operations.test.tsx (2 tests) 415ms
+   ✓ paginates and refreshes real records  385ms
+ ✓ tests/attachments.test.tsx (3 tests) 317ms
+ ✓ tests/notification-preferences.test.tsx (2 tests) 261ms
+ ✓ tests/account-link.test.tsx (2 tests) 4ms
+ ✓ tests/firebase-client.test.tsx (2 tests) 7ms
+ ✓ tests/deployment.test.tsx (2 tests) 4ms
+ ✓ tests/connections.test.tsx (2 tests) 183ms
+
+ Test Files  18 passed (18)
+      Tests  45 passed (45)
+   Start at  09:29:36
+   Duration  4.32s (transform 779ms, setup 0ms, collect 4.06s, tests 7.40s, environment 11.36s, prepare 1.22s)
+
+JUNIT report written to /workspace/scratch/1f23d267138b/aegis-security-cloud/docs/testing/finding-browser-frontend.xml
