@@ -14,7 +14,7 @@ from .models import User, LoginSession, EmailToken, Organization, Membership, As
 from .auth import current, member, admin, audit, digest, hasher, send_token
 from .runtime import validate_runtime
 
-validate_runtime()
+validate_runtime('api')
 
 app = FastAPI(title='AEGIS Security Cloud', version='0.1.0', description='Authorized configuration assessment. Not comprehensive penetration testing. Payments disabled.')
 

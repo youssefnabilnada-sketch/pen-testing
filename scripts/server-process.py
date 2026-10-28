@@ -11,7 +11,7 @@ if role!='web':
     # A scanner must not require the API's Firebase/MFA/SMTP secrets.
     os.environ['AEGIS_SERVICE_ROLE']=role
     from aegis.runtime import validate_runtime
-    validate_runtime()
+    validate_runtime(role)
 python=sys.executable
 commands={
  'api':[python,'-m','uvicorn','aegis.main:app','--host','127.0.0.1','--port','8000','--workers','2','--proxy-headers','--forwarded-allow-ips','127.0.0.1'],
