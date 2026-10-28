@@ -46,3 +46,9 @@ def test_guidance_uses_real_finding_and_tenant_boundary(client,mail,monkeypatch)
         return original_get(self,entity,ident,*args,**kwargs)
     monkeypatch.setattr(DatabaseSession,'get',missing_job)
     assert client.get(path).status_code==409
+
+def test_api_guidance_does_not_claim_a_proven_code_root_cause():
+    p=build_plan(sample('api.transport'),SimpleNamespace(id='a',origin='http://owned.example'),'cloud')
+    assert p['recommended_action']==RULES['api.transport'][2]
+    assert 'root cause and exploitability have not been established' in p['root_cause']
+    assert p['fix_verified'] is False

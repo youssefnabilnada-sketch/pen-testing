@@ -2,7 +2,9 @@
 import base64
 import difflib
 import json
+import math
 import re
+from decimal import Decimal
 import secrets
 import time
 from urllib.parse import quote
@@ -101,7 +103,14 @@ def propose_nosniff(content):
             obj[key]=value
         return obj
     def reject_constant(value):raise ValueError('Non-finite JSON values require manual review.')
-    config=json.loads(content or '{}',object_pairs_hook=unique_object,parse_constant=reject_constant)
+    def exact_float(value):
+        # JSON can overflow to Infinity or silently lose decimal precision.
+        number=float(value)
+        if not math.isfinite(number) or Decimal(str(number))!=Decimal(value):
+            raise ValueError('Non-round-trippable JSON numbers require manual review.')
+        return number
+    parse_options={'object_pairs_hook':unique_object,'parse_constant':reject_constant,'parse_float':exact_float}
+    config=json.loads(content or '{}',**parse_options)
     if not isinstance(config,dict):raise ValueError('Expected a JSON object.')
     headers=config.setdefault('headers',[])
     if not isinstance(headers,list):raise ValueError('Invalid headers configuration.')
@@ -111,10 +120,12 @@ def propose_nosniff(content):
             if not isinstance(header,dict) or not isinstance(header.get('key'),str):raise ValueError('Invalid header entry.')
             if header['key'].lower()=='x-content-type-options':raise ValueError('Existing policy requires manual review; no overwrite proposed.')
     headers.append({'source':'/(.*)','headers':[{'key':'X-Content-Type-Options','value':'nosniff'}]})
-    result=json.dumps(config,ensure_ascii=False,indent=2)+'\n'
+    result=json.dumps(config,ensure_ascii=False,indent=2,allow_nan=False)+'\n'
+    if len(result.encode('utf-8'))>65536:
+        raise ValueError('Proposed configuration exceeds the safe size limit.')
     # Structural regression check: removing our exact addition restores every original field.
-    verified=json.loads(result);verified['headers'].pop()
-    before=json.loads(content or '{}');before.setdefault('headers',[])
+    verified=json.loads(result,**parse_options);verified['headers'].pop()
+    before=json.loads(content or '{}',**parse_options);before.setdefault('headers',[])
     if verified!=before:raise ValueError('Configuration preservation test failed.')
     return result
 

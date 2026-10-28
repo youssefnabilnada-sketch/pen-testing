@@ -53,7 +53,7 @@ def build_plan(finding,asset,platform):
         'origin':asset.origin,'rule':finding.rule,'observed_status':finding.status,
         'evidence':{'summary':finding.evidence,'confidence':finding.confidence,'last_observed':finding.last_observed},
         'platform':platform,'platform_verified':False,'method':method,
-        'root_cause':'The assessment observed a response configuration signal; the responsible source file, hosting layer and exploitability have not been established.',
+        'root_cause':'The assessment recorded a security configuration observation; the responsible component, actual root cause and exploitability have not been established.',
         'recommended_action':action,'platform_guidance':context,
         'missing_information':['Confirmed technology and version','Responsible source/configuration layer','Authorized staging environment and deployment revision','Application compatibility requirements'],
         'compatibility_risks':['Browser policy changes can break scripts, embedding and third-party integrations.','Cookie changes can affect login, checkout and cross-site authentication.','HTTPS/HSTS changes require valid certificates and coverage of affected hosts.'],

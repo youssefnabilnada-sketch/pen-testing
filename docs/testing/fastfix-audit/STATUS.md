@@ -1,3 +1,7 @@
+## Additional independent continuation — strict JSON numeric and output limits
+
+The existing proposed fix parser still allowed JSON exponents such as `1e999` that Python converts to non-finite floats, and silently rounded very precise numeric values. This revision rejects floats that cannot round-trip exactly through the built-in encoder, verifies the entire generated JSON remains within the existing 64 KiB safety budget, and parses the generated proposal with the same strict options. Added regression tests for overflow, underflow, precision loss, near-limit expansion, and a valid exact decimal. Also changed a potentially over-specific FastFix root-cause statement to explicitly acknowledge that the underlying cause is unproven for API and other configuration observations. No customer repository changes or public AI enablement are added. GitHub CI evidence for this revision must be checked after push.
+
 # Authoritative audit/FastFix continuation — 2026-10-28
 
 Base verified from private GitHub: main 73ce5577e5e060be88c32e3e310f1961c1d699ac. All650 file blobs were independently SHA1-verified against the remote tree. Direct CLI clone lacked terminal credentials; connector reads supplied the exact snapshot. The original remote history remains untouched. Local snapshot commit is not represented as the original remote commit.
