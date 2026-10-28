@@ -6,6 +6,8 @@ import sys
 from pathlib import PurePosixPath
 
 MAX_BLOB_BYTES=2*1024*1024
+MAX_TEXT_BYTES=16*1024*1024
+INSPECTABLE_TEXT_EXTENSIONS=frozenset({'.log','.txt','.md','.json','.xml','.csv'})
 PATTERNS={
     'private-key':re.compile(rb"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----"),
     'github-token':re.compile(rb"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})"),
@@ -27,7 +29,15 @@ def is_sensitive_path(path):
 
 def analyze_blob(path,data):
     problems=['sensitive-filename'] if is_sensitive_path(path) else []
-    if len(data)>MAX_BLOB_BYTES:return problems+['oversized-object-requires-manual-review']
+    if len(data)>MAX_BLOB_BYTES:
+        if (len(data)>MAX_TEXT_BYTES or
+            PurePosixPath(path.lower()).suffix not in INSPECTABLE_TEXT_EXTENSIONS):
+            return problems+['oversized-object-requires-manual-review']
+        if b'\x00' in data:
+            return problems+['large-binary-object-requires-manual-review']
+        try:data.decode('utf-8')
+        except UnicodeDecodeError:
+            return problems+['large-non-utf8-object-requires-manual-review']
     return problems+[name for name,pattern in PATTERNS.items() if pattern.search(data)]
 
 def git(*args,cwd='.'):
@@ -52,9 +62,13 @@ def audit_history(cwd='.'):
         if git('cat-file','-t',sha,cwd=cwd).strip()!=b'blob':continue
         size=int(git('cat-file','-s',sha,cwd=cwd).strip())
         path=path_raw.decode('utf-8',errors='replace')
-        data=b'' if size>MAX_BLOB_BYTES else git('cat-file','blob',sha,cwd=cwd)
-        issues=(['oversized-object-requires-manual-review'] if size>MAX_BLOB_BYTES
-                else [issue for issue in analyze_blob(path,data) if issue!='sensitive-filename'])
+        if size>MAX_TEXT_BYTES:
+            issues=['oversized-object-requires-manual-review']
+        elif size>MAX_BLOB_BYTES and PurePosixPath(path.lower()).suffix not in INSPECTABLE_TEXT_EXTENSIONS:
+            issues=['oversized-object-requires-manual-review']
+        else:
+            data=git('cat-file','blob',sha,cwd=cwd)
+            issues=[issue for issue in analyze_blob(path,data) if issue!='sensitive-filename']
         examined+=1
         for issue in issues:findings.append((sha[:12],path,issue))
     return len(records),examined,findings

@@ -31,6 +31,21 @@ class PublicHistoryTests(unittest.TestCase):
         self.assertIn('oversized-object-requires-manual-review',
                       guard.analyze_blob('data',b'x'*(guard.MAX_BLOB_BYTES+1)))
 
+    def test_large_utf8_text_log_is_inspected_and_not_automatically_blocked(self):
+        benign=b'normal build diagnostics\\n' * (guard.MAX_BLOB_BYTES//22+100)
+        self.assertGreater(len(benign),guard.MAX_BLOB_BYTES)
+        self.assertEqual(guard.analyze_blob('docs/testing/build.log',benign),[])
+
+    def test_large_log_secret_is_still_detected(self):
+        data=b'normal build diagnostics\\n'*(guard.MAX_BLOB_BYTES//22+100)
+        data+=b'ghp_'+b'A'*36
+        self.assertIn('github-token',guard.analyze_blob('docs/testing/build.log',data))
+
+    def test_large_log_with_binary_content_requires_manual_review(self):
+        data=b'x'*(guard.MAX_BLOB_BYTES+1)+b'\\x00'
+        self.assertIn('large-binary-object-requires-manual-review',
+                      guard.analyze_blob('docs/testing/build.log',data))
+
     def test_deleted_sensitive_file_remains_visible_in_history(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)

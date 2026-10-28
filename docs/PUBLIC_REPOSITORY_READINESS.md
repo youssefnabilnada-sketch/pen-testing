@@ -8,7 +8,7 @@ The current GitHub CI baseline and the Universal FastFix branch do **not** estab
 
 - Uses a full-history checkout to examine reachable Git object content and historical file names, including previously deleted files.
 - Looks for a narrow set of high-confidence credential/private-key indicators without printing secret values.
-- Blocks on suspicious sensitive filenames or files too large to inspect.
+- Inspects larger UTF-8 text logs, Markdown, JSON, XML and CSV up to 16 MiB; refuses oversized, opaque/binary, or non-UTF-8 large objects. Does not automatically waive unusual files.
 - Includes local isolated tests proving that a deleted .env remains detectable.
 
 Run on a full-history checkout: `python scripts/check_public_repo_history.py`.
@@ -27,3 +27,7 @@ Before changing visibility:
 7. Make visibility changes separately through GitHub owner Settings only after explicit final owner review; making a repo public exposes prior commits, not just the newest source.
 
 Keep billing and public AI disabled pending authorization and evaluation. GitHub publication and customer SaaS deployment are separate decisions.
+
+## 2026-10-28 audit iteration
+
+A 2.3 MiB committed historical build log triggered the initial conservative size block. The gate now inspects large UTF-8 text logs instead of automatically failing on size alone; it still blocks unreadable and binary large files, and all recognized secret indicators. Approval remains NO-GO until the latest CI run and independent pre-publication review complete.
