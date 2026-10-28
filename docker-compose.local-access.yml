@@ -1,0 +1,14 @@
+# Local Windows access + outbound access for explicitly authorized public targets.
+# Database and Redis remain internal; published ports stay bound to 127.0.0.1.
+services:
+  web:
+    networks: [control, local_access]
+  mailpit:
+    networks: [control, local_access]
+  api:
+    networks: [control, targets, local_access]
+  worker:
+    networks: [control, targets, local_access]
+networks:
+  local_access:
+    driver: bridge

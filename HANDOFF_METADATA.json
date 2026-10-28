@@ -1,0 +1,12 @@
+{
+  "source_commit": "0b0c44a1744a4fd8fed41f5d9941d35f98a7d2f8",
+  "branch": "master",
+  "sanitized_history_commit": "8a71b680bf36d4fe7772f71d054624798d3651ce",
+  "history_sanitization": "Public Firebase API-key values removed from every exported revision; commit IDs differ. No private credential files exported.",
+  "state": "Incomplete development handoff, not final release",
+  "frontend_latest": "75 passed across26 files",
+  "ruff": "passed",
+  "wordpress_runtime": "FAILED bootstrap critical error; test preserved",
+  "backend_latest": "281 passed,6 skipped (prior evidence)",
+  "excluded": "Generated dependencies/builds/local databases/.env/private credential files/stale pnpm lock. Synthetic test credentials retained."
+}

@@ -1,0 +1,21 @@
+.env
+*.env
+firebase-identity.json
+*.db
+*.sqlite
+__pycache__/
+.pytest_cache/
+.coverage
+node_modules/
+.next/
+*.tsbuildinfo
+test-results/
+playwright-report/
+*-firebase-adminsdk-*.json
+service-account*.json
+.firebase/
+*.dump
+.next-*/
+
+# Authentication CLI diagnostics may contain sensitive session data
+firebase-debug*.log

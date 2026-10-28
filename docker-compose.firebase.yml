@@ -1,0 +1,17 @@
+# Optional identity API ONLY. The scanner never mounts Firebase credentials.
+services:
+  api:
+    build:
+      context: ./apps/api
+      args:
+        INSTALL_FIREBASE: 'true'
+    environment:
+      FIREBASE_AUTH_ENABLED: 'true'
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:?Set your Firebase project ID}
+      FIREBASE_WEB_API_KEY: ${FIREBASE_WEB_API_KEY:?Copy the public Firebase web API key}
+      FIREBASE_WEB_APP_ID: ${FIREBASE_WEB_APP_ID:?Copy the public Firebase web App ID}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase_identity
+    secrets: [firebase_identity]
+secrets:
+  firebase_identity:
+    file: ${FIREBASE_CREDENTIAL_FILE:?Set a credential file path outside this repository}

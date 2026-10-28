@@ -1,0 +1,135 @@
+name: aegis-security-cloud
+x-api: &api
+  build: ./apps/api
+  environment: &environment
+    DATABASE_HOST: db
+    DATABASE_PORT: '5432'
+    DATABASE_NAME: aegis
+    DATABASE_USER: aegis
+    DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env and set POSTGRES_PASSWORD}
+    REDIS_URL: redis://redis:6379/0
+    SMTP_HOST: mailpit
+    SMTP_PORT: 1025
+    WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+    COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    LOCAL_FIXTURE_MODE: ${LOCAL_FIXTURE_MODE:-true}
+    PAYMENTS_ENABLED: 'false'
+    BILLING_MODE: disabled
+    DEMO_ACCESS_ENABLED: 'true'
+  networks: [control, targets]
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  read_only: true
+  tmpfs: [/tmp]
+  mem_limit: 512m
+  cpus: 1
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: aegis
+      POSTGRES_USER: aegis
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    networks: [control]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U aegis -d aegis']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    command: [redis-server, --appendonly, 'yes']
+    volumes: [redisdata:/data]
+    networks: [control]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    <<: *api
+    command: [alembic, -c, alembic.ini, upgrade, head]
+    depends_on:
+      db: {condition: service_healthy}
+  api:
+    <<: *api
+    ports: ['127.0.0.1:8000:8000']
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+      mailpit: {condition: service_started}
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://localhost:8000/health", timeout=3)']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  worker:
+    <<: *api
+    command: [celery, -A, aegis.worker.celery, worker, --loglevel=INFO, --concurrency=1, --hostname=scanner@%h]
+    environment:
+      <<: *environment
+      # Scanner worker has no SMTP credentials or external AI credentials.
+      SMTP_HOST: disabled
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, 'celery -A aegis.worker.celery inspect ping -d scanner@$$HOSTNAME --timeout 3']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  intelligence-worker:
+    <<: *api
+    command: [celery, -A, aegis.worker.celery, worker, -Q, intelligence, --loglevel=INFO, --concurrency=1, --hostname=intelligence@%h]
+    networks: [control, intelligence_egress]
+    environment:
+      <<: *environment
+      SMTP_HOST: disabled
+      LOCAL_FIXTURE_MODE: 'false'
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+  scheduler:
+    <<: *api
+    command: [celery, -A, aegis.worker.celery, beat, --loglevel=INFO, --schedule=/tmp/aegis-beat]
+    networks: [control]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+  web:
+    build: ./apps/web
+    ports: ['127.0.0.1:3000:3000']
+    networks: [control]
+    depends_on:
+      api: {condition: service_healthy}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    mem_limit: 768m
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports: ['127.0.0.1:8025:8025']
+    networks: [control]
+  fixture:
+    image: python:3.12-alpine
+    command: [python, /fixture/server.py]
+    volumes: ['./infrastructure/fixture:/fixture:ro']
+    networks:
+      targets:
+        ipv4_address: 172.29.0.10
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+networks:
+  intelligence_egress: {}
+  control:
+    internal: true
+  targets:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.29.0.0/24
+volumes:
+  pgdata:
+  redisdata:
