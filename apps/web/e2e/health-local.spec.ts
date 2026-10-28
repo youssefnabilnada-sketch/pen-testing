@@ -15,7 +15,9 @@ test('authorized health dashboard configures checks and displays real history',a
   await expect(page.getByText(/up · Enabled/)).toBeVisible();
  }).toPass({timeout:15000});
  await page.getByRole('button',{name:'View history'}).click();
- await expect(page.getByText(/HTTP 200/)).toBeVisible();
+ // Multiple successful samples are legitimate; verify visible history without
+ // assuming the sample text appears exactly once.
+ await expect(page.getByText(/HTTP 200/).first()).toBeVisible();
  await page.getByRole('button',{name:'Disable monitor'}).click();
  await expect(page.getByText(/Disabled · consent ends/)).toBeVisible();
  await page.screenshot({path:info.outputPath('health-dashboard.png'),fullPage:true});
