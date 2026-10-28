@@ -36,7 +36,7 @@ def test_supported_exact_numeric_value_still_preserves_existing_configuration():
     assert fixed['headers'][-1]['headers'][0]['value']=='nosniff'
 
 
-@pytest.mark.parametrize('source',['', ' ', '\\n'])
+@pytest.mark.parametrize('source',['', ' ', '\n'])
 def test_empty_or_whitespace_only_configuration_needs_manual_review(source):
     # An existing zero-length vercel.json is invalid JSON, not an empty object.
     with pytest.raises(ValueError):propose_nosniff(source)
