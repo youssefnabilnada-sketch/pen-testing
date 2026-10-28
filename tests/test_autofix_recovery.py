@@ -2,7 +2,7 @@ from sqlalchemy import select
 from fastapi.testclient import TestClient
 from aegis.db import Session
 from aegis.main import app
-from aegis.models import PatchBackup
+from aegis.models import PatchBackup, Report
 from test_repositories import github,patch_setup
 from conftest import signup
 
@@ -68,6 +68,9 @@ def test_staging_link_requires_separate_new_completed_asset(client,mail,monkeypa
     endpoint=f'/repository-patches/{pid}/staging-evidence'
     assert client.post(endpoint,json={'job_id':jid,'accepted':True}).status_code==409
     monkeypatch.setattr(worker,'fetch',lambda origin:GOOD);worker.assess(jid)
+    with Session() as db:
+        report=db.scalar(select(Report).where(Report.job_id==jid))
+        assert report is not None and report.snapshot['profile']['paths']==['/']
     assert client.post(endpoint,json={'job_id':jid,'accepted':False}).status_code==403
     r=client.post(endpoint,json={'job_id':jid,'accepted':True})
     assert r.status_code==200,r.text
