@@ -110,7 +110,7 @@ def propose_nosniff(content):
             raise ValueError('Non-round-trippable JSON numbers require manual review.')
         return number
     parse_options={'object_pairs_hook':unique_object,'parse_constant':reject_constant,'parse_float':exact_float}
-    config=json.loads(content or '{}',**parse_options)
+    config=json.loads(content,**parse_options)
     if not isinstance(config,dict):raise ValueError('Expected a JSON object.')
     headers=config.setdefault('headers',[])
     if not isinstance(headers,list):raise ValueError('Invalid headers configuration.')
@@ -125,7 +125,7 @@ def propose_nosniff(content):
         raise ValueError('Proposed configuration exceeds the safe size limit.')
     # Structural regression check: removing our exact addition restores every original field.
     verified=json.loads(result,**parse_options);verified['headers'].pop()
-    before=json.loads(content or '{}',**parse_options);before.setdefault('headers',[])
+    before=json.loads(content,**parse_options);before.setdefault('headers',[])
     if verified!=before:raise ValueError('Configuration preservation test failed.')
     return result
 
