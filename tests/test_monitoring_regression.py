@@ -121,7 +121,9 @@ def test_scheduler_slots_dedup_expiry_and_revocation(client,mail,monkeypatch):
         schedule=db.get(AssessmentSchedule,r.json()['id']);schedule.next_due=0;db.get(Authorization,schedule.authorization_id).expires=0;db.commit()
     assert monitoring.monitor_tick()==[]
     data=client.get(f'/organizations/{org}/intelligence').json()
-    assert data['schedules'][0]['status']=='blocked'
+    # A revoked/expired authorization must never appear to permit recurring scans.
+    assert data['schedules'][0]['status']=='blocked_no_current_consent'
+    assert data['schedules'][0]['authorization_active'] is False
     assert any(n['kind']=='schedule_blocked' for n in data['notifications'])
     assert client.delete('/schedules/'+r.json()['id']).status_code==200
     assert monitoring.monitor_tick()==[]
