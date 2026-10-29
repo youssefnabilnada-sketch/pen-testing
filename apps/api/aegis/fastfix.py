@@ -9,6 +9,7 @@ from .analyst import RULES
 
 router=APIRouter(tags=['Universal FastFix guidance'])
 PLATFORMS={
+    'netlify':('hosting_guidance','Existing netlify.toml nosniff proposals are supported through the separately approved GitHub workflow. Static responses only; functions, SSR, proxies and competing _headers require manual review.'),
     'unknown':('engineering_review','Identify the responsible application, hosting layer and maintainer before changing configuration.'),
     'github':('developer_handoff','Confirm the repository actually deploys this asset. Existing draft-PR support is limited to reviewed vercel.json nosniff proposals.'),
     'gitlab':('developer_handoff','Have a maintainer create a reviewed merge request. No live GitLab write adapter is implemented.'),
@@ -67,6 +68,8 @@ def build_plan(finding,asset,platform):
     }
     if known and rule=='header.nosniff' and platform in ('github','nextjs','static'):
         plan['optional_supported_adapter']={'name':'github_vercel_nosniff','availability':'conditional; separately authorized connected repository and accepted remediation scope required','entrypoint':'/repository-patches','limitations':'Existing vercel.json only; no application tests or deployment implied.'}
+    if known and rule=='header.nosniff' and platform=='netlify':
+        plan['optional_supported_adapter']={'name':'github_netlify_nosniff','adapter':'netlify','availability':'conditional; separately authorized connected repository and accepted remediation scope required','entrypoint':'/repository-patches','limitations':'Existing root netlify.toml; static responses only. No application tests, deployment or fix verification implied.'}
     plan['content_sha256']=hashlib.sha256(json.dumps(plan,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     return plan
 
