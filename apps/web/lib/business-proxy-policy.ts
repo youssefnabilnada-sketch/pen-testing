@@ -18,6 +18,15 @@ export function businessGate(
   browserOrigin: string,
 ): {allowed: true; secret?: string} | {allowed: false; status:403|503} {
   if (path === '/health' && method === 'GET') return {allowed:true};
+  // Only the isolated, loopback CI native-runtime test may bypass the
+  // preview gateway. Never honor TESTING on Vercel or in AEGIS production.
+  const localBackend = env.API_INTERNAL_URL || 'http://localhost:8000';
+  const isolatedTest = env.TESTING === '1'
+    && env.AEGIS_ENV !== 'production'
+    && env.VERCEL !== '1'
+    && !env.VERCEL_ENV
+    && /^http:\/\/(?:localhost|127\.0\.0\.1):8000\/?$/.test(localBackend);
+  if (isolatedTest) return {allowed:true};
   if (env.VERCEL_ENV !== 'preview' || env.AEGIS_PREVIEW_AUTH_ENABLED !== 'true')
     return {allowed:false,status:503};
   const secret = env.AEGIS_PREVIEW_GATEWAY_KEY ?? '';
