@@ -13,6 +13,7 @@ from .historical_records import asset_origin
 from .models import User, LoginSession, EmailToken, Organization, Membership, Asset, Challenge, Authorization, Job, Finding, FindingHistory, Report, Remediation, Message, Audit, Setting
 from .auth import current, member, admin, audit, digest, hasher, send_token
 from .runtime import validate_runtime
+from .request_origins import allowed_request_origins
 
 validate_runtime('api')
 
@@ -22,7 +23,7 @@ app = FastAPI(title='AEGIS Security Cloud', version='0.1.0', description='Author
 async def security_headers(request: Request, call_next):
     if request.method not in ('GET', 'HEAD', 'OPTIONS'):
         origin = request.headers.get('origin')
-        if origin and origin != os.getenv('WEB_ORIGIN', 'http://localhost:3000'):
+        if origin and origin not in allowed_request_origins():
             return Response(status_code=403, content='Untrusted origin')
     result = await call_next(request)
     result.headers['X-Content-Type-Options'] = 'nosniff'
