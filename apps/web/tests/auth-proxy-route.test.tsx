@@ -49,6 +49,25 @@ describe('server-only Vercel auth proxy',()=>{
   expect(stub).toHaveBeenCalledOnce();
   expect(stub.mock.calls[0][0]).toBe(backend+'/auth/login');
  });
+ it('accepts empty-body logout but never forwards a non-JSON payload',async()=>{
+  vi.stubEnv('API_INTERNAL_URL',backend);
+  vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','false');
+  vi.stubEnv('VERCEL_ENV','production');
+  const upstream=vi.fn(async (_url:string,options:RequestInit)=>{
+    expect(options.body).toBeUndefined();
+    return new Response('{"message":"Signed out."}',{status:200});
+  });
+  vi.stubGlobal('fetch',upstream);
+  const logout=request('POST','auth/logout',preview);
+  logout.headers.delete('content-type');
+  (logout as unknown as {arrayBuffer:()=>Promise<ArrayBuffer>}).arrayBuffer=async()=>new ArrayBuffer(0);
+  expect((await POST(logout,context(['logout']))).status).toBe(200);
+  expect(upstream).toHaveBeenCalledOnce();
+  const malformed=request('POST','auth/logout',preview);
+  malformed.headers.set('content-type','text/plain');
+  expect((await POST(malformed,context(['logout']))).status).toBe(415);
+  expect(upstream).toHaveBeenCalledOnce();
+ });
  it('staging requires a server secret and exact browser Origin before proxying writes',async()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
   vi.stubEnv('VERCEL_ENV','preview');
