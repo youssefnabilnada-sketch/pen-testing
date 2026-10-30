@@ -34,3 +34,13 @@ it('ignores late responses from the previous remediation request',async()=>{
  await waitFor(()=>expect(screen.queryByText(pending.evidence)).toBeNull());
  expect(screen.queryByRole('button',{name:'Approve & run full reassessment'})).toBeNull();
 });
+it('does not show a late plan after switching request identity',async()=>{
+ let finish!:(value:unknown)=>void;const delayed=new Promise(resolve=>{finish=resolve});
+ const api=vi.fn((p:string)=>p.endsWith('/old/plan')?delayed:Promise.resolve([]));
+ const {rerender}=render(<RetestPanel api={api} requestId="old" assetId="a" onUpdate={vi.fn()} role="owner"/>);
+ await userEvent.click(screen.getByText('Review change & full security retest'));
+ await userEvent.click(screen.getByRole('button',{name:'Retrieve remediation plan'}));
+ rerender(<RetestPanel api={api} requestId="new" assetId="b" onUpdate={vi.fn()} role="owner"/>);
+ await act(async()=>{finish({original_finding:{supported_configuration_fix:'OLD REQUEST PRIVATE PLAN'},plan:{},source_code_access:'none'});await delayed;});
+ expect(screen.queryByText('OLD REQUEST PRIVATE PLAN')).toBeNull();
+});

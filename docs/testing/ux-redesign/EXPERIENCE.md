@@ -1,3 +1,7 @@
+# Newer checkpoint
+
+See `RESUME.md` in this directory. Baseline bd3d0e1 CI run 41066185428 passed all 10 jobs, including browser health and desktop/mobile smoke. Earlier pending statements below are historical. New source changes require their own CI result.
+
 # Experience continuation — 2026-10-30
 
 Base ffa702484f4ccb27bcea58f48db7384184f64bc8; same feature branch.

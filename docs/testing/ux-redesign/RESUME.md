@@ -36,3 +36,10 @@ Local SWC preview issue remains; supported browser CI is used instead.
 Resume: inspect candidate CI first, fix failures without weakening assertions; review this
 file and EXPERIENCE.md. Preserve existing work. Integration requires deployment-workstream
 review and explicit approval. Revert UI commits for rollback; no data migration or rollback.
+
+Follow-up before final candidate: keyed retest state by request+asset identity, preventing
+late plan responses as well as list responses from appearing in a different request. Added
+regression for delayed plan resolution. Six focused retest/comparison tests and TypeScript
+passed; consent scope text now bilingual with the same paths, 24-hour window and no-deploy
+limitation. Latest onboarding/console result: 13 passed. Current browser fixture execution
+must be read from CI before claiming success.
