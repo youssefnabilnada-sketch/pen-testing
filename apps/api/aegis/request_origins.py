@@ -16,7 +16,7 @@ def valid_preview_origin(value: str) -> bool:
         return (
             parsed.scheme == "https"
             and parsed.hostname is not None
-            and re.fullmatch(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+vercel\\.app", parsed.hostname) is not None
+            and re.fullmatch(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+vercel\.app", parsed.hostname) is not None
             and parsed.username is None
             and parsed.password is None
             and parsed.port in (None, 443)
