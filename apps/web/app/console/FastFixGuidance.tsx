@@ -2,7 +2,7 @@
 import {useExperience} from './Experience';
 import {useEffect,useState} from 'react';
 type API=(p:string,m?:string,d?:unknown)=>Promise<any>;
-const platforms=['unknown','github','gitlab','wordpress','woocommerce','joomla','drupal','php','laravel','python','django','fastapi','node','express','nextjs','react','vue','nuxt','java','spring','aspnet','rails','static','cpanel','plesk','cloud','shopify','wix','webflow','custom'];
+const platforms=['unknown','github','netlify','gitlab','wordpress','woocommerce','joomla','drupal','php','laravel','python','django','fastapi','node','express','nextjs','react','vue','nuxt','java','spring','aspnet','rails','static','cpanel','plesk','cloud','shopify','wix','webflow','custom'];
 export default function FastFixGuidance({api,findingId}:{api:API;findingId:string}){
  const {t}=useExperience();
  const [platform,setPlatform]=useState('unknown'),[plan,setPlan]=useState<any>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false),[opened,setOpened]=useState(false);
