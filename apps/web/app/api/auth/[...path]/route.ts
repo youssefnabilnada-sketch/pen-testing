@@ -32,7 +32,7 @@ async function proxyAuth(request: NextRequest, context: Context): Promise<Respon
   if (session) headers.set('Cookie',session);
   if (gate.secret) headers.set('X-AEGIS-Preview-Gateway',gate.secret);
 
-  let body: Uint8Array | undefined;
+  let body: string | undefined;
   if (!['GET','HEAD'].includes(request.method)) {
     if (request.headers.get('content-type')?.split(';')[0]?.toLowerCase() !== 'application/json')
       return new Response('JSON content required.', {status:415});
@@ -42,7 +42,7 @@ async function proxyAuth(request: NextRequest, context: Context): Promise<Respon
     const data = await request.arrayBuffer();
     if (data.byteLength > 65536)
       return new Response('Request too large.', {status:413});
-    body = new Uint8Array(data);
+    body = new TextDecoder().decode(data);
   }
 
   let upstream: Response;
