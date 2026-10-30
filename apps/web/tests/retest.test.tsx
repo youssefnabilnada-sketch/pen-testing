@@ -1,5 +1,5 @@
 import React from 'react';
-import {render,screen,cleanup,waitFor} from '@testing-library/react';
+import {render,screen,cleanup,waitFor,act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach,it,expect,vi} from 'vitest';
 import RetestPanel from '../app/console/RetestPanel';
@@ -21,4 +21,16 @@ it('viewer can read evidence but cannot approve or record changes',async()=>{
  await userEvent.click(screen.getByText('Review change & full security retest'));
  expect(await screen.findByText(pending.evidence)).toBeTruthy();
  expect(screen.queryByRole('checkbox')).toBeNull();expect(screen.queryByRole('textbox')).toBeNull();
+});
+it('ignores late responses from the previous remediation request',async()=>{
+ let finish!:(value:unknown)=>void;
+ const old=new Promise(resolve=>{finish=resolve});
+ const api=vi.fn((p:string)=>p.includes('/old/')?old:Promise.resolve([]));
+ const {rerender}=render(<RetestPanel api={api} requestId="old" assetId="a" onUpdate={vi.fn()} role="owner"/>);
+ rerender(<RetestPanel api={api} requestId="new" assetId="b" onUpdate={vi.fn()} role="owner"/>);
+ await userEvent.click(screen.getByText('Review change & full security retest'));
+ await screen.findByText('No recorded changes or retests yet.');
+ await act(async()=>{finish([pending]);await old;});
+ await waitFor(()=>expect(screen.queryByText(pending.evidence)).toBeNull());
+ expect(screen.queryByRole('button',{name:'Approve & run full reassessment'})).toBeNull();
 });

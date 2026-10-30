@@ -1,3 +1,7 @@
+# Latest recovery and remediation UX checkpoint
+
+Read `docs/testing/ux-redesign/RESUME.md` first. Continued exact remote bd3d0e1 on the same feature branch; baseline CI all 10 jobs passed. Retest stale-response protection, comparison states and additional Arabic guidance implemented and locally tested. Candidate CI must be checked. Full redesign remains incomplete; production untouched.
+
 # Experience continuation — 2026-10-30
 
 Read `docs/testing/ux-redesign/EXPERIENCE.md` for current implementation and verification. Same `feature/aegis-ultimate-ux-redesign` branch; shared glass surfaces, progressive evidence/FastFix details, partial Arabic/RTL and offscreen 3D optimization added. 93 frontend tests passed. Browser CI pending; complete redesign still unfinished. Production untouched.

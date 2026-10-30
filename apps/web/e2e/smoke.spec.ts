@@ -34,3 +34,26 @@ test('isolated workspace fixture supports primary navigation, reports and Arabic
  await expect(page.getByRole('button',{name:'أمان الحساب',exact:true})).toBeVisible();
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
+
+test('isolated FastFix fixture keeps evidence and guidance separate from applied changes',async({page})=>{
+ const mutations:string[]=[];
+ await page.route('**/api/**',async route=>{
+  const path=new URL(route.request().url()).pathname;
+  if(route.request().method()!=='GET')mutations.push(path);
+  const f={id:'fixture-finding',title:'Fixture missing header',rule:'nosniff',origin:'https://fixture.test',severity:'low',confidence:'high',status:'open',evidence:'Controlled fixture response omitted X-Content-Type-Options.',remediation:'Review the response header configuration.'};
+  const data=path==='/api/auth/me'?{id:'fixture-user',email:'fixture@example.test',verified:true,superadmin:false,csrf:'fixture',organizations:[{id:'fixture-org',name:'Isolated UI fixture',role:'viewer'}]}:path.endsWith('/dashboard')?{assets:1,verified_assets:1,completed:1,active:0,open_findings:1,resolved:0,severity:{low:1},pending_remediation:0,trend:[],activity:[]}:path.endsWith('/finding-page')?{items:[f],total:1}:path.endsWith('/fastfix')?{mode:'deterministic fixture guidance',root_cause:'Source code not inspected.',recommended_action:'Review the response policy.',platform_guidance:'Ask the authorized maintainer.',approval:'Separate customer approval required.',compatibility_risks:['Check supported content types.'],validation_required:['Run the approved full reassessment.'],backup_scope:'No backup has been created by this guidance.'}:path.endsWith('/remediation-page')?{items:[],total:0}:[];
+  await route.fulfill({json:data});
+ });
+ await page.goto('/console');
+ await page.getByRole('button',{name:'Findings & fixes',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Fixture missing header'})).toBeVisible();
+ await page.getByText('Evidence and technical context',{exact:true}).click();
+ await expect(page.getByText('Controlled fixture response omitted X-Content-Type-Options.')).toBeVisible();
+ await page.getByRole('button',{name:'Choose a remediation path'}).click();
+ await expect(page.getByText('Guidance only · no change applied')).toBeVisible();
+ await page.getByText('Engineering review and validation',{exact:true}).click();
+ await expect(page.getByText('Run the approved full reassessment.')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Request remediation'})).toHaveCount(0);
+ expect(mutations).toEqual([]);
+ expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
+});
