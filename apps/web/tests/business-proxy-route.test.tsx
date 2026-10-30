@@ -33,6 +33,18 @@ describe('private business gateway boundaries',()=>{
   expect(businessGate({VERCEL_ENV:'production',AEGIS_PREVIEW_AUTH_ENABLED:'true',AEGIS_PREVIEW_GATEWAY_KEY:key},
     '/organizations','GET',null,preview)).toEqual({allowed:false,status:503});
  });
+ it('permits only the isolated loopback native test, never a Vercel testing override',()=>{
+  const isolated={TESTING:'1',API_INTERNAL_URL:'http://localhost:8000'};
+  expect(businessGate(isolated,'/organizations','POST',null,'http://127.0.0.1:3001')).toEqual({allowed:true});
+  for(const env of [
+    {...isolated,VERCEL:'1'},
+    {...isolated,VERCEL_ENV:'production'},
+    {...isolated,AEGIS_ENV:'production'},
+    {...isolated,API_INTERNAL_URL:'https://aegis-pentest-eg-api.duckdns.org'},
+    {...isolated,API_INTERNAL_URL:'http://localhost:8000.evil.test'},
+  ])expect(businessGate(env,'/organizations','POST',null,'http://127.0.0.1:3001'))
+     .toEqual({allowed:false,status:503});
+ });
  it('requires exact Origin for mutating requests',()=>{
   const env={VERCEL_ENV:'preview',AEGIS_PREVIEW_AUTH_ENABLED:'true',AEGIS_PREVIEW_GATEWAY_KEY:key};
   expect(businessGate(env,'/organizations','POST',preview,preview)).toEqual({allowed:true,secret:key});
