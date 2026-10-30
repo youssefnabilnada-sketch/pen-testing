@@ -1,6 +1,6 @@
 import type {NextRequest} from 'next/server';
 import {apiOrigin} from '../../../../lib/deployment';
-import {authPath, previewProxyGate} from '../../../../lib/auth-proxy-policy';
+import {authPath, previewProxyGate, aegisSessionCookie} from '../../../../lib/auth-proxy-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,16 +24,21 @@ async function proxyAuth(request: NextRequest, context: Context): Promise<Respon
   // Never pass X-Forwarded-For or arbitrary browser-supplied headers to an API
   // privileged by a server-side preview secret.
   const headers = new Headers({Accept:'application/json'});
-  for (const key of ['content-type','cookie','origin','x-csrf-token']) {
+  for (const key of ['content-type','origin','x-csrf-token']) {
     const val = request.headers.get(key);
     if (val) headers.set(key,val);
   }
+  const session = aegisSessionCookie(request.headers.get('cookie'));
+  if (session) headers.set('Cookie',session);
   if (gate.secret) headers.set('X-AEGIS-Preview-Gateway',gate.secret);
 
   let body: Uint8Array | undefined;
   if (!['GET','HEAD'].includes(request.method)) {
     if (request.headers.get('content-type')?.split(';')[0]?.toLowerCase() !== 'application/json')
       return new Response('JSON content required.', {status:415});
+    const length = Number(request.headers.get('content-length') || 0);
+    if (!Number.isSafeInteger(length) || length > 65536 || length < 0)
+      return new Response('Request too large.', {status:413});
     const data = await request.arrayBuffer();
     if (data.byteLength > 65536)
       return new Response('Request too large.', {status:413});

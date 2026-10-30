@@ -31,3 +31,13 @@ export function previewProxyGate(
   }
   return { allowed: true, secret };
 }
+
+/** Strip unrelated Vercel/session cookies before forwarding to the private API. */
+export function aegisSessionCookie(raw: string | null): string | null {
+  if (!raw) return null;
+  for (const item of raw.split(';')) {
+    const part = item.trim();
+    if (/^aegis_session=[A-Za-z0-9_-]{32,256}$/.test(part)) return part;
+  }
+  return null;
+}

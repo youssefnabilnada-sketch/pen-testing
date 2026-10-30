@@ -31,6 +31,7 @@ describe('server-only Vercel auth proxy',()=>{
    const h=new Headers(options.headers);
    expect(h.has('X-AEGIS-Preview-Gateway')).toBe(false);
    expect(h.has('X-Forwarded-For')).toBe(false);
+   expect(h.get('Cookie')).toBe('aegis_session='+('v'.repeat(43)));
    return new Response('{"csrf":"generated"}',{status:200,headers:{
      'Set-Cookie':'aegis_session=fixture; HttpOnly; Secure; SameSite=Strict; Path=/',
      'Content-Type':'application/json',
@@ -40,6 +41,7 @@ describe('server-only Vercel auth proxy',()=>{
   const result=await POST(request('POST','auth/login',preview,{
     'X-AEGIS-Preview-Gateway':'attacker-controlled',
     'X-Forwarded-For':'127.0.0.1',
+    'Cookie':'vercel_auth=do-not-leak; aegis_session='+('v'.repeat(43))+'; other=secret',
   }),context(['login']));
   expect(result.status).toBe(200);
   expect(result.headers.get('set-cookie')).toContain('HttpOnly; Secure; SameSite=Strict');

@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {authPath,previewProxyGate} from '../lib/auth-proxy-policy';
+import {authPath,previewProxyGate,aegisSessionCookie} from '../lib/auth-proxy-policy';
 
 const preview = 'https://pen-testing-aspz5rfpn-youssefnabilnada-1001s-projects.vercel.app';
 const secret = 'A'.repeat(64);
@@ -36,5 +36,16 @@ describe('preview secret and exact origin',()=>{
   }
   expect(previewProxyGate(env,preview,preview,'POST')).toEqual({allowed:true,secret});
   expect(previewProxyGate(env,null,preview,'GET')).toEqual({allowed:true,secret});
+ });
+});
+
+describe('auth cookie forwarding',()=>{
+ it('forwards only a well-formed host-only AEGIS session cookie',()=>{
+  const sess='a'.repeat(43);
+  expect(aegisSessionCookie('vercel_auth=sensitive; aegis_session='+sess+'; other=secret'))
+   .toBe('aegis_session='+sess);
+  expect(aegisSessionCookie('vercel_auth=sensitive')).toBeNull();
+  expect(aegisSessionCookie('aegis_session=short')).toBeNull();
+  expect(aegisSessionCookie('aegis_session=bad!token')).toBeNull();
  });
 });
