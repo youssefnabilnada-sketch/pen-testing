@@ -4,15 +4,15 @@
 set -Eeuo pipefail
 if [[ "$(id -u)" -eq 0 ]]; then echo "Run as ubuntu, not root." >&2; exit 1; fi
 for name in postgresql redis-server caddy aegis@api aegis@scanner aegis@intelligence aegis@notifier; do
-  if ! sudo systemctl is-active --quiet "$name"; then
+  if ! sudo -n systemctl is-active --quiet "$name"; then
     echo "STOP: $name is not active. Do not enable unverified services." >&2; exit 1
   fi
 done
-if sudo systemctl is-active --quiet aegis@scheduler; then
+if sudo -n systemctl is-active --quiet aegis@scheduler; then
   echo "STOP: scheduler unexpectedly running. Review before enabling persistence." >&2
   exit 1
 fi
-rev="$(sudo -u postgres psql -X -d aegis -Atqc 'SELECT version_num FROM alembic_version;' 2>/dev/null)"
+rev="$(sudo -n -u postgres psql -X -d aegis -Atqc 'SELECT version_num FROM alembic_version;' 2>/dev/null)"
 if [[ "$rev" != 017_evidence_legal_holds ]]; then
   echo "STOP: database migration head differs; do not enable stale services." >&2
   exit 1
@@ -29,9 +29,9 @@ if [[ "${1:-}" != --apply ]]; then
   exit 0
 fi
 for name in postgresql redis-server caddy aegis@api aegis@scanner aegis@intelligence aegis@notifier; do
-  sudo systemctl enable "$name" >/dev/null
-  sudo systemctl is-enabled --quiet "$name"
+  sudo -n systemctl enable "$name" >/dev/null
+  sudo -n systemctl is-enabled --quiet "$name"
 done
-sudo systemctl disable aegis@scheduler >/dev/null 2>&1 || true
+sudo -n systemctl disable aegis@scheduler >/dev/null 2>&1 || true
 echo "AEGIS_AUTOSTART_ENABLED: database, Redis, Caddy and four running AEGIS roles."
 echo "No services were restarted; scheduler remains disabled. No route was opened."
