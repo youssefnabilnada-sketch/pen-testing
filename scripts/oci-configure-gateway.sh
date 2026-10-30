@@ -16,7 +16,7 @@ fi
 command -v caddy >/dev/null
 sudo systemctl is-active --quiet caddy
 # Avoid overwriting a previously deployed proxy or the current production API.
-if sudo grep -Eq 'aegis-pentest-eg-api\\.duckdns\\.org|reverse_proxy' /etc/caddy/Caddyfile; then
+if sudo grep -Fq "$DOMAIN" /etc/caddy/Caddyfile || sudo grep -Fq 'reverse_proxy' /etc/caddy/Caddyfile; then
   echo 'Caddy appears already configured. Inspect /etc/caddy/Caddyfile; no changes made.' >&2
   exit 1
 fi
