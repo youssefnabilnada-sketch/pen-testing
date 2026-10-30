@@ -46,7 +46,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
    return response(200,[]);
   }));render(<Console/>);const user=userEvent.setup();
   await screen.findByRole('heading',{name:'Your security, in focus.'});
-  await user.click(screen.getByRole('button',{name:'Assets'}));
+  await user.click(screen.getByRole('button',{name:'My websites'}));
   await user.click(await screen.findByRole('button',{name:'Configure'}));
   const launch=screen.getByRole('button',{name:'Launch assessment'}) as HTMLButtonElement;
   expect(launch.disabled).toBe(true);

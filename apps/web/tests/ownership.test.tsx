@@ -22,3 +22,12 @@ it('shows service failure without a success claim',async()=>{
  render(<OwnershipGuide assetId="a" api={api} onVerified={vi.fn()}/>);
  expect((await screen.findByRole('alert')).textContent).toBe('Verification unavailable');
 });
+it.each(['file','dns','meta'])('explains %s verification without granting assessment permission',async(method)=>{
+ const challenge={id:'c',method,token:'proof',instruction:'Exact server instructions',expires:2000000000};
+ const api=vi.fn(async(p:string)=>p.endsWith('/verification-recommendation')?null:challenge);
+ const done=vi.fn(async()=>{});render(<OwnershipGuide assetId="a" api={api} onVerified={done}/>);
+ await screen.findByText('Exact server instructions');
+ expect(screen.getByText(/Return here and choose Check ownership/)).toBeTruthy();
+ expect(api.mock.calls.some(([p])=>p.includes('/verify/'))).toBe(false);
+ expect(done).not.toHaveBeenCalled();
+});
