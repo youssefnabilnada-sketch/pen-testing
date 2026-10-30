@@ -23,7 +23,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
  it('renders a useful service error instead of success',async()=>{
   vi.stubGlobal('fetch',vi.fn(()=>response(503,{})));render(<Console/>);
   expect(await screen.findByRole('alert')).toBeTruthy();
-  expect(screen.getByText(/Account service unavailable/)).toBeTruthy();
+  expect(screen.getByText(/Account sign-in is temporarily unavailable \(HTTP 503\)/)).toBeTruthy();
  });
  it('registers and opens verification without pretending email is verified',async()=>{
   const f=vi.fn((url:string)=>url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
