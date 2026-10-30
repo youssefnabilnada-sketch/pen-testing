@@ -4,6 +4,7 @@ The preview origin is opt-in; production's canonical WEB_ORIGIN remains unchange
 No wildcards, subdomain suffix matching for requests, or CORS relaxation.
 """
 import os
+import re
 from urllib.parse import urlsplit
 
 
@@ -15,8 +16,7 @@ def valid_preview_origin(value: str) -> bool:
         return (
             parsed.scheme == "https"
             and parsed.hostname is not None
-            and parsed.hostname.endswith(".vercel.app")
-            and parsed.hostname != "vercel.app"
+            and re.fullmatch(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+vercel\\.app", parsed.hostname) is not None
             and parsed.username is None
             and parsed.password is None
             and parsed.port in (None, 443)
