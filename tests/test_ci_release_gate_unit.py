@@ -13,7 +13,7 @@ class ReleaseEvidenceTests(unittest.TestCase):
     def all_green(self):
         return {name: {'result': 'success'} for name in gate.REQUIRED}
 
-    def test_all_eight_required_success(self):
+    def test_all_nine_required_success(self):
         self.assertEqual(gate.evaluate(self.all_green()), (True, []))
 
     def test_browser_smoke_must_not_be_skipped_or_missing(self):
@@ -23,6 +23,13 @@ class ReleaseEvidenceTests(unittest.TestCase):
             self.assertFalse(gate.evaluate(evidence)[0])
         evidence = self.all_green()
         evidence.pop('browser-smoke')
+        self.assertFalse(gate.evaluate(evidence)[0])
+
+    def test_publication_history_guard_is_required(self):
+        evidence=self.all_green()
+        evidence['public-repository-history']={'result':'failure'}
+        self.assertFalse(gate.evaluate(evidence)[0])
+        evidence.pop('public-repository-history')
         self.assertFalse(gate.evaluate(evidence)[0])
 
     def test_native_runtime_requires_real_worker_success(self):

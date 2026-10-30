@@ -1,3 +1,62 @@
+# Verified preservation checkpoint — 2026-10-30
+
+Repository: https://github.com/youssefnabilnada-sketch/pen-testing
+Branch: `audit/fastfix-guidance-20261028`. Latest verified implementation:
+`cef9915b3100e7acedd403e28d893373555d8400`. This documentation-only checkpoint
+descends from it. Do not overwrite with earlier recovery snapshots or merge unfinished work into main.
+
+## Preserved and verified
+The complete current branch was cloned with its 22 existing commits, including
+WordPress SmartVerify, notification changes, migrations and all previously committed source.
+FastFix includes strict JSON duplicate/nonfinite/precision rejection, UTF-8 and generated-output
+size limits, evidence-bound guidance and developer handoff, plus reviewed Vercel and
+Netlify static nosniff adapters with backup/restore rehearsal and existing approval/MFA gates.
+No implementation was changed by this preservation operation.
+
+GitHub Actions run 40841851000 on the implementation commit was independently checked:
+10/10 jobs succeeded: backend, web, PostgreSQL migrations, integrated PostgreSQL/Redis,
+native runtime, WordPress runtime, browser smoke, browser health, public-repository-history,
+and predeploy-ci-evidence. Run 40841846973 also reports success.
+https://github.com/youssefnabilnada-sketch/pen-testing/actions/runs/40841851000
+
+Historical focused results preserved in docs/testing/fastfix-audit/OCT29_VALIDATION.md:
+43 repository/Netlify/recovery/configuration tests; 34 guidance tests; 7 frontend tests;
+TypeScript and Ruff passed. Earlier 22/32/2 counts describe the prior increment.
+No tests were rerun during this save-only operation. No current failing CI job was observed.
+Full test counts/coverage were not extracted from latest CI logs: do not substitute
+historical coverage or the earlier 75-frontend claim for a measurement of this commit.
+
+## Incomplete / release gates
+NOT production-ready. Universal FastFix is incomplete. Netlify functions/SSR/proxy responses,
+competing header configurations and deployed revision are not verified. Remaining:
+authorized static staging acceptance; additional adapters and exact-change approvals;
+authenticated full customer journeys; real Firebase/email/cloud/recovery acceptance;
+remaining platform/privacy audit and AI Agent quality evaluations.
+Public AI Assistant and payments/pricing remain disabled; no live site was modified.
+See OCT29_VALIDATION.md and the preserved historical module descriptions below.
+Successful CI does not establish production acceptance.
+
+## Exact continuation
+1. Clone with authorized GitHub access:
+   git clone --branch audit/fastfix-guidance-20261028 https://github.com/youssefnabilnada-sketch/pen-testing.git
+2. Run git status --short and git log -3 --oneline. Confirm the implementation SHA above is an ancestor.
+3. Read this section and docs/testing/fastfix-audit/OCT29_VALIDATION.md first.
+   Earlier status sections are historical, not evidence that latest CI remains blocked.
+4. Next implementation priority: owned Netlify static staging fixture, competing header
+   policy checks and deployed-revision evidence. Then resume additional adapter/approval work.
+   Reuse unchanged passing tests; run targeted tests for changes and full CI before release.
+5. Obtain authorized provider/staging access securely when needed. Never put credentials in Git.
+   Keep payments and public AI disabled. Do not deploy or merge based on this checkpoint.
+6. ZIP restores source; included Git bundle restores this branch's full reachable history:
+   git clone AEGIS_SECURITY_CLOUD_HISTORY.bundle aegis-restored
+   The bundle does not include unrelated remote branches.
+
+---
+ 
+# Current audit/FastFix checkpoint
+
+Continue from the latest audit branch and docs/testing/fastfix-audit/STATUS.md. Only FastFix may receive major expansion; elsewhere fix reproduced defects only. New config parser regression fix and evidence-bound guided remediation UI/API are focused-tested. Universal FastFix and the whole-platform audit are NOT complete. Candidate CI must be reviewed. Older continuation scopes below are historical and superseded where conflicting.
+
 # Latest engineering checkpoint — 2026-10-28 (SmartVerify/AutoFix/CI)
 
 **This is NOT a public-release-ready build.** Staging AutoFix evidence now requires exact observed paths and rejects contradictory detector records. The CI release gate requires eight jobs, including fresh separate-process services and desktop/mobile Chromium smoke. A read-only staged HTTPS probe was added but NOT run against live infrastructure. **84 isolated Python unit tests passed**, along with PHP contract, SQLite migration round-trip through 017 and CI YAML structure. Full pytest collection remains blocked by missing Celery, and PostgreSQL/Redis/Next dependencies/WordPress runtime are unavailable here. See `docs/testing/current/SMARTVERIFY_AUTOFIX_CLOUD_VALIDATION_2026-10-28.md`. No real hosting, WordPress or provider deployment has been certified.

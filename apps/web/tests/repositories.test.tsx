@@ -37,3 +37,12 @@ it('loads the explicitly selected repository page',async()=>{
  await user.click(screen.getByText('Load authorized repositories'));
  await waitFor(()=>expect(call).toHaveBeenCalledWith('/github/connections/c/repositories?page=2'));
 });
+
+it('changing the configuration adapter clears consent',async()=>{
+ render(<RepositoryPanel api={api()} org="o" requests={[]} role="owner"/>);
+ const user=userEvent.setup();await screen.findByText('+ nosniff');
+ await user.click(screen.getByLabelText(/I authorize this workspace/));
+ await user.selectOptions(screen.getByLabelText('Configuration platform'),'netlify');
+ expect((screen.getByLabelText(/I authorize this workspace/) as HTMLInputElement).checked).toBe(false);
+ expect(screen.getByText(/Netlify support covers static responses only/)).toBeTruthy();
+});
