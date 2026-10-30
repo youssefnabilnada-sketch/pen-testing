@@ -34,15 +34,18 @@ async function proxyAuth(request: NextRequest, context: Context): Promise<Respon
 
   let body: string | undefined;
   if (!['GET','HEAD'].includes(request.method)) {
-    if (request.headers.get('content-type')?.split(';')[0]?.toLowerCase() !== 'application/json')
-      return new Response('JSON content required.', {status:415});
+    const type = request.headers.get('content-type')?.split(';')[0]?.toLowerCase();
     const length = Number(request.headers.get('content-length') || 0);
     if (!Number.isSafeInteger(length) || length > 65536 || length < 0)
       return new Response('Request too large.', {status:413});
     const data = await request.arrayBuffer();
     if (data.byteLength > 65536)
       return new Response('Request too large.', {status:413});
-    body = new TextDecoder().decode(data);
+    // Logout and similar CSRF-protected account commands legitimately
+    // have no JSON body. Still reject every nonempty non-JSON body.
+    if (data.byteLength > 0 && type !== 'application/json')
+      return new Response('JSON content required.', {status:415});
+    body = data.byteLength ? new TextDecoder().decode(data) : undefined;
   }
 
   let upstream: Response;
