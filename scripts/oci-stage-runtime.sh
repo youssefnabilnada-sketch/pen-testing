@@ -16,7 +16,7 @@ if [[ -e /srv/aegis/scripts/server-process.py ]]; then
   echo 'An AEGIS runtime already exists at /srv/aegis. Stop; do not overwrite it.' >&2
   exit 1
 fi
-if [[ ! -f /etc/aegis/postgres-password ]]; then
+if ! sudo test -f /etc/aegis/postgres-password; then
   echo 'The protected database password file is missing. Initialize the DB safely first.' >&2
   exit 1
 fi
