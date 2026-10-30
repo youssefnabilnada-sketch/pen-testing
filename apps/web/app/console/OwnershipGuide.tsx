@@ -1,10 +1,12 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {useExperience} from './Experience';
+import VerificationRetry from './VerificationRetry';
 import VerificationRecommendation from './VerificationRecommendation';
 type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
  const {t}=useExperience();
+ const [autoChecking,setAutoChecking]=useState(false);
  const [recommendation,setRecommendation]=useState<{method:string;reason:string;source:string}|null>(null),[history,setHistory]=useState<any[]>([]);
  useEffect(()=>{let active=true;api(`/assets/${assetId}/verification-recommendation`,'POST',{platform:'auto'}).then(r=>{if(active)setRecommendation(r)}).catch(()=>{});return()=>{active=false}},[assetId,api]);
  const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('file'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
@@ -34,8 +36,9 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
  })}>{t('Publish this single TXT record','نشر سجل TXT المحدد')}</button>
  <p>Publishing the record does not verify ownership immediately. Wait for DNS propagation, then select Check ownership below.</p></div>}
  </details>}
+ {c.method==='dns'&&<VerificationRetry disabled={busy} key={c.id} assetId={assetId} challengeId={c.id} api={api} onRunning={setAutoChecking} onVerified={async()=>{setC(null);await onVerified()}}/>}
  {c.method==='file'&&<a className="button" href={`/api/assets/${assetId}/challenge/${c.id}/file`}>{t('Download verification file','تنزيل ملف التحقق')}</a>}
  {c.method==='file'&&<details><summary>{t('My website deploys from GitHub','موقعي يُنشر عبر GitHub')}</summary><div className="form"><label>Repository (owner/name)<input value={repository} placeholder="your-account/your-site" onChange={e=>{setRepository(e.target.value);setLink('')}}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><button disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/challenge/${c.id}/github`,'POST',{repository,directory,branch:'main'});setLink(r.url)})}>Prepare GitHub file</button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">Open prepared file on GitHub ↗</a><p>Review and commit on branch main, wait for hosting deployment, then check ownership below.</p></>}</div></details>}
- <button disabled={busy} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/verify/${c.id}`,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?t('Working…','جارٍ التحقق…'):t('Check ownership','تحقق من الملكية')}</button></>}
+ <button disabled={busy||autoChecking} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/verify/${c.id}`,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?t('Working…','جارٍ التحقق…'):t('Check ownership','تحقق من الملكية')}</button></>}
  <p className="subtle">{t('Ownership verification does not grant scanning or AutoFix permission. Cloudflare assistance can publish only an approved TXT proof; other hosting integrations remain guided/manual.','إثبات الملكية لا يمنح إذن الفحص أو الإصلاح. مساعدة Cloudflare تنشر سجل تحقق معتمدًا فقط، أما الاستضافات الأخرى فتستخدم الخطوات اليدوية الموضحة.')}</p></section>
 }

@@ -1,3 +1,7 @@
+# Latest verified development checkpoint
+
+Read `docs/testing/ux-redesign/RESUME.md`. 107 local frontend tests and production build passed. Bounded opt-in DNS retries, additional Arabic account/onboarding controls, retest state isolation and evidence comparison implemented. Eight desktop/mobile browser smoke tests passed on preceding 6cd2647; check latest candidate CI separately. No production changes. Remaining redesign work explicitly listed.
+
 # Latest recovery and remediation UX checkpoint
 
 Read `docs/testing/ux-redesign/RESUME.md` first. Continued exact remote bd3d0e1 on the same feature branch; baseline CI all 10 jobs passed. Retest stale-response protection, comparison states and additional Arabic guidance implemented and locally tested. Candidate CI must be checked. Full redesign remains incomplete; production untouched.

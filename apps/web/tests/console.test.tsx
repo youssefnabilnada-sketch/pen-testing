@@ -71,3 +71,15 @@ it('browses older remediation pages and resets pagination for filters',async()=>
  await user.selectOptions(screen.getByLabelText('Remediation status'),'closed');
  await waitFor(()=>expect(fetcher.mock.calls.some(([p])=>p.includes('/remediation-page?offset=0&limit=25&status=closed'))).toBe(true));
 });
+it('localizes the sign-in form while keeping its authentication contract',async()=>{
+ localStorage.removeItem('aegis-language');
+ vi.stubGlobal('fetch',vi.fn(async()=>new Response('{}',{status:401,headers:{'Content-Type':'application/json'}})));
+ render(<Console/>);
+ await screen.findByLabelText('Email address');
+ await userEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));
+ expect(screen.getByLabelText('البريد الإلكتروني')).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل')).toBeTruthy();
+ expect(screen.getByRole('button',{name:'تسجيل الدخول ←'})).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل').getAttribute('minlength')).toBe('12');
+ localStorage.removeItem('aegis-language');
+});

@@ -43,3 +43,23 @@ regression for delayed plan resolution. Six focused retest/comparison tests and 
 passed; consent scope text now bilingual with the same paths, 24-hour window and no-deploy
 limitation. Latest onboarding/console result: 13 passed. Current browser fixture execution
 must be read from CI before claiming success.
+
+## Latest verified local integration
+- Optional DNS verification retries: explicit opt-in, 3 attempts maximum, 30 seconds apart;
+  cancellation/unmount stops future attempts; late cancelled responses ignored; no assessment
+  submission; server ownership/rate/expiry checks reused unchanged. A successful consumed proof
+  is not retried merely because the subsequent workspace refresh failed.
+- Additional Arabic account, website, onboarding and assessment controls. Localization still
+  incomplete across specialist panels and server-generated explanations; no full Arabic claim.
+- Final local suite: 107 tests passed in 34 files (7.47s). Production build passed. TypeScript
+  passed on the updated code. Generated dependencies/caches excluded from commits.
+- Browser CI on 6cd2647: browser-smoke job ran 8 tests on desktop/mobile, 8 passed (5.5s),
+  including isolated FastFix and Arabic navigation; browser-health also succeeded. Run 41131193595.
+  These are actual CI tests, not visual approval of every page or live-provider acceptance.
+- New verification/auth-copy changes need latest-commit CI confirmation after push. Baseline
+  tests and predecessor browser results are not represented as tests of later modifications.
+
+Next implementation priorities: finish specialist-panel Arabic copy and server explanation
+localization; complete website wizard visual validation and keyboard accessibility; review
+remaining FastFix staging/rollback integrations and notification states. Do not rebuild existing
+scheduler or authorization logic. Original broad redesign is NOT completed by this checkpoint.
