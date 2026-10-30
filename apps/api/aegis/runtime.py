@@ -52,6 +52,10 @@ def validate_runtime(role=None):
             or not os.getenv('SMTP_HOST') or os.getenv('SMTP_HOST')=='disabled'
             or not os.getenv('MAIL_FROM')):
             problems.append('encrypted transactional SMTP configuration required')
+    if role in ('api','migrate') and os.getenv('AEGIS_PREVIEW_AUTH_ENABLED','false')=='true':
+        from .request_origins import valid_preview_origin
+        if not valid_preview_origin(os.getenv('WEB_PREVIEW_ORIGIN','')):
+            problems.append('valid exact HTTPS Vercel preview origin required when preview auth is enabled')
     if (os.getenv('AI_ASSISTANT_ENABLED','false')!='false'
         or os.getenv('AI_PROVIDER_ENABLED','false')!='false'):
         problems.append('AI services must remain disabled for this release')
