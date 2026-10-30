@@ -51,7 +51,7 @@ describe('server-only Vercel auth proxy',()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
   vi.stubEnv('VERCEL_ENV','preview');
   vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','true');
-  const upstream=vi.fn(async()=>new Response('{}',{status:422}));
+  const upstream=vi.fn(async (_url:string,_options:RequestInit)=>new Response('{}',{status:422}));
   vi.stubGlobal('fetch',upstream);
   expect((await POST(request('POST','auth/login',preview),context(['login']))).status).toBe(503);
   vi.stubEnv('AEGIS_PREVIEW_GATEWAY_KEY',secret);
@@ -65,7 +65,7 @@ describe('server-only Vercel auth proxy',()=>{
  it('reads never get arbitrary browser proxy headers and invalid auth paths fail closed',async()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
   vi.stubEnv('VERCEL_ENV','preview');
-  const upstream=vi.fn(async()=>new Response('{"enabled":true}',{status:200,headers:{'Content-Type':'application/json'}}));
+  const upstream=vi.fn(async (_url:string,_options:RequestInit)=>new Response('{"enabled":true}',{status:200,headers:{'Content-Type':'application/json'}}));
   vi.stubGlobal('fetch',upstream);
   const r=await GET(request('GET','auth/firebase/config',undefined,{'X-Forwarded-For':'1.2.3.4'}),context(['firebase','config']));
   expect(r.status).toBe(200);
