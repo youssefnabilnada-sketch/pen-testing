@@ -1,3 +1,7 @@
+# Experience continuation — 2026-10-30
+
+Read `docs/testing/ux-redesign/EXPERIENCE.md` for current implementation and verification. Same `feature/aegis-ultimate-ux-redesign` branch; shared glass surfaces, progressive evidence/FastFix details, partial Arabic/RTL and offscreen 3D optimization added. 93 frontend tests passed. Browser CI pending; complete redesign still unfinished. Production untouched.
+
 # Current UX development checkpoint — 2026-10-30
 
 Continue on `feature/aegis-ultimate-ux-redesign`, from the preserved audit branch. Read `docs/testing/ux-redesign/STATUS.md` for exact scope, tests, browser blocker and next steps. UX navigation/onboarding/verification improvements are implemented; the complete redesign is NOT finished. Production services untouched. Earlier entries below are historical.

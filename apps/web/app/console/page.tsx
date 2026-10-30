@@ -1,4 +1,5 @@
 'use client';
+import {Experience} from './Experience';
 import WorkspaceNavigation,{GettingStarted} from './WorkspaceNavigation';
 import CrmPanel from './CrmPanel';
 import VaultPanel from './VaultPanel';
@@ -38,7 +39,8 @@ type Dash={assets:number;verified_assets:number;completed:number;active:number;o
 type Admin={users:number;organizations:{id:string;name:string}[];jobs:Record<string,number>;remediations:Fix[];audit:{action:string;created:number}[];scans_paused:boolean;reports:number;ai_mode:string};
 const date=(n:number)=>new Date(n*1000).toLocaleString();
 const terminal=['completed','failed','cancelled','partially_completed'];
-export default function Console(){
+export default function Console(){return <Experience><ConsoleContent/></Experience>}
+function ConsoleContent(){
  const [me,setMe]=useState<Me|null>(null),[ready,setReady]=useState(false),[org,setOrg]=useState(''),[page,setPage]=useState('Overview');
  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.has('code')&&p.has('state'))setPage('Remediation')},[]);
  const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false);
