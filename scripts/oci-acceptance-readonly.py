@@ -80,8 +80,14 @@ def main():
 
     # Avoid "source" or shell evaluation of secrets. Parse the existing systemd
     # EnvironmentFile values as raw or JSON-quoted strings, never echo contents.
+    # Diagnose the exact guarded release that systemd now serves, not a stale
+    # /srv/aegis checkout with older imports or migration expectations.
+    release = Path("/srv/aegis-release-v1")
+    if not (release / "apps/api/aegis/connections.py").is_file():
+        print("CHECK Guarded v1 release: missing live source")
+        return 1
     env = {"PATH":"/usr/bin:/bin", "LANG":"C.UTF-8",
-           "PYTHONPATH":"/srv/aegis/apps/api", "AEGIS_SERVICE_ROLE":"api"}
+           "PYTHONPATH":str(release / "apps/api"), "AEGIS_SERVICE_ROLE":"api"}
     try:
         for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
             if not line or line.lstrip().startswith("#"):
@@ -104,7 +110,7 @@ def main():
     env["HOME"] = svc.pw_dir
     try:
         task = subprocess.run(
-            [PYTHON, "-m", MODULE], cwd="/srv/aegis",
+            [PYTHON, "-m", MODULE], cwd=str(release),
             env=env, user=svc.pw_uid, group=svc.pw_gid, extra_groups=[],
             capture_output=True, text=True, timeout=35, check=False
         )
