@@ -1,0 +1,22 @@
+name: AEGIS production safe gateway smoke
+on:
+  pull_request:
+    branches:
+      - release/aegis-v1-final
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aegis-production-safe-gateway-smoke
+  cancel-in-progress: true
+jobs:
+  safe-gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout AEGIS reviewed candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate official production gateway (invalid JSON only, no secrets)
+        run: bash scripts/oci-live-web-smoke.sh
