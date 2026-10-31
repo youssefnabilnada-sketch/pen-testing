@@ -17,7 +17,7 @@ function githubRepository(value:string){
  }catch{return trimmed}
 }
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
- const {t}=useExperience();
+ const {t,language}=useExperience();
  const [autoChecking,setAutoChecking]=useState(false);
  const [host,setHost]=useState('unsure'),[branch,setBranch]=useState('main');
  const [history,setHistory]=useState<any[]>([]);
@@ -76,11 +76,12 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
  </div>
  <section className="ownership-direct-videos" aria-label={t('Ownership verification video','فيديو إثبات الملكية')}>
   <div><strong>{t('See a short MP4 tutorial','شاهد فيديو شرح سريع MP4')}</strong><Link href={'/guides?platform='+encodeURIComponent(host)+'&method='+encodeURIComponent(method)}>{t('All tutorials','كل الشروحات')} <ExternalLink size={13}/></Link></div>
-  <video controls playsInline preload="metadata" key={host} aria-label={t('Selected platform verification video','فيديو إثبات ملكية المنصة المحددة')}>
-   <source src={'/guides/videos/'+(['unsure','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google'].includes(host)?host:'unsure')+'.mp4'} type="video/mp4"/>
+  <video controls playsInline preload="metadata" key={host+'-'+language} aria-label={t('Selected platform verification video','فيديو إثبات ملكية المنصة المحددة')}>
+   <source src={'/guides/videos/'+(['unsure','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google'].includes(host)?host:'unsure')+'-'+language+'.mp4'} type="video/mp4"/>
+   <track kind="captions" src={'/guides/videos/'+(['unsure','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google'].includes(host)?host:'unsure')+'-'+language+'.vtt'} srcLang={language} label={language==='ar'?'العربية':'English'} default/>
    {t('Your browser does not support MP4 playback.','متصفحك لا يدعم تشغيل MP4.')}
   </video>
-  <small>{t('Original illustrative animation in Arabic and English. No account credentials are shown.','شرح توضيحي أصلي بالعربي والإنجليزي بدون عرض أي بيانات حساب.')}</small>
+  <small>{t('Original English narration and captions. No account credentials are shown.','شرح عربي بالصوت والترجمة النصية، بدون عرض أي بيانات حساب.')}</small>
  </section>
  <SmartVerifyVideoGuide platform={host} method={method}/>
  <SmartVerifyPlatformGuide platform={host}/>
