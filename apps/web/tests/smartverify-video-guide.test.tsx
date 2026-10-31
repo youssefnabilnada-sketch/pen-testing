@@ -35,3 +35,17 @@ it('supports file, DNS, and HTML proof walkthroughs without contacting the API',
   view.unmount();
  }
 });
+
+it('does not autoplay tutorial scenes when reduced motion is requested',async()=>{
+ const previous=window.matchMedia;
+ Object.defineProperty(window,'matchMedia',{configurable:true,writable:true,value:()=>({matches:true})});
+ try{
+  const user=userEvent.setup();
+  render(<SmartVerifyVideoGuide platform="wordpress" method="meta"/>);
+  await user.click(screen.getByRole('button',{name:'Watch animated guide'}));
+  expect(screen.getByRole('button',{name:'Play'})).toBeTruthy();
+  expect(screen.queryByRole('button',{name:'Pause'})).toBeNull();
+ }finally{
+  Object.defineProperty(window,'matchMedia',{configurable:true,writable:true,value:previous});
+ }
+});
