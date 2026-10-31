@@ -102,6 +102,12 @@ def connections(u=Depends(current)):
     from .connections import diagnose
     return diagnose()
 
+@app.get('/auth/registration-status')
+def registration_status():
+    """Non-sensitive launch signal for the public signup UI; production fails closed."""
+    return {'enabled': os.getenv('AEGIS_ENV') != 'production' or os.getenv('AEGIS_PUBLIC_REGISTRATION_ENABLED') == 'true'}
+
+
 @app.post('/auth/register', status_code=201)
 def register(data: Credentials, request: Request, db=Depends(database)):
     if os.getenv('AEGIS_ENV') == 'production' and os.getenv('AEGIS_PUBLIC_REGISTRATION_ENABLED') != 'true':

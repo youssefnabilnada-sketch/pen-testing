@@ -26,9 +26,11 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   expect(screen.getByText(/Account sign-in is temporarily unavailable \(HTTP 503\)/)).toBeTruthy();
  });
  it('registers and opens verification without pretending email is verified',async()=>{
-  const f=vi.fn((url:string)=>url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
+  const f=vi.fn((url:string)=>url.endsWith('/registration-status')?response(200,{enabled:true}):url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
   await screen.findByRole('heading',{name:'Welcome back.'});const user=userEvent.setup();
   await user.click(screen.getByRole('button',{name:'Register'}));
+  await waitFor(()=>expect((screen.getByRole('button',{name:'Continue'}) as HTMLButtonElement).disabled).toBe(false));
+  expect(screen.queryByText(/Public registration is not open yet/)).toBeNull();
   await user.type(screen.getByLabelText('Email address'),'test@example.test');
   await user.type(screen.getByLabelText(/Password ·/),'Long-password123!');
   await user.click(screen.getByRole('button',{name:'Continue'}));
@@ -52,6 +54,18 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   expect(screen.queryByRole('button',{name:'Start authorized assessment'})).toBeNull();
   expect(screen.queryByText('Maximum discovery requests')).toBeNull();
  });
+});
+
+it('does not offer public registration when launch approval is off or unavailable',async()=>{
+ const f=vi.fn((url:string)=>url.endsWith('/registration-status')?response(200,{enabled:false}):response(401,{}));
+ vi.stubGlobal('fetch',f);
+ render(<Console/>);
+ await screen.findByRole('heading',{name:'Welcome back.'});
+ await userEvent.click(screen.getByRole('button',{name:'Register'}));
+ expect(await screen.findByText(/Public registration is not open yet/)).toBeTruthy();
+ expect((screen.getByRole('button',{name:'Continue'}) as HTMLButtonElement).disabled).toBe(true);
+ expect(screen.queryByLabelText('Create with Google')).toBeNull();
+ expect(f.mock.calls.some(call=>call[0]==='/api/auth/register')).toBe(false);
 });
 
 it('browses older remediation pages and resets pagination for filters',async()=>{

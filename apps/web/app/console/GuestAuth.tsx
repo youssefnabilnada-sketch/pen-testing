@@ -1,5 +1,5 @@
 'use client';
-import {useState,type FormEvent} from 'react';
+import {useEffect,useState,type FormEvent} from 'react';
 import Link from 'next/link';
 import {ShieldCheck,LockKeyhole,CheckCircle2,Eye,EyeOff,ArrowRight,Mail,KeyRound} from 'lucide-react';
 import {useExperience} from './Experience';
@@ -28,6 +28,16 @@ export default function GuestAuth({
 }:Props){
  const {t}=useExperience();
  const [showPassword,setShowPassword]=useState(false);
+ const [registrationOpen,setRegistrationOpen]=useState(false);
+ const [registrationChecked,setRegistrationChecked]=useState(false);
+ useEffect(()=>{
+  let active=true;
+  api('/auth/registration-status')
+   .then(status=>{if(active)setRegistrationOpen(status?.enabled===true)})
+   .catch(()=>{if(active)setRegistrationOpen(false)})
+   .finally(()=>{if(active)setRegistrationChecked(true)});
+  return()=>{active=false};
+ },[api]);
  const heading=headings[mode as AuthMode]||headings.login;
  const isLogin=mode==='login',isRegister=mode==='register',isVerify=mode==='verify',isReset=mode==='reset';
  const needsEmail=isLogin||isRegister||mode==='reset-request';
@@ -58,11 +68,14 @@ export default function GuestAuth({
      ?t('We will email a recovery link if this account is eligible.','سنرسل رابط استرداد للحساب المؤهل.')
      :isReset
      ?t('Enter your reset token and choose a new password.','أدخل رمز الاستعادة واختر كلمة مرور جديدة.')
+     :registrationOpen
+     ?t('Create your AEGIS account securely. Verify your email before adding a website.','أنشئ حسابك بأمان، ثم فعّل بريدك قبل إضافة موقع.')
      :t('New accounts are currently available only during approved launch access.','إنشاء الحسابات متاح حاليًا بعد موافقة الإطلاق فقط.')}
     </p>
    </header>
    {isLogin&&<p className="auth-guidance">{t('Use your exact AEGIS account email, including any +alias.','استخدم بريد حساب AEGIS بالكامل، بما فيه +alias إن وُجد.')}</p>}
-   {isRegister&&<p className="auth-release-note" role="status">{t('Public registration is not open yet. Already have an account? Sign in instead.','التسجيل العام لم يُفتح بعد. لديك حساب بالفعل؟ سجّل الدخول بدلًا من ذلك.')}</p>}
+   {isRegister&&!registrationChecked&&<p className="auth-release-note" role="status">{t('Checking registration availability…','جاري التحقق من إتاحة التسجيل…')}</p>}
+   {isRegister&&registrationChecked&&!registrationOpen&&<p className="auth-release-note" role="status">{t('Public registration is not open yet. Already have an account? Sign in instead.','التسجيل العام لم يُفتح بعد. لديك حساب بالفعل؟ سجّل الدخول بدلًا من ذلك.')}</p>}
    {error&&<div role="alert" className="error auth-feedback">{error}</div>}
    {notice&&<div role="status" className="notice auth-feedback">{notice}</div>}
    <form className="form auth-form" onSubmit={onSubmit}>
@@ -79,7 +92,7 @@ export default function GuestAuth({
      <p>{t('Leave this empty unless you have enabled MFA. This is not your email verification token.','اتركها فارغة ما لم تكن فعّلت المصادقة الثنائية. هذا ليس رمز تفعيل البريد.')}</p>
     </details>}
     {(isVerify||isReset)&&<label>{t('One-time token from email','الرمز المرسل بالبريد الإلكتروني')}<input required autoComplete="off" value={token} onChange={e=>setToken(e.target.value)}/></label>}
-    <button disabled={busy} className="primary auth-submit" type="submit">
+    <button disabled={busy||(isRegister&&!registrationOpen)} className="primary auth-submit" type="submit">
      {busy?t('Please wait…','يرجى الانتظار…'):isLogin?t('Sign in','تسجيل الدخول'):isVerify?t('Verify email','تفعيل البريد'):isReset?t('Reset password','تغيير كلمة المرور'):mode==='reset-request'?t('Send recovery email','إرسال بريد الاسترداد'):t('Continue','متابعة')}
      {!busy&&<ArrowRight size={18} aria-hidden="true"/>}
     </button>
@@ -91,6 +104,10 @@ export default function GuestAuth({
     {mode==='reset-request'&&<button type="button" onClick={()=>go('reset')}>{t('I have a reset token','لدي رمز الاستعادة')}</button>}
     {isReset&&<button type="button" onClick={()=>go('reset-request')}>{t('Request a reset email','طلب بريد الاستعادة')}</button>}
    </nav>
+   {isRegister&&registrationOpen&&<section className="auth-google-section" aria-label={t('Create with Google','إنشاء حساب باستخدام Google')}>
+    <div className="auth-divider"><span>{t('or','أو')}</span></div>
+    <FirebasePanel api={api} allowCreate initialMode="create" onComplete={onComplete}/>
+   </section>}
    {isLogin&&<section className="auth-google-section" aria-label={t('Sign in with Google','تسجيل الدخول باستخدام Google')}>
     <div className="auth-divider"><span>{t('or','أو')}</span></div>
     <FirebasePanel api={api} allowCreate={false} compact onComplete={onComplete}/>
