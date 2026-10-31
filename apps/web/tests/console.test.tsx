@@ -47,11 +47,10 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   }));render(<Console/>);const user=userEvent.setup();
   await screen.findByRole('heading',{name:'Your security, in focus.'});
   await user.click(screen.getByRole('button',{name:'My websites'}));
-  await user.click(await screen.findByRole('button',{name:'Configure'}));
-  const launch=screen.getByRole('button',{name:'Launch assessment'}) as HTMLButtonElement;
-  expect(launch.disabled).toBe(true);
-  await user.click(screen.getByRole('checkbox',{name:/I control this asset/}));
-  expect(launch.disabled).toBe(true);
+  await user.click(await screen.findByRole('button',{name:'Continue'}));
+  expect(await screen.findByText('Your next step: verify ownership')).toBeTruthy();
+  expect(screen.queryByRole('button',{name:'Start authorized assessment'})).toBeNull();
+  expect(screen.queryByText('Maximum discovery requests')).toBeNull();
  });
 });
 
