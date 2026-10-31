@@ -101,7 +101,7 @@ function ConsoleContent(){
     <button className="premium-signout" aria-label="Sign out" title={t('Sign out','تسجيل الخروج')} onClick={()=>action(async()=>{await api('/auth/logout','POST');setMe(null);setOrg('')})}><LogOut size={18}/></button>
    </div>
   </header>
-  <main id="workspace-content" tabIndex={-1} className="content premium-content">{feedback}{!me.verified&&<div className="notice">Email verification is required. Sign out and use “Verify email” with your emailed token.</div>}{!org?<PremiumWelcome name={name} setName={setName} busy={busy} verified={me.verified} onCreate={createOrg} accountTools={<>
+  <main id="workspace-content" tabIndex={-1} className="content premium-content">{feedback}{!me.verified&&<div className="notice">Email verification is required. Sign out and use “Verify email” with your emailed token.</div>}{!org?<PremiumWelcome name={name} setName={setName} busy={busy} verified={me.verified} onCreate={createOrg} onVerify={async token=>{await api('/auth/verify','POST',{token});await identity();setNotice(t('Email verified successfully. Your workspace is ready to create.','تم تفعيل بريدك بنجاح. يمكنك الآن إنشاء مساحة العمل.'))}} accountTools={<>
   <AccountPanel api={api} onSignedOut={()=>{setMe(null);setOrg('')}}/>
   <MfaPanel api={api} onDisabled={()=>{setMe(null);setOrg('')}}/>
   <FirebasePanel account api={api} onComplete={identity}/>
