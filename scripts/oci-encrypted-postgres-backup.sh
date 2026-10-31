@@ -43,8 +43,15 @@ fi
 install -d -o root -g root -m 0700 "$destination_dir"
 temporary="$(mktemp "$destination_dir/.incomplete-XXXXXXXX")"
 finished=0
+published=0
+target=''
 cleanup() {
-  if [ "$finished" != 1 ] && [ -n "$temporary" ]; then rm -f -- "$temporary"; fi
+  if [ "$finished" != 1 ]; then
+    if [ -n "$temporary" ]; then rm -f -- "$temporary"; fi
+    if [ "$published" = 1 ] && [ -n "$target" ]; then
+      rm -f -- "$target.sha256" "$target"
+    fi
+  fi
 }
 trap cleanup EXIT
 trap 'exit 130' INT
@@ -59,6 +66,7 @@ name="aegis-postgres-$(date -u +%Y%m%dT%H%M%SZ)-$RANDOM.dump.gpg"
 target="$destination_dir/$name"
 # Hard link is an atomic no-overwrite publish within the backup filesystem.
 ln -- "$temporary" "$target" || stop 'Cannot publish backup without overwrite.'
+published=1
 rm -f -- "$temporary"
 temporary=''
 chmod 0600 "$target"
