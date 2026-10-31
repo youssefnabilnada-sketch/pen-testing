@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Render original silent bilingual MP4 explainers. No logos/screenshots of third parties.
+"""Render separate Arabic/English narrated MP4 ownership explainers.
 Do not use sample values as ownership proofs; real unique tokens come from AEGIS.
 """
 from __future__ import annotations
+import asyncio
 import os
 import subprocess
 import tempfile
-import textwrap
+import logging
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -100,55 +101,138 @@ def wrapping(draw, text, font_, max_px, rtl=False):
     if current:lines.append(current)
     return lines
 
-def draw_slide(topic,arabic,step_number,eng,ar,out):
-    im=Image.new("RGB",SIZE)
-    dr=ImageDraw.Draw(im)
-    w,h=SIZE
-    for y in range(h):
-        dr.line((0,y,w,y),fill=(int(8+y*.008),int(18+y*.018),int(30+y*.021)))
-    dr.ellipse((725,-170,1100,205),fill=(16,62,65))
-    dr.ellipse((-130,300,180,660),fill=(16,39,65))
-    dr.rounded_rectangle((42,38,918,502),radius=24,fill=(17,32,47),outline=(51,99,105),width=2)
-    dr.rounded_rectangle((60,53,104,96),radius=12,fill=(40,123,114))
-    dr.line((72,71,82,82,95,65),fill=CYAN,width=5)
-    dr.text((118,61),"AEGIS",font=BRAND,fill=WHITE)
-    dr.text((228,67),"SMARTVERIFY  /  VIDEO TUTORIAL",font=TINY,fill=MUTED)
-    dr.text((865,73),f"{step_number+1} / 3",font=LATIN_SMALL,fill=CYAN,anchor="ra")
-    dr.line((68,117,892,117),fill=(39,67,81),width=2)
-    dr.text((80,144),topic,font=LATIN_TITLE,fill=WHITE)
-    dr.text((878,227),arabic,font=ARABIC_TITLE,fill=CYAN,anchor="ra",direction="rtl")
-    dr.text((80,259),f"STEP {step_number+1:02d}",font=LATIN_SMALL,fill=CYAN)
-    line_y=304
-    for line in wrapping(dr,eng,LATIN_SMALL,800):
-        dr.text((80,line_y),line,font=LATIN_SMALL,fill=WHITE)
-        line_y+=34
-    line_y=max(382,line_y+24)
-    for line in wrapping(dr,ar,ARABIC,800,True):
-        dr.text((880,line_y),line,font=ARABIC,fill=(193,233,225),anchor="ra",direction="rtl")
-        line_y+=40
+
+VOICE_CODES={"ar":"ar-EG-SalmaNeural","en":"en-US-JennyNeural"}
+VOICE_FALLBACK={"ar":"ar","en":"en-us"}
+EDGE_ENABLED={"ar":True,"en":True}
+
+def duration(path:Path)->float:
+    result=subprocess.run(["ffprobe","-v","error","-show_entries","format=duration",
+      "-of","default=noprint_wrappers=1:nokey=1",str(path)],check=True,
+      capture_output=True,text=True)
+    return float(result.stdout.strip())
+
+async def _edge_voice(text:str,language:str,target:Path):
+    import edge_tts
+    await asyncio.wait_for(edge_tts.Communicate(text,voice=VOICE_CODES[language],rate="-5%").save(str(target)),timeout=25)
+
+def speak(text:str,language:str,output:Path)->Path:
+    """Use a natural neural voice when available; offline language-correct fallback."""
+    if EDGE_ENABLED[language]:
+        try:
+            asyncio.run(_edge_voice(text,language,output))
+            if output.stat().st_size<1000 or duration(output)<0.5:
+                raise ValueError("TTS returned empty audio")
+            return output
+        except Exception as exc:
+            EDGE_ENABLED[language]=False
+            logging.warning("Neural %s voice unavailable (%s); using offline speech",language,type(exc).__name__)
+    target=output.with_suffix(".wav")
+    subprocess.run(["espeak-ng","-v",VOICE_FALLBACK[language],"-s",
+                    "135" if language=="ar" else "145","-w",str(target),text],check=True)
+    if duration(target)<0.5:raise RuntimeError("Offline narration missing")
+    return target
+
+def draw_slide(title:str,step:int,text:str,destination:Path,language:str):
+    """One language per frame, with proper Arabic shaping and RTL alignment."""
+    rtl=language=="ar"
+    image=Image.new("RGB",SIZE)
+    dr=ImageDraw.Draw(image)
+    width,height=SIZE
+    for y in range(height):
+        dr.line((0,y,width,y),fill=(int(8+y*.008),int(18+y*.018),int(30+y*.02)))
+    dr.ellipse((728,-170,1105,210),fill=(16,63,63))
+    dr.ellipse((-140,310,185,690),fill=(17,41,64))
+    dr.rounded_rectangle((39,35,922,504),radius=24,fill=(17,32,47),outline=(51,105,110),width=2)
+    dr.rounded_rectangle((59,52,105,97),radius=12,fill=(39,126,112))
+    dr.line((72,74,82,84,97,64),fill=CYAN,width=5)
+    dr.text((117,60),"AEGIS",font=BRAND,fill=WHITE)
+    label="دليل إثبات الملكية" if rtl else "SMARTVERIFY • OWNERSHIP TUTORIAL"
+    dr.text((883 if rtl else 235,67),label,font=font("Noto Sans Arabic",21) if rtl else TINY,
+            fill=MUTED,anchor="ra" if rtl else None,direction="rtl" if rtl else "ltr")
+    dr.line((68,117,892,117),fill=(38,72,85),width=2)
+    heading=ARABIC_TITLE if rtl else LATIN_TITLE
+    heading_lines=wrapping(dr,title,heading,780,rtl)
+    top=149
+    for line in heading_lines:
+        dr.text((880 if rtl else 79,top),line,font=heading,fill=WHITE,
+                anchor="ra" if rtl else None,direction="rtl" if rtl else "ltr")
+        top+=55
+    num=f"الخطوة {step+1} من 3" if rtl else f"STEP {step+1} OF 3"
+    numfont=ARABIC if rtl else LATIN_SMALL
+    dr.text((875 if rtl else 81,top+23),num,font=numfont,fill=CYAN,
+            anchor="ra" if rtl else None,direction="rtl" if rtl else "ltr")
+    bodyfont=ARABIC if rtl else LATIN_SMALL
+    y=max(323,top+73)
+    bodylines=wrapping(dr,text,bodyfont,770,rtl)
+    for line in bodylines:
+        dr.text((875 if rtl else 82,y),line,font=bodyfont,fill=(206,237,230),
+                anchor="ra" if rtl else None,direction="rtl" if rtl else "ltr")
+        y+=41 if rtl else 35
     for k in range(3):
-        rect=(74+280*k,473,334+280*k,479)
-        dr.rounded_rectangle(rect,radius=3,fill=CYAN if k<=step_number else (55,76,91))
-    dr.text((78,510),"ILLUSTRATION • NO REAL ACCOUNTS OR PROOF TOKENS • NO AUTO SCAN",font=TINY,fill=(118,150,162))
-    im.save(out,optimize=True)
+        dr.rounded_rectangle((74+280*k,473,334+280*k,479),radius=3,
+                             fill=CYAN if k<=step else (55,76,91))
+    disclaimer=("رسم توضيحي • رموز التحقق الحقيقية داخل حسابك فقط" if rtl else
+                "ILLUSTRATION • ACTUAL PROOF TOKENS ARE INSIDE YOUR ACCOUNT")
+    dr.text((880 if rtl else 79,513),disclaimer,font=font("Noto Sans Arabic",16) if rtl else TINY,
+            fill=(137,165,172),anchor="ra" if rtl else None,direction="rtl" if rtl else "ltr")
+    image.save(destination,optimize=True)
+
+def vtt_timestamp(seconds:float)->str:
+    milliseconds=round(seconds*1000)
+    h,remaining=divmod(milliseconds,3600000)
+    m,remaining=divmod(remaining,60000)
+    s,ms=divmod(remaining,1000)
+    return f"{h:02d}:{m:02d}:{s:02d}.{ms:03d}"
+
+def make_video(slug:str,title:str,steps:list,language:str,work:Path):
+    segments=[]
+    cues=[]
+    elapsed=0.0
+    for index,(english,arabic) in enumerate(steps):
+        narration=arabic if language=="ar" else english
+        image=work/f"{slug}-{language}-{index}.png"
+        draw_slide(title,index,narration,image,language)
+        voice=speak(narration,language,work/f"{slug}-{language}-{index}.mp3")
+        speaking=duration(voice)
+        clip_duration=speaking+1.1
+        clip=work/f"{slug}-{language}-{index}.mp4"
+        subprocess.run([
+          "ffmpeg","-y","-hide_banner","-loglevel","error",
+          "-loop","1","-framerate","12","-i",str(image),"-i",str(voice),
+          "-map","0:v:0","-map","1:a:0","-t",f"{clip_duration:.3f}",
+          "-vf","fps=12,format=yuv420p","-c:v","libx264","-preset","veryfast","-crf","28",
+          "-c:a","aac","-b:a","96k","-ar","44100","-ac","1",
+          "-af","apad","-movflags","+faststart",str(clip)
+        ],check=True)
+        segments.append(clip)
+        cues.append(f"{vtt_timestamp(elapsed)} --> {vtt_timestamp(elapsed+clip_duration)}\n{narration}\n")
+        elapsed+=clip_duration
+    manifest=work/f"{slug}-{language}-concat.txt"
+    manifest.write_text("".join(f"file '{clip}'\n" for clip in segments),encoding="utf-8")
+    output=OUT/f"{slug}-{language}.mp4"
+    subprocess.run(["ffmpeg","-y","-hide_banner","-loglevel","error",
+       "-f","concat","-safe","0","-i",str(manifest),"-c","copy",
+       "-movflags","+faststart",str(output)],check=True)
+    (OUT/f"{slug}-{language}.vtt").write_text("WEBVTT\n\n"+"\n".join(cues),encoding="utf-8")
+    streams=subprocess.run(["ffprobe","-v","error","-show_entries","stream=codec_type",
+       "-of","csv=p=0",str(output)],capture_output=True,text=True,check=True).stdout.splitlines()
+    if "audio" not in streams or "video" not in streams or output.stat().st_size<10000:
+        raise RuntimeError(f"Expected a real narrated MP4 with video and audio: {output}")
+    print(f"{slug}-{language}: narrated {duration(output):.1f}s, {output.stat().st_size} bytes",flush=True)
 
 def render():
     OUT.mkdir(parents=True,exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="aegis-videos-") as tmp:
-        work=Path(tmp)
-        for slug,(topic,arabic,steps) in METHODS.items():
-            clips=[]
-            for i,(en,ar) in enumerate(steps):
-                p=work/f"{slug}-{i}.png"
-                draw_slide(topic,arabic,i,en,ar,p)
-                clips.append(p)
-            manifest=work/f"{slug}.txt"
-            # Concat demuxer respects duration for each still image.
-            manifest.write_text("".join(f"file '{p}'\nduration 2.8\n" for p in clips)+f"file '{clips[-1]}'\n",encoding="utf-8")
-            dest=OUT/(slug+".mp4")
-            subprocess.run(["ffmpeg","-y","-hide_banner","-loglevel","error","-f","concat","-safe","0","-i",str(manifest),"-vf","fps=15,format=yuv420p","-c:v","libx264","-preset","veryfast","-crf","27","-movflags","+faststart","-an",str(dest)],check=True)
-            if dest.stat().st_size < 2000:raise RuntimeError(f"Empty MP4: {dest}")
-            print(f"{slug}: {dest.stat().st_size} bytes")
+    with tempfile.TemporaryDirectory(prefix="aegis-voice-videos-") as name:
+        work=Path(name)
+        for slug,(english_title,arabic_title,steps) in METHODS.items():
+            for language in ("ar","en"):
+                make_video(slug,arabic_title if language=="ar" else english_title,
+                           steps,language,work)
+    # Old mixed-language files are intentionally removed only after both languages succeed.
+    for slug in METHODS:
+        old=OUT/f"{slug}.mp4"
+        if old.exists():old.unlink()
 
 if __name__=="__main__":
     render()
