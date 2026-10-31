@@ -79,7 +79,7 @@ export default function GuestAuth({
    </div>}
    {error&&!(previewSignInUnavailable&&error.includes('HTTP 503'))&&<div role="alert" className="error auth-feedback">{error}</div>}
    {notice&&<div role="status" className="notice auth-feedback">{notice}</div>}
-   <form className="form auth-form" onSubmit={onSubmit}>
+   <form className="form auth-form" onSubmit={event=>{if(isLogin&&previewSignInUnavailable){event.preventDefault();return;}return onSubmit(event)}}>
     {needsEmail&&<label>{t('Email address','البريد الإلكتروني')}<input type="email" required value={email} autoComplete="email" onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/></label>}
     {needsPassword&&<label>{isLogin?t('Password','كلمة المرور'):t('Password · at least 12 characters','كلمة المرور · 12 حرفًا على الأقل')}
      <span className="auth-password">
