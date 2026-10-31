@@ -8,9 +8,8 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
  const {t}=useExperience();
  const [autoChecking,setAutoChecking]=useState(false);
  const [host,setHost]=useState('unsure'),[branch,setBranch]=useState('main');
- const [recommendation,setRecommendation]=useState<{method:string;reason:string;source:string}|null>(null),[history,setHistory]=useState<any[]>([]);
- useEffect(()=>{let active=true;api(`/assets/${assetId}/verification-recommendation`,'POST',{platform:'auto'}).then(r=>{if(active)setRecommendation(r)}).catch(()=>{});return()=>{active=false}},[assetId,api]);
- const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('file'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const [history,setHistory]=useState<any[]>([]);
+ const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('dns'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [cfZone,setCfZone]=useState(''),[cfToken,setCfToken]=useState(''),[cfApproved,setCfApproved]=useState(false),[cfMfa,setCfMfa]=useState(''),[cfPreview,setCfPreview]=useState<{name:string;content:string;ttl:number}|null>(null);
  useEffect(()=>{setCfToken('');setCfZone('');setCfApproved(false);setCfMfa('');setCfPreview(null);let active=true;api(`/assets/${assetId}/challenge`).then(v=>{if(active){setC(v);if(v)setMethod(v.method)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[assetId,api]);
  async function act(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
