@@ -16,3 +16,15 @@ test('public SmartVerify tutorials are reachable without an account on desktop a
  expect(calls).toHaveLength(0);
  expect(await page.locator('body').evaluate(el=>el.scrollWidth>window.innerWidth+2)).toBe(false);
 });
+
+test('all 14 hosted ownership MP4 tutorials are real files playable before login',async({request})=>{
+ const names=['file','dns','meta','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google','unsure'];
+ for(const name of names){
+  const response=await request.get('/guides/videos/'+name+'.mp4');
+  expect(response.status(),name+' missing video').toBe(200);
+  expect(response.headers()['content-type']).toContain('video/mp4');
+  const data=await response.body();
+  expect(data.length).toBeGreaterThan(10000);
+  expect(data.subarray(4,8).toString('ascii')).toBe('ftyp');
+ }
+});
