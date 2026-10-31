@@ -1,4 +1,5 @@
 import {AEGIS_AUTH_HOST,helperProject} from './firebase-first-party';
+import type {FirebaseFeatureEnv} from './firebase-first-party';
 
 /**
  * Proxy only Firebase's public helper resources. The browser's AEGIS session,
@@ -11,7 +12,7 @@ const HELPER_FILES=new Set([
 const INIT='/__/firebase/init.json';
 
 export async function firebaseHelperProxy(
- request:Request, path:string, env:NodeJS.ProcessEnv=process.env,
+ request:Request, path:string, env:FirebaseFeatureEnv=process.env,
  fetcher:typeof fetch=fetch
 ):Promise<Response> {
  const project=helperProject(env);
