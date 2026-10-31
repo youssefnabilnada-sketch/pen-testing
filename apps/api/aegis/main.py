@@ -104,6 +104,8 @@ def connections(u=Depends(current)):
 
 @app.post('/auth/register', status_code=201)
 def register(data: Credentials, request: Request, db=Depends(database)):
+    if os.getenv('AEGIS_ENV') == 'production' and os.getenv('AEGIS_PUBLIC_REGISTRATION_ENABLED') != 'true':
+        raise HTTPException(503, 'Registration is unavailable until launch approval.')
     email = data.email.strip().lower()
     throttle_public_account(request, 'register', email)
     if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', email):
