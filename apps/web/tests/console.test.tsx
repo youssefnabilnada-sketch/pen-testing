@@ -25,6 +25,13 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   expect(await screen.findByRole('alert')).toBeTruthy();
   expect(screen.getByText(/Account sign-in is temporarily unavailable \(HTTP 503\)/)).toBeTruthy();
  });
+ it('shows registration available rather than limited-access copy when open',async()=>{
+  const f=vi.fn((url:string)=>url.endsWith('/registration-status')?response(200,{enabled:true}):response(401,{}));
+  vi.stubGlobal('fetch',f);render(<Console/>);
+  await screen.findByRole('heading',{name:'Welcome back.'});
+  expect(await screen.findByText('· Registration open')).toBeTruthy();
+  expect(screen.queryByText('· Limited launch access')).toBeNull();
+ });
  it('registers and opens verification without pretending email is verified',async()=>{
   const f=vi.fn((url:string)=>url.endsWith('/registration-status')?response(200,{enabled:true}):url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
   await screen.findByRole('heading',{name:'Welcome back.'});const user=userEvent.setup();
