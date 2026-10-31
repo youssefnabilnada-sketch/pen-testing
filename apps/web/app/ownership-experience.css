@@ -213,3 +213,11 @@
 .guides-video-meta a:hover{background:#66d9c522}
 .guides-interactive-heading{color:#d6fff6;font-weight:700;font-size:12px;display:flex;gap:9px;align-items:center;margin:22px 0 12px}
 .guides-interactive-heading:before{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,#59bfb074)}
+
+.ownership-direct-videos{border:1px solid #73e5d23d;background:linear-gradient(145deg,#12303bb8,#121c32eb);border-radius:14px;padding:14px;display:grid;gap:11px}
+.ownership-direct-videos>div{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ownership-direct-videos strong{font-size:13px;color:#e7fff8}
+.ownership-direct-videos a{display:flex;gap:5px;align-items:center;color:#9bfae8;border:1px solid #72dfcf52;background:#6aebd012;border-radius:9px;padding:8px 10px;font-size:11px;font-weight:700}
+.ownership-direct-videos a:hover{background:#54c9b42e}
+.ownership-direct-videos video{display:block;width:100%;max-width:760px;aspect-ratio:16/9;object-fit:contain;background:#06111c;border-radius:11px}
+.ownership-direct-videos small{font-size:10.5px;line-height:1.65;color:#92b7c5}
