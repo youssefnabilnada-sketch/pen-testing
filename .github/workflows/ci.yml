@@ -278,6 +278,7 @@ jobs:
           bash -n scripts/oci-rotate-production-gateway.sh
           bash -n scripts/oci-live-web-smoke.sh
           bash -n scripts/oci-protected-email-acceptance.sh
+          python3 -m py_compile scripts/oci-brevo-delivery-probe.py
           bash -n scripts/oci-v1-backend-rollout.sh
           docker run --rm -e AEGIS_PRODUCTION_GATEWAY_KEY=ci-only-placeholder-not-for-any-production-use-123456789012345678901234567890 \
             -v "$PWD/infrastructure/deployment/Caddyfile.production-gated:/etc/caddy/Caddyfile:ro" \
