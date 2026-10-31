@@ -15,6 +15,10 @@ def propose_netlify_nosniff(content):
     if not isinstance(content, str) or len(content.encode('utf-8')) > 65536:
         raise ValueError('Configuration too large.')
     before = tomllib.loads(content)
+    # Static header rules cannot establish behavior for context overrides or
+    # runtime/proxy routes. Fail closed instead of implying adapter support.
+    if any(key in before for key in ('context', 'redirects', 'functions', 'edge_functions', 'plugins')):
+        raise ValueError('Context overrides or dynamic routing require manual review; no static proposal generated.')
     headers = before.get('headers', [])
     if not isinstance(headers, list):
         raise ValueError('Invalid headers configuration.')
