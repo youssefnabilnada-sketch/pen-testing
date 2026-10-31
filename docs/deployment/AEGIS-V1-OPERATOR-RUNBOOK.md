@@ -101,6 +101,10 @@ bash scripts/oci-rotate-production-gateway.sh
 
 If the rotation script returns `STOP` or `ROLLBACK`, do **not** enable the Vercel flag. The safest stop is Vercel `AEGIS_PRODUCTION_GATEWAY_ENABLED=false`.
 
+### Production gateway already enabled — guard against stale acceptance instructions
+
+The Vercel Production gateway was enabled and deployed only after the private-key rotation. Therefore do **not** run `scripts/oci-protected-email-acceptance.sh`: that legacy isolation wrapper explicitly requires the public Vercel auth routes to return HTTP 503 and cannot pass once the protected gateway is in service. Do not toggle public signup or turn off the operational production gateway to force that test to pass. The read-only Oracle checks and separate one-email SMTP probe are safe; they establish connection and mail delivery only. A real user-account browser test needs an approved existing test identity or a separately reviewed test-only provisioning procedure, and proof of cleanup. Avoid testing password reset with an unrelated customer account.
+
 ## 6. Controlled Production acceptance (no public registration)
 - Engineer uses the **existing** Vercel `pen-testing` project to deploy the reviewed release source as Production only once OCI staging is accepted; never publish an old `main`/ZIP build.
 - Production Next.js auth/business APIs remain HTTP 503 while the production opt-in flag is `false`. The FastAPI release also blocks **new local and Firebase customer registration** by default in `AEGIS_ENV=production`, even if Vercel routing becomes enabled. This protects from premature public signups.
