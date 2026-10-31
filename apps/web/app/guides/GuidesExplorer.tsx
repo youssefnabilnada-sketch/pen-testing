@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {ArrowRight,BookOpen,CheckCircle2,FileCode2,FileText,Globe2,PlayCircle,ShieldCheck} from 'lucide-react';
 import SmartVerifyVideoGuide from '../console/SmartVerifyVideoGuide';
@@ -30,6 +30,18 @@ function GuidesContent(){
  const [provider,setProvider]=useState('unsure');
  const [method,setMethod]=useState<Method>('dns');
  const [videoId,setVideoId]=useState('unsure');
+ useEffect(()=>{
+  const params=new URLSearchParams(window.location.search);
+  const p=params.get('platform'),m=params.get('method');
+  if(p&&providers.some(item=>item.id===p)){
+   setProvider(p);
+   setVideoId(p);
+   const preferred=providers.find(item=>item.id===p)!;
+   setMethod(m&&methods.some(item=>item.id===m)?m as Method:preferred.method);
+  }else if(m&&methods.some(item=>item.id===m)){
+   setMethod(m as Method);setVideoId(m);
+  }
+ },[]);
  return <main className="guides-public">
   <nav className="guides-nav">
    <Link href="/" className="brand"><ShieldCheck size={24}/> AEGIS <small>SECURITY CLOUD</small></Link>
