@@ -116,8 +116,8 @@ read -r -s -p "Paste the dedicated 64-character Production gateway key (hidden):
 printf '\n'
 [[ "$key" =~ ^[A-Za-z0-9_-]{48,256}$ ]] ||
   { unset key; echo "STOP: invalid gateway key (48-256 URL-safe characters required)." >&2; exit 1; }
-# Caddyfile environment replacement is validated before any system configuration changes.
-sudo env AEGIS_PRODUCTION_GATEWAY_KEY="$key" caddy validate   --config "$candidate" --adapter caddyfile >/dev/null
+# Never put the credential in process arguments (including sudo env or curl -H).
+# Validate after writing the root-only EnvironmentFile and before installing Caddy.
 
 applied=0
 complete=0
@@ -145,6 +145,7 @@ sudo install -d -o root -g root -m 0755 /etc/systemd/system/caddy.service.d
 printf 'AEGIS_PRODUCTION_GATEWAY_KEY=%s\n' "$key" | sudo tee "$envfile" >/dev/null
 sudo chown root:root "$envfile"
 sudo chmod 0600 "$envfile"
+sudo sh -c 'set -a; . "$1"; set +a; exec caddy validate --config "$2" --adapter caddyfile' sh "$envfile" "$candidate" >/dev/null
 printf '[Service]\nEnvironmentFile=%s\n' "$envfile" | sudo tee "$dropin" >/dev/null
 sudo chown root:root "$dropin"
 sudo chmod 0644 "$dropin"
@@ -154,7 +155,7 @@ sudo systemctl restart caddy
 
 # No customer login or writes: the valid-key test uses deliberately incomplete JSON.
 require_closed_public
-valid_status="$(http_status -X POST "$url/auth/login"   -H 'Content-Type: application/json'   -H 'Origin: https://aegis-pentest-eg.vercel.app'   -H "X-AEGIS-Preview-Gateway: $key"   --data-binary '{}')"
+valid_status="$(printf 'X-AEGIS-Preview-Gateway: %s\n' "$key" | http_status -X POST "$url/auth/login" -H 'Content-Type: application/json' -H 'Origin: https://aegis-pentest-eg.vercel.app' -H @- --data-binary '{}')"
 [[ "$valid_status" == 422 ]] ||
   { echo "STOP: keyed API routing did not return expected validation response." >&2; exit 1; }
 [[ "$(http_status -X POST "$url/auth/login" -H 'Content-Type: application/json'   -H 'X-AEGIS-Preview-Gateway: definitely-wrong' --data-binary '{}')" == 503 ]] ||
