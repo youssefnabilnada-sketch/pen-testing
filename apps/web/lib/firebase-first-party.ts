@@ -8,8 +8,12 @@ import type {FirebaseOptions} from 'firebase/app';
  * Do not enable this flag as part of a routine UI deployment.
  */
 export const AEGIS_AUTH_HOST='aegis-pentest-eg.vercel.app';
+export type FirebaseFeatureEnv={
+ NEXT_PUBLIC_AEGIS_FIREBASE_FIRST_PARTY?:string;
+ NEXT_PUBLIC_AEGIS_FIREBASE_HELPER_PROJECT_ID?:string;
+};
 
-export function helperProject(env:NodeJS.ProcessEnv):string|null {
+export function helperProject(env:FirebaseFeatureEnv):string|null {
  if(env.NEXT_PUBLIC_AEGIS_FIREBASE_FIRST_PARTY!=='true')return null;
  const project=env.NEXT_PUBLIC_AEGIS_FIREBASE_HELPER_PROJECT_ID||'';
  if(!/^[a-z][a-z0-9-]{5,62}$/.test(project)||project.endsWith('-'))return null;
@@ -17,7 +21,7 @@ export function helperProject(env:NodeJS.ProcessEnv):string|null {
 }
 
 export function firstPartyFirebaseConfig<T extends FirebaseOptions>(
- config:T, hostname:string, env:NodeJS.ProcessEnv
+ config:T, hostname:string, env:FirebaseFeatureEnv
 ):T {
  const project=helperProject(env);
  if(!project||hostname!==AEGIS_AUTH_HOST||config.projectId!==project)return config;
