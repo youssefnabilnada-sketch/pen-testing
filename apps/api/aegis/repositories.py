@@ -17,7 +17,7 @@ from sqlalchemy import select,update
 from . import github_client as gh
 from .auth import current,member,audit,digest,admin
 from .db import database
-from .models import GitHubState,GitHubConnection,RepositoryPatch,Remediation,Finding,MfaState,Setting
+from .models import GitHubState,GitHubConnection,RepositoryPatch,PatchBackup,Remediation,Finding,MfaState,Setting
 router=APIRouter(tags=['Authorized repositories'])
 
 def call(path,token,method='GET',body=None):
@@ -203,6 +203,20 @@ def create_pr(patch_id:str,data:Approval,u=Depends(current),db=Depends(database)
     if not finding or finding.org_id!=p.org_id or p.test_evidence.get('finding_snapshot')!=finding_snapshot(finding):
         raise HTTPException(409,'Finding evidence changed or is unversioned; generate and review a fresh proposal.')
     if not data.accepted or p.status!='review_required':raise HTTPException(409,'Explicit approval of a pending diff is required.')
+    # Before even attempting a provider write, independently verify the exact
+    # encrypted original retained for this proposal. Old/unversioned proposals
+    # without a valid restorable backup are never publishable.
+    backup=db.scalar(select(PatchBackup).where(PatchBackup.patch_id==p.id))
+    if (not backup or not backup.restore_verified or
+        not isinstance(p.test_evidence,dict) or
+        p.test_evidence.get('backup_sha256')!=backup.sha256):
+        raise HTTPException(409,'Verified original configuration backup required; regenerate the proposal.')
+    try:
+        from .autofix_recovery import restore_rehearsal
+        preview=gh.cipher().decrypt(p.proposed_content.encode()).decode('utf-8')
+        restore_rehearsal(backup.encrypted_content,backup.sha256,preview,patch_file(p))
+    except Exception as exc:
+        raise HTTPException(409,'Rollback backup failed integrity verification; no repository change authorized.') from exc
     mfa=db.get(MfaState,u.id)
     if not mfa or not mfa.enabled:raise HTTPException(403,'Enable authenticator MFA before authorizing repository writes.')
     from .mfa import enforce
