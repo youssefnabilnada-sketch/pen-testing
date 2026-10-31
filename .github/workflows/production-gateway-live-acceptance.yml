@@ -1,6 +1,10 @@
 name: production-gateway-live-acceptance
 on:
   workflow_dispatch:
+  # Scheduled checks run only after this release is approved and merged into
+  # the default branch; they have NO write access and send no customer requests.
+  schedule:
+    - cron: '17 * * * *'
   push:
     branches: [release/aegis-v1-final]
     paths:
@@ -31,6 +35,8 @@ jobs:
           echo 'This workflow performs only read-only checks and malformed-JSON auth requests.' 
           echo 'It does not create accounts, send email, scan websites, or validate real user sessions.'
   production-live-browser:
+    # Hourly monitoring is HTTP-only to avoid browser-install CPU/cost.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
