@@ -4,6 +4,15 @@ import {useExperience} from './Experience';
 import VerificationRetry from './VerificationRetry';
 import {Github,Globe2,Cloud,FileCheck2,Server,HelpCircle,CheckCircle2,ExternalLink,ShieldCheck} from 'lucide-react';
 type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
+function githubRepository(value:string){
+ const trimmed=value.trim();
+ if(!trimmed.startsWith('https://github.com/'))return trimmed.replace(/\.git$/i,'');
+ try{
+  const url=new URL(trimmed);
+  if(url.hostname!=='github.com'||url.username||url.password)return trimmed;
+  return url.pathname.split('/').filter(Boolean).slice(0,2).join('/').replace(/\.git$/i,'');
+ }catch{return trimmed}
+}
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
  const {t}=useExperience();
  const [autoChecking,setAutoChecking]=useState(false);
@@ -28,6 +37,8 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
   ['wordpress','WordPress','ووردبريس',FileCheck2,'meta'],
   ['cloudflare','Cloudflare / DNS','كلاودفلير / DNS',Cloud,'dns'],
   ['cpanel','cPanel / Plesk','سي بانل / بليسك',Server,'file'],
+  ['netlify','Netlify','نتليفاي',Globe2,'file'],
+  ['builders','Wix / Shopify / Squarespace','Wix / Shopify / Squarespace',Cloud,'dns'],
   ['unsure','Other / not sure','أخرى / مش متأكد',HelpCircle,'dns']
  ] as const).map(([id,en,ar,Icon,choice])=><button key={id} type="button" disabled={busy||autoChecking}
   aria-pressed={host===id} className={'ownership-host'+(host===id?' selected':'')}
@@ -89,8 +100,8 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
  {c.method==='dns'&&<VerificationRetry disabled={busy} key={c.id} assetId={assetId} challengeId={c.id} api={api} onRunning={setAutoChecking} onVerified={async()=>{setC(null);await onVerified()}}/>}
  {c.method==='file'&&<a className="button" href={`/api/assets/${assetId}/challenge/${c.id}/file`}>{t('Download verification file','تنزيل ملف التحقق')}</a>}
  {c.method==='file'&&<details className="ownership-github" open={host==='github'||host==='vercel'?true:undefined}><summary>{t('My website deploys from GitHub','موقعي يُنشر عبر GitHub')}</summary>
- <p>{t('This shortcut opens GitHub to prepare a verification file. Sign in on GitHub, review and commit it, and wait for your website to deploy. AEGIS does not get your GitHub password or repository access.','الاختصار ده بيفتح GitHub ويجهز ملف التحقق. سجّل دخولك هناك، راجع الملف واحفظه، وانتظر نشر الموقع. AEGIS مش بياخد كلمة السر أو صلاحيات المستودع.')}</p><div className="form"><label>Repository (owner/name)<input value={repository} placeholder="your-account/your-site" onChange={e=>{setRepository(e.target.value);setLink('')}}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><details><summary>{t('My deployment branch is not main','فرع النشر مش main')}</summary><label>{t('Deployment branch','فرع النشر')}<input value={branch} onChange={e=>{setBranch(e.target.value);setLink('')}} maxLength={100}/></label></details>
- <button className="primary" disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/challenge/'+c.id+'/github','POST',{repository,directory,branch});setLink(r.url)})}>{t('Prepare file on GitHub','جهّز الملف على GitHub')} <ExternalLink size={16}/></button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">{t('Open prepared file on GitHub','افتح الملف المجهز على GitHub')} <ExternalLink size={15}/></a><p>Review and commit on the selected deployment branch, wait for your website to publish, then check ownership below. No site scan will start.</p></>}</div></details>}
+ <p>{t('This shortcut opens GitHub to prepare a verification file. Sign in on GitHub, review and commit it, and wait for your website to deploy. AEGIS does not get your GitHub password or repository access.','الاختصار ده بيفتح GitHub ويجهز ملف التحقق. سجّل دخولك هناك، راجع الملف واحفظه، وانتظر نشر الموقع. AEGIS مش بياخد كلمة السر أو صلاحيات المستودع.')}</p><div className="form"><label>{t('GitHub repository link (or owner/name)','رابط مستودع GitHub أو المالك/المستودع')}<input value={repository} placeholder="https://github.com/owner/site" onChange={e=>{setRepository(e.target.value);setLink('')}} onBlur={()=>setRepository(githubRepository(repository))}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><details><summary>{t('My deployment branch is not main','فرع النشر مش main')}</summary><label>{t('Deployment branch','فرع النشر')}<input value={branch} onChange={e=>{setBranch(e.target.value);setLink('')}} maxLength={100}/></label></details>
+ <button className="primary" disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/challenge/'+c.id+'/github','POST',{repository:githubRepository(repository),directory,branch});setLink(r.url)})}>{t('Prepare file on GitHub','جهّز الملف على GitHub')} <ExternalLink size={16}/></button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">{t('Open prepared file on GitHub','افتح الملف المجهز على GitHub')} <ExternalLink size={15}/></a><p>Review and commit on the selected deployment branch, wait for your website to publish, then check ownership below. No site scan will start.</p></>}</div></details>}
  <button className="primary ownership-check" disabled={busy||autoChecking} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/verify/'+c.id,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?t('Working…','جارٍ التحقق…'):t('Check ownership','تحقق من الملكية')} <CheckCircle2 size={17}/></button></div></>}
  <p className="subtle ownership-trust"><ShieldCheck size={16} aria-hidden="true"/>{t('Ownership proof does not permit scanning or AutoFix. Every assessment needs separate authorization.','إثبات الملكية لا يسمح بالفحص أو الإصلاح التلقائي. كل فحص يحتاج موافقة منفصلة.')}</p></section>
 }
