@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
+import Link from 'next/link';
 import {useExperience} from './Experience';
 import VerificationRetry from './VerificationRetry';
 import {Github,Globe2,Cloud,FileCheck2,Server,HelpCircle,CheckCircle2,ExternalLink,ShieldCheck} from 'lucide-react';
@@ -14,7 +15,9 @@ function githubRepository(value:string){
  }catch{return trimmed}
 }
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
- const {t}=useExperience();
+ const {t,language}=useExperience();
+ const recommendedVideoMethod:Record<string,string>={github:'file',vercel:'file',wordpress:'meta',cloudflare:'dns',cpanel:'file',netlify:'file'};
+ const videoSlug=host==='builders'||host==='unsure'||recommendedVideoMethod[host]!==method?method:host;
  const [autoChecking,setAutoChecking]=useState(false);
  const [host,setHost]=useState('unsure'),[branch,setBranch]=useState('main');
  const [history,setHistory]=useState<any[]>([]);
@@ -51,6 +54,15 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
   <div><span>02</span><strong>{t('Publish a simple proof','انشر رمز التحقق')}</strong></div>
   <div><span>03</span><strong>{t('Confirm ownership','أكد الملكية')}</strong></div>
  </div>
+ <section className="ownership-direct-videos" aria-label={t('Ownership verification tutorial video','فيديو شرح إثبات الملكية')}>
+  <div><strong>{t('Watch the quick video for this proof','شاهد فيديو شرح الطريقة')}</strong><Link href={'/guides?platform='+encodeURIComponent(host==='builders'?'unsure':host)+'&method='+encodeURIComponent(method)}>{t('All tutorials','كل الفيديوهات')} <ExternalLink size={13}/></Link></div>
+  <video key={videoSlug+'-'+language} controls playsInline preload="metadata" aria-label={t('Video of the selected ownership proof','فيديو شرح طريقة إثبات الملكية المختارة')}>
+   <source src={'/guides/videos/'+videoSlug+'-'+language+'.mp4'} type="video/mp4"/>
+   <track kind="captions" src={'/guides/videos/'+videoSlug+'-'+language+'.vtt'} srcLang={language} label={language==='ar'?'العربية':'English'} default/>
+   {t('Your browser does not support MP4 playback.','متصفحك لا يدعم تشغيل MP4.')}
+  </video>
+  <small>{t('Illustrated tutorial with English narration and captions. Your actual proof appears below.','فيديو توضيحي بالصوت العربي والترجمة النصية. إثبات ملكيتك الحقيقي موجود بالأسفل.')}</small>
+ </section>
  <div className="ownership-choice">
   <p>{t('Recommended proof:','طريقة التحقق المقترحة:')} <strong>{method==='file'?t('Verification file','ملف تحقق'):method==='dns'?t('DNS TXT record','سجل DNS TXT'):t('HTML meta tag','وسم HTML')}</strong></p>
   <details className="ownership-advanced-method"><summary>{t('Choose another verification method','اختر طريقة تحقق أخرى')}</summary>
@@ -102,6 +114,7 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
  {c.method==='file'&&<details className="ownership-github" open={host==='github'||host==='vercel'?true:undefined}><summary>{t('My website deploys from GitHub','موقعي يُنشر عبر GitHub')}</summary>
  <p>{t('This shortcut opens GitHub to prepare a verification file. Sign in on GitHub, review and commit it, and wait for your website to deploy. AEGIS does not get your GitHub password or repository access.','الاختصار ده بيفتح GitHub ويجهز ملف التحقق. سجّل دخولك هناك، راجع الملف واحفظه، وانتظر نشر الموقع. AEGIS مش بياخد كلمة السر أو صلاحيات المستودع.')}</p><div className="form"><label>{t('GitHub repository link (or owner/name)','رابط مستودع GitHub أو المالك/المستودع')}<input value={repository} placeholder="https://github.com/owner/site" onChange={e=>{setRepository(e.target.value);setLink('')}} onBlur={()=>setRepository(githubRepository(repository))}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><details><summary>{t('My deployment branch is not main','فرع النشر مش main')}</summary><label>{t('Deployment branch','فرع النشر')}<input value={branch} onChange={e=>{setBranch(e.target.value);setLink('')}} maxLength={100}/></label></details>
  <button className="primary" disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/challenge/'+c.id+'/github','POST',{repository:githubRepository(repository),directory,branch});setLink(r.url)})}>{t('Prepare file on GitHub','جهّز الملف على GitHub')} <ExternalLink size={16}/></button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">{t('Open prepared file on GitHub','افتح الملف المجهز على GitHub')} <ExternalLink size={15}/></a><p>Review and commit on the selected deployment branch, wait for your website to publish, then check ownership below. No site scan will start.</p></>}</div></details>}
+ <p className="ownership-watch-again"><Link href={'/guides?method='+encodeURIComponent(method)}>{t('Watch the proof method video again','شاهد فيديو شرح الطريقة مرة أخرى')} <ExternalLink size={13}/></Link></p>
  <button className="primary ownership-check" disabled={busy||autoChecking} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/verify/'+c.id,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?t('Working…','جارٍ التحقق…'):t('Check ownership','تحقق من الملكية')} <CheckCircle2 size={17}/></button></div></>}
  <p className="subtle ownership-trust"><ShieldCheck size={16} aria-hidden="true"/>{t('Ownership proof does not permit scanning or AutoFix. Every assessment needs separate authorization.','إثبات الملكية لا يسمح بالفحص أو الإصلاح التلقائي. كل فحص يحتاج موافقة منفصلة.')}</p></section>
 }

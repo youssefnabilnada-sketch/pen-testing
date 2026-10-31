@@ -44,6 +44,7 @@ export default function GuestAuth({
     <div><CheckCircle2 size={18} aria-hidden="true"/><span>{t('Every change requires your approval','كل تغيير يتطلب موافقتك')}</span></div>
     <div><LockKeyhole size={18} aria-hidden="true"/><span>{t('Your workspace is private by design','مساحة عملك خاصة ومحمية')}</span></div>
    </div>
+   <Link href="/guides" className="auth-tutorials-link">{t('Watch website verification videos before signing in','شاهد فيديوهات إثبات الملكية قبل تسجيل الدخول')} <ArrowRight size={15}/></Link>
   </section>
   <section className="glass auth-card auth-card-modern" aria-label={t('Account access','الدخول للحساب')}>
    <header className="auth-card-head">
