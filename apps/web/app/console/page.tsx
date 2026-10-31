@@ -56,6 +56,7 @@ function ConsoleContent(){
  const refreshSequence=useRef(0);
  const [remediationOffset,setRemediationOffset]=useState(0),[remediationTotal,setRemediationTotal]=useState(0),[remediationStatus,setRemediationStatus]=useState('');
  const [showRepositoryTools,setShowRepositoryTools]=useState(false);
+ useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.has('code')&&p.has('state'))setShowRepositoryTools(true)},[]);
  useEffect(()=>{refreshSequence.current++;setAssets([]);setJobs([]);setFindings([]);setFixes([]);setDash(null);setRemediationTotal(0);setRemediationOffset(0);setRemediationStatus('')},[org]);
  const [quoteId,setQuoteId]=useState(''),[scope,setScope]=useState(''),[health,setHealth]=useState('');
  const api=useCallback(async(path:string,method='GET',data?:unknown)=>{const r=await fetch('/api'+path,{method,headers:{'Content-Type':'application/json',...(me?{'x-csrf-token':me.csrf}:{})},...(data!==undefined?{body:JSON.stringify(data)}:{})});if(!r.ok){let detail='Service unavailable. Please retry.';try{const j=await r.json();detail=typeof j.detail==='string'?j.detail:'Please check the form fields.'}catch{}if(path==='/auth/login'&&r.status===401)detail='Invalid email or password. Check the exact AEGIS account address (including any +alias) and its password. Leave the authenticator field empty unless you enabled MFA.';throw new Error(detail)}return r.json()},[me]);
