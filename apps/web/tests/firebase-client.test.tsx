@@ -1,7 +1,7 @@
 import {beforeEach,it,expect,vi} from 'vitest';
-const m=vi.hoisted(()=>({initAuth:vi.fn(()=>({})),popup:vi.fn(),out:vi.fn(),verify:vi.fn(),token:vi.fn(),email:vi.fn()}));
+const m=vi.hoisted(()=>({initAuth:vi.fn(()=>({})),popup:vi.fn(),out:vi.fn(),verify:vi.fn(),token:vi.fn(),email:vi.fn(),redirect:vi.fn(),redirectResult:vi.fn()}));
 vi.mock('firebase/app',()=>({getApps:()=>[],initializeApp:()=>({})}));
-vi.mock('firebase/auth',()=>({initializeAuth:m.initAuth,inMemoryPersistence:'memory',browserPopupRedirectResolver:'resolver',GoogleAuthProvider:class{setCustomParameters(){}},signInWithPopup:m.popup,signOut:m.out,sendEmailVerification:m.verify,signInWithEmailAndPassword:m.email,createUserWithEmailAndPassword:vi.fn(),sendPasswordResetEmail:vi.fn()}));
+vi.mock('firebase/auth',()=>({initializeAuth:m.initAuth,inMemoryPersistence:'memory',browserPopupRedirectResolver:'resolver',GoogleAuthProvider:class{setCustomParameters(){}},signInWithPopup:m.popup,signInWithRedirect:m.redirect,getRedirectResult:m.redirectResult,signOut:m.out,sendEmailVerification:m.verify,signInWithEmailAndPassword:m.email,createUserWithEmailAndPassword:vi.fn(),sendPasswordResetEmail:vi.fn()}));
 import {authenticate,friendlyError} from '../lib/firebase-client';
 beforeEach(()=>{vi.clearAllMocks();m.popup.mockResolvedValue({user:{emailVerified:true,getIdToken:m.token}});m.token.mockResolvedValue('token');m.out.mockResolvedValue(undefined)});
 it('exchanges token in memory and signs SDK out even on API failure',async()=>{
