@@ -111,3 +111,33 @@
 @media(max-width:760px){.ops-steps{grid-template-columns:1fr;gap:10px}.ops-monitor-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ops-hero-content>div{min-width:0}.ops-hero{padding:20px}.ops-section{padding:15px}.ops-hero-safety{max-width:100%}}
 @media(max-width:425px){.ops-monitor-stats{grid-template-columns:1fr}.ops-toolbar{align-items:flex-start}.ops-actions{width:100%}.ops-actions button{flex:1}.ops-section .ops-inline-actions button{flex:1}.ops-proposal-head{align-items:flex-start}.ops-repository-entry button{width:100%}}
 @media(prefers-reduced-motion:reduce){.ops-module *, .repo-journey *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Shared premium layout for all remaining tools, without rewriting existing business controls */
+.ops-tool-intro{margin-bottom:21px}
+.ops-legacy-content>.glass.panel,
+.ops-legacy-content>section>.glass.panel,
+.ops-legacy-content>section.glass.panel{border:1px solid #84b4c33d;background:linear-gradient(145deg,#172b42cf,#111d30da);border-radius:17px;padding:clamp(17px,2.2vw,24px);margin-bottom:17px}
+.ops-legacy-content>.glass.panel h3,
+.ops-legacy-content>section.glass.panel h3{color:#e9fbf4;font-size:17px;font-weight:750;letter-spacing:-.02em}
+.ops-legacy-content>.glass.panel h4{font-size:13px;color:#d7eee9}
+.ops-legacy-content>.glass.panel p{font-size:11.5px;line-height:1.8;color:#a8c5cf;max-width:850px}
+.ops-legacy-content>.glass.panel form{max-width:900px;display:grid;gap:14px;margin:16px 0}
+.ops-legacy-content>.glass.panel label{font-size:11px;font-weight:680;color:#aecbd5;display:grid;gap:7px}
+.ops-legacy-content>.glass.panel label.check{display:flex;align-items:flex-start;gap:10px;background:#153e3a3b;border:1px solid #73d7bf3f;padding:12px;border-radius:11px;line-height:1.8}
+.ops-legacy-content>.glass.panel label.check input{width:18px;height:18px;flex:none;accent-color:#63ddcf;margin:2px 0 0}
+.ops-legacy-content>.glass.panel input:not([type=checkbox]),
+.ops-legacy-content>.glass.panel textarea,
+.ops-legacy-content>.glass.panel select{max-width:100%;min-width:0;min-height:43px;background:#0c1b2d;color:#e7f7f5;border:1px solid #81afbf62;border-radius:10px;padding:10px 12px;font-size:12px}
+.ops-legacy-content>.glass.panel textarea{min-height:105px;resize:vertical}
+.ops-legacy-content>.glass.panel button,
+.ops-legacy-content>.glass.panel .button{font-size:11.5px;min-height:39px}
+.ops-legacy-content>.glass.panel .row{padding:12px 0;border-bottom:1px solid #aacbd221;gap:12px;flex-wrap:wrap;align-items:center}
+.ops-legacy-content>.glass.panel article{border:1px solid #81a8c43d;background:#12283b90;border-radius:12px;padding:15px;margin:12px 0}
+.ops-legacy-content>.glass.panel details{border:1px solid #7a9dae45;border-radius:11px;padding:11px 13px;margin:10px 0;min-width:0}
+.ops-legacy-content>.glass.panel details summary{cursor:pointer;font-size:11.5px;font-weight:700;color:#b7ecdf}
+.ops-legacy-content>.glass.panel pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;font-size:10px}
+.ops-legacy-content>.glass.panel input:focus-visible,
+.ops-legacy-content>.glass.panel textarea:focus-visible,
+.ops-legacy-content>.glass.panel select:focus-visible{outline:2px solid #70e5d2;outline-offset:2px}
+@media(max-width:600px){.ops-legacy-content>.glass.panel,
+.ops-legacy-content>section.glass.panel{padding:14px}.ops-legacy-content>.glass.panel .actions{flex-wrap:wrap}.ops-legacy-content>.glass.panel .actions button{flex:1}}
