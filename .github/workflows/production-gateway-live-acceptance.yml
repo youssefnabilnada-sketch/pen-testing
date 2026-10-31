@@ -1,0 +1,31 @@
+name: production-gateway-live-acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [release/aegis-v1-final]
+    paths:
+      - .github/workflows/production-gateway-live-acceptance.yml
+      - scripts/oci-live-web-smoke.sh
+permissions:
+  contents: read
+concurrency:
+  group: aegis-live-production-smoke
+  cancel-in-progress: true
+jobs:
+  production-safe-gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check production HTTP behavior without secrets or real user data
+        run: bash scripts/oci-live-web-smoke.sh
+      - name: Verify public Firebase web-config readiness
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 15 --retry 2 \
+            https://aegis-pentest-eg.vercel.app/api/auth/firebase/config \
+            | python3 -c 'import json,sys; result=json.load(sys.stdin); assert result.get("enabled") is True, "Firebase web identity is not enabled"; cfg=result.get("config",{}); assert cfg.get("projectId") and cfg.get("appId") and cfg.get("apiKey"), "Firebase public web settings incomplete"; print("AEGIS_FIREBASE_PUBLIC_CONFIG_READY")'
+      - name: Document scope
+        run: |
+          echo 'This workflow performs only read-only checks and malformed-JSON auth requests.' 
+          echo 'It does not create accounts, send email, scan websites, or validate real user sessions.'
