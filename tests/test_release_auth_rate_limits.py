@@ -85,3 +85,17 @@ def test_public_registration_flag_is_explicit_exact_string(monkeypatch):
         with pytest.raises(HTTPException) as err:
             main.register(local, req, db=None)
         assert err.value.status_code == 503
+
+
+def test_registration_availability_status_fails_closed_in_production(monkeypatch):
+    monkeypatch.setenv("AEGIS_ENV", "production")
+    monkeypatch.delenv("AEGIS_PUBLIC_REGISTRATION_ENABLED", raising=False)
+    assert main.registration_status() == {"enabled": False}
+    for value in ("TRUE", "1", "false"):
+        monkeypatch.setenv("AEGIS_PUBLIC_REGISTRATION_ENABLED", value)
+        assert main.registration_status() == {"enabled": False}
+    monkeypatch.setenv("AEGIS_PUBLIC_REGISTRATION_ENABLED", "true")
+    assert main.registration_status() == {"enabled": True}
+    monkeypatch.setenv("AEGIS_ENV", "staging")
+    monkeypatch.delenv("AEGIS_PUBLIC_REGISTRATION_ENABLED", raising=False)
+    assert main.registration_status() == {"enabled": True}
