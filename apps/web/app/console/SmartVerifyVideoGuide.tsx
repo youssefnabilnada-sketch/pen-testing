@@ -52,7 +52,7 @@ export default function SmartVerifyVideoGuide({platform,method}:{platform:string
  },[open,playing,step,steps.length]);
  function navigate(next:number){setPlaying(false);setStep(Math.max(0,Math.min(steps.length-1,next)))}
  function toggle(){
-  if(!open){setOpen(true);setPlaying(true);setStep(0)}
+  if(!open){setOpen(true);setPlaying(!(typeof window.matchMedia==='function'&&window.matchMedia('(prefers-reduced-motion: reduce)').matches));setStep(0)}
   else setOpen(false);
  }
  const Icon=mode==='platform'?Globe2:method==='file'?FileText:method==='meta'?FileCode2:Globe2;
