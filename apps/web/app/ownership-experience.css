@@ -93,3 +93,21 @@
 @media(max-width:440px){.workspace-v2 .ownership-hosts{grid-template-columns:1fr}.workspace-v2 .ownership-host{min-height:56px}.ownership-simple-steps{gap:5px}.ownership-simple-steps>div{gap:4px}.ownership-simple-steps span{width:23px;height:23px}.ownership-simple-steps strong{font-size:9px}}
 .experience[dir=rtl] .ownership-host,.experience[dir=rtl] .ownership-asset-row{text-align:right}
 @media(prefers-reduced-motion:reduce){.workspace-v2 .ownership-host{transition:none!important;transform:none!important}}
+
+/* SmartVerify guided platform options — additive to the existing production wizard. */
+.ownership-other-platforms{padding:2px 0 0;border-top:1px solid #88d4d422}
+.ownership-other-platforms>summary{cursor:pointer;list-style-position:inside;padding:12px 0;color:#a7dfdf;font-size:12px;font-weight:650;line-height:1.65}
+.ownership-other-platforms>summary:hover{color:#baffef}
+.ownership-other-platforms .ownership-hosts{margin:10px 0 3px}
+.ownership-platform-guide{min-width:0;padding:18px;border:1px solid #80e4d749;border-radius:14px;background:linear-gradient(130deg,#17403b88,#11223ab8);box-shadow:inset 0 1px #ffffff0b}
+.ownership-platform-guide-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.ownership-platform-guide-title svg{color:#8df1df;flex:none}
+.ownership-platform-guide-title strong{font-size:12.5px;line-height:1.45;color:#e8fff9;flex:1}
+.ownership-platform-guide-title>span{font-size:10px;padding:4px 8px;border-radius:24px;background:#6de4df15;color:#a5efdf;border:1px solid #6de4df35}
+.ownership-platform-guide ol{counter-reset:ae-step;list-style:none;padding:0;margin:15px 0;display:grid;gap:12px}
+.ownership-platform-guide li{display:flex;gap:10px;color:#c7d7e5;font-size:12px;line-height:1.7;align-items:flex-start}
+.ownership-platform-guide li:before{counter-increment:ae-step;content:counter(ae-step);display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:50%;color:#b4f6e6;background:#6de4df20;border:1px solid #6de4df47;font-size:11px}
+.ownership-platform-warning{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;background:#efaf6b0b;border:1px solid #f0b77633;border-radius:9px;color:#efcfab!important;font-size:11px!important;margin:11px 0!important}
+.ownership-platform-warning svg{flex:none;margin-top:2px}
+.ownership-platform-guide>small{display:block;color:#97aec4;line-height:1.7;font-size:10.5px}
+@media(max-width:480px){.ownership-platform-guide{padding:13px}.ownership-platform-guide-title{align-items:flex-start}.ownership-platform-guide-title>span{margin-inline-start:30px}}
