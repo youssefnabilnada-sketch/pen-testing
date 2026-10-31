@@ -101,6 +101,23 @@ bash scripts/oci-rotate-production-gateway.sh
 
 If the rotation script returns `STOP` or `ROLLBACK`, do **not** enable the Vercel flag. The safest stop is Vercel `AEGIS_PRODUCTION_GATEWAY_ENABLED=false`.
 
+### Firebase Google sign-in domain and one approved pilot account
+
+- A live screenshot of `/console` showed `auth/unauthorized-domain` in the Firebase Google sign-in flow. Firebase web configuration and server-admin access can be fully healthy while the browser's **current hostname** is not authorized for OAuth. In the SAME Firebase project configured as AEGIS `FIREBASE_PROJECT_ID`, use **Firebase Console → Authentication → Settings → Authorized domains → Add domain** and add **`aegis-pentest-eg.vercel.app`** (without `https://` or slash). Do not whitelist arbitrary Vercel previews or open Firebase API key restrictions. Retest Google popup on the exact production hostname after saving. If already present, inspect browser API-key restrictions and project matching rather than adding unrelated domains.
+- Production registrations are intentionally rejected even though the gateway is live. Never set `AEGIS_PUBLIC_REGISTRATION_ENABLED=true` merely to create an operator test account.
+- A **single safe operator-owned pilot**, with email verification, can be provisioned via `scripts/oci-provision-pilot-account.py`. This helper (1) accepts only an owned Gmail `+aegis-pilot` alias, (2) requires an explicit authorization phrase and secret password typed only in SSH, (3) verifies protected production config still has public signup disabled, (4) drops root privileges to the API service user, (5) creates exactly one ordinary unverified user on existing PostgreSQL and sends one AEGIS Brevo email, and (6) assigns no tenant, superadmin or scan authorization. The operator must confirm the emitted `AEGIS_ONE_PILOT_ACCOUNT_CREATED` signal and verify email through the real AEGIS browser; a green CI syntax check **is not** a live account acceptance result.
+
+```bash
+git -C /home/ubuntu/aegis-cloud fetch origin refs/heads/release/aegis-v1-final:refs/remotes/origin/release/aegis-v1-final &&
+git -C /home/ubuntu/aegis-v1-final switch --detach refs/remotes/origin/release/aegis-v1-final &&
+cd /home/ubuntu/aegis-v1-final &&
+sudo /srv/aegis/.venv/bin/python scripts/oci-provision-pilot-account.py
+```
+
+- Use `yourname+aegis-pilot@gmail.com` (same owned mailbox). The script asks for a **new** strong password twice and `CREATE ONE PILOT ACCOUNT` to authorize the one real account. Do not post password, verification token, browser session cookie, or server environment in chat/issues.
+- This pilot account is a real database account, **not automatically cleaned up**. For final signoff verify its inactive/retained-audit status and remove any temporary workspace/assets if created. Do not use it to scan a website before verifying ownership, approved scope, SSRF guardrails and rate limits. Do not test FastFix against production AEGIS itself.
+- Existing production source app currently does not have a privileged test-signup bypass; future reviews must not add one to public HTTP APIs.
+
 ### Production gateway already enabled — guard against stale acceptance instructions
 
 The Vercel Production gateway was enabled and deployed only after the private-key rotation. Therefore do **not** run `scripts/oci-protected-email-acceptance.sh`: that legacy isolation wrapper explicitly requires the public Vercel auth routes to return HTTP 503 and cannot pass once the protected gateway is in service. Do not toggle public signup or turn off the operational production gateway to force that test to pass. The read-only Oracle checks and separate one-email SMTP probe are safe; they establish connection and mail delivery only. A real user-account browser test needs an approved existing test identity or a separately reviewed test-only provisioning procedure, and proof of cleanup. Avoid testing password reset with an unrelated customer account.
