@@ -90,11 +90,10 @@ export default function GuestAuth({
     {mode==='reset-request'&&<button type="button" onClick={()=>go('reset')}>{t('I have a reset token','لدي رمز الاستعادة')}</button>}
     {isReset&&<button type="button" onClick={()=>go('reset-request')}>{t('Request a reset email','طلب بريد الاستعادة')}</button>}
    </nav>
-   {isLogin&&<details className="auth-provider">
-    <summary>{t('Other sign-in options · Google / Firebase','طرق دخول أخرى · Google / Firebase')}</summary>
-    <p className="auth-provider-hint">{t('Only for accounts already linked to AEGIS. First-time users should sign in with their AEGIS email.','للحسابات المرتبطة مسبقًا بـAEGIS فقط. ابدأ بالدخول باستخدام بريد AEGIS.')}</p>
-    <FirebasePanel api={api} allowCreate={false} onComplete={onComplete}/>
-   </details>}
+   {isLogin&&<section className="auth-google-section" aria-label={t('Sign in with Google','تسجيل الدخول باستخدام Google')}>
+    <div className="auth-divider"><span>{t('or','أو')}</span></div>
+    <FirebasePanel api={api} allowCreate={false} compact onComplete={onComplete}/>
+   </section>}
    <footer className="auth-card-footer">
     {isLogin?<p>{t('New to AEGIS?','جديد على AEGIS؟')} <button type="button" onClick={()=>go('register')}>{t('Register','التسجيل')}</button> <span>{t('· Limited launch access','· الدخول الجديد محدود خلال الإطلاق')}</span></p>:<p>{t('Already have an account?','عندك حساب بالفعل؟')} <button type="button" onClick={()=>go('login')}>{t('Sign in','تسجيل الدخول')}</button></p>}
     <p className="auth-privacy"><LockKeyhole size={13} aria-hidden="true"/>{t('Protected access · No payment required','دخول محمي · بدون دفع')}</p>
