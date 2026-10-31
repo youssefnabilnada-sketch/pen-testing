@@ -4,7 +4,7 @@ import {useExperience} from './Experience';
 
 type LanguagePair=[string,string];
 type Guide={steps:[LanguagePair,LanguagePair,LanguagePair];disclaimer?:LanguagePair};
-const guides:Record<string,Guide>={
+export const guides:Record<string,Guide>={
  github:{steps:[
   ['Download the verification file or prepare it with the GitHub shortcut below.','نزّل ملف إثبات الملكية أو جهّزه باستخدام اختصار GitHub بالأسفل.'],
   ['Commit the file to the branch your actual website deploys from.','احفظ الملف على فرع GitHub الذي يُنشر منه موقعك الفعلي.'],
