@@ -2,7 +2,7 @@
 import RecoveryPanel from './RecoveryPanel';
 import {useExperience} from './Experience';
 import {useCallback,useEffect,useState} from 'react';
-import {AlertCircle,ArrowRight,CheckCircle2,ChevronRight,Code2,ExternalLink,FileCode2,GitBranch,GitPullRequest,LockKeyhole,RefreshCw,ShieldCheck} from 'lucide-react';
+import {AlertCircle,ArrowRight,Code2,FileCode2,GitBranch,GitPullRequest,LockKeyhole,RefreshCw,ShieldCheck} from 'lucide-react';
 type API=(path:string,method?:string,data?:unknown)=>Promise<any>;
 type Patch={id:string;repository:string;diff:string;status:string;tests:Record<string,unknown>;pull_number:number|null};
 type Connection={id:string;login:string;revoked?:boolean;expires:number};
