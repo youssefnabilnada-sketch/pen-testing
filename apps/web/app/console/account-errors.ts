@@ -3,7 +3,7 @@
  */
 export function accountErrorMessage(status:number,path:string,backendDetail?:string):string{
  if(path==='/auth/login'&&status===401)
-  return 'Invalid email or password. Check the exact AEGIS account email (including any +alias) and password. Leave the authenticator code empty unless MFA is enabled.';
+  return 'Invalid email or password. Check the exact AEGIS account address (including any +alias) and password. Leave the authenticator code empty unless MFA is enabled.';
  if(status===429)return 'Too many sign-in attempts (HTTP 429). Please try again later.';
  if(status===503)return 'Account service temporarily unavailable (HTTP 503). The secure gateway or backend may not be ready. Your password was not identified as incorrect.';
  if(status===502||status===504)return 'AEGIS cannot reach the account service (HTTP '+status+'). Please try again later. This is not a password error.';
