@@ -7,7 +7,7 @@
 - Combined Astra features, isolated PostgreSQL/Redis/WordPress/browser tests, restricted production Next.js proxy, account throttling, registration closed by default, Caddy production-only gateway template and guarded Oracle release/rollback tooling.
 - Vercel project environment: `API_INTERNAL_URL` is already correct for both Preview and Production (`https://aegis-pentest-eg-api.duckdns.org`).
 - Vercel **Production-only** `AEGIS_PRODUCTION_GATEWAY_ENABLED=false` was safely created. Do not enable yet.
-- `AEGIS_PRODUCTION_GATEWAY_KEY` has NOT been created. The same user-owned strong secret must be entered privately into Vercel and Oracle.
+- `AEGIS_PRODUCTION_GATEWAY_KEY` is now created as a Vercel Production-only **Secret**, and the Oracle Caddy Production gateway was installed successfully by the operator. A previous screenshot exposed part of the first key; **rotate it before enabling traffic**. Never re-run the first-time `oci-production-gateway.sh --install` on an installed gateway.
 - CI must finish successfully on the exact **latest** release SHA; do not rely on a passing historical SHA.
 
 ## 2. One-time operator preparation on Windows
@@ -76,9 +76,30 @@ bash scripts/oci-v1-backend-rollout.sh --rollback
 Navigate to `https://vercel.com/youssefnabilnada-1001s-projects/pen-testing/settings/environment-variables`.
 
 - Add `AEGIS_PRODUCTION_GATEWAY_KEY` as an **encrypted/sensitive server-only** Production variable containing the EXACT user-owned key used on Oracle. No `NEXT_PUBLIC_` prefix, no Preview/Development target. This must never be copied into an issue or support ticket.
-- Keep `AEGIS_PRODUCTION_GATEWAY_ENABLED=false` until the Oracle operator has supplied both PASS results and the release source CI passes. Do not set true on your own.
+- Keep `AEGIS_PRODUCTION_GATEWAY_ENABLED=false` until the **newly rotated** gateway key is installed in both Oracle and Vercel and the operator reports `AEGIS_PRODUCTION_GATEWAY_ROTATED_PASS`. Do not set true on your own.
 - Existing Production `API_INTERNAL_URL` has already been checked and needs no change. Avoid branch-scoped Preview env; Vercel API is rejecting that mode (GitHub issue #13).
 - Confirm Firebase Authentication Authorized Domains includes `aegis-pentest-eg.vercel.app` and the intended providers are enabled. Do not paste Firebase service-account JSON in any chat.
+
+## 5a. Current next action: rotate the already-installed production key (one-time)
+
+This is **not** the original gateway install path. The original v1 backend rollout and Caddy installation have already succeeded, the release is READY on Vercel Production and the Production opt-in flag is **false**. Do **not** repeat their installers. A previous user-submitted screenshot revealed part of the old key.
+
+1. Make a **fresh** 64-character random key locally on Windows using the one-line PowerShell command above; store it in a password manager. It must differ from the existing Oracle/Vercel key.
+2. Open the existing Oracle SSH session. Fetch the release branch explicitly because OCI is configured for single-branch fetch. Update **only the detached deployment-helper worktree**, never the running `/srv/aegis-release-v1` snapshot:
+
+```bash
+git -C /home/ubuntu/aegis-cloud fetch origin refs/heads/release/aegis-v1-final:refs/remotes/origin/release/aegis-v1-final &&
+git -C /home/ubuntu/aegis-v1-final -c advice.detachedHead=false switch --detach refs/remotes/origin/release/aegis-v1-final &&
+cd /home/ubuntu/aegis-v1-final &&
+bash scripts/oci-rotate-production-gateway.sh
+```
+
+3. At the **hidden** SSH prompt, paste the **new** key, then Enter. Script checks the existing Caddy policy, stages a root-only env file, validates the policy, atomically replaces Caddy's key, checks wrong/public key denial, and restores the old value on failure. Expected: `AEGIS_PRODUCTION_GATEWAY_ROTATED_PASS`.
+4. In the existing Vercel project Environment Variables UI, edit `AEGIS_PRODUCTION_GATEWAY_KEY` (Type Secret, Production only) and replace it with this **same new key**. Save and never send a screenshot showing any portion of it. Keep `AEGIS_PRODUCTION_GATEWAY_ENABLED=false`.
+5. Only after steps 3 and 4 succeed may the engineer enable the flag and redeploy **the already-approved existing Production release**. Explicitly verify that the deployed source and public domain remain correct. As an additional safe check, from Oracle run `bash scripts/oci-live-web-smoke.sh`; expected `AEGIS_PRODUCTION_SAFE_GATEWAY_SMOKE_PASS`. This uses invalid JSON only and no user credentials.
+6. Then perform a **real, authorized** customer browser sign-in, Firebase identity and Brevo email check, session/CSRF/logout/tenant permissions, and authorized asset/scan/report/FastFix acceptance. Existing production registration stays **off** until approval. These cannot be marked passing solely from the safe no-credentials script.
+
+If the rotation script returns `STOP` or `ROLLBACK`, do **not** enable the Vercel flag. The safest stop is Vercel `AEGIS_PRODUCTION_GATEWAY_ENABLED=false`.
 
 ## 6. Controlled Production acceptance (no public registration)
 - Engineer uses the **existing** Vercel `pen-testing` project to deploy the reviewed release source as Production only once OCI staging is accepted; never publish an old `main`/ZIP build.
