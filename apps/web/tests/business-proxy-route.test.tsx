@@ -45,6 +45,21 @@ describe('private business gateway boundaries',()=>{
   ])expect(businessGate(env,'/organizations','POST',null,'http://127.0.0.1:3001'))
      .toEqual({allowed:false,status:503});
  });
+ it('authorizes production only with a separate strong server key and same-origin writes',()=>{
+  const base={VERCEL_ENV:'production'};
+  const previewOnly={...base,AEGIS_PREVIEW_AUTH_ENABLED:'true',AEGIS_PREVIEW_GATEWAY_KEY:key};
+  expect(businessGate(previewOnly,'/organizations','GET',null,preview)).toEqual({allowed:false,status:503});
+  const opted={...previewOnly,AEGIS_PRODUCTION_GATEWAY_ENABLED:'true'};
+  expect(businessGate(opted,'/organizations','GET',null,preview)).toEqual({allowed:false,status:503});
+  const configured={...opted,AEGIS_PRODUCTION_GATEWAY_KEY:key};
+  expect(businessGate(configured,'/organizations','GET',null,preview)).toEqual({allowed:true,secret:key});
+  expect(businessGate(configured,'/organizations','POST',preview,preview)).toEqual({allowed:true,secret:key});
+  expect(businessGate(configured,'/organizations','POST',null,preview)).toEqual({allowed:false,status:403});
+  expect(businessGate(configured,'/organizations','POST',preview+'.evil.test',preview))
+   .toEqual({allowed:false,status:403});
+  expect(businessGate({...opted,AEGIS_PRODUCTION_GATEWAY_KEY:'short'},
+   '/organizations','GET',null,preview)).toEqual({allowed:false,status:503});
+ });
  it('requires exact Origin for mutating requests',()=>{
   const env={VERCEL_ENV:'preview',AEGIS_PREVIEW_AUTH_ENABLED:'true',AEGIS_PREVIEW_GATEWAY_KEY:key};
   expect(businessGate(env,'/organizations','POST',preview,preview)).toEqual({allowed:true,secret:key});
