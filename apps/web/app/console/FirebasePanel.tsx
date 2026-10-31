@@ -6,7 +6,7 @@ import {useExperience} from './Experience';
 type API=(path:string,method?:string,data?:unknown)=>Promise<any>;
 export default function FirebasePanel({api,account=false,allowCreate=true,compact=false,initialMode='login',onComplete}:{api:API;account?:boolean;allowCreate?:boolean;compact?:boolean;initialMode?:'login'|'create';onComplete:()=>Promise<void>}){
  const {t}=useExperience();
- const [config,setConfig]=useState<FirebaseWebConfig|null>(null),[linked,setLinked]=useState(false),[mode,setMode]=useState(initialMode),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[localPassword,setLocalPassword]=useState(''),[mfaCode,setMfaCode]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+ const [config,setConfig]=useState<FirebaseWebConfig|null>(null),[linked,setLinked]=useState(false),[mode,setMode]=useState(initialMode),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[localPassword,setLocalPassword]=useState(''),[mfaCode,setMfaCode]=useState(''),[busy,setBusy]=useState(false),[showRecovery,setShowRecovery]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
  useEffect(()=>{let active=true;api('/auth/firebase/config').then(r=>{if(active&&r.enabled)setConfig(r.config)}).catch(()=>{if(active)setError('Firebase sign-in settings could not be checked because the account API is unavailable. This does not mean Firebase credentials are missing.')});if(account)api('/auth/firebase/status').then(r=>{if(active)setLinked(r.linked)}).catch(()=>{if(active)setError('Unable to load linked identity.')});return()=>{active=false}},[api,account]);
  async function run(fn:()=>Promise<void>){setBusy(true);setError('');setMessage('');try{await fn()}catch(e){setError(friendlyError(e))}finally{setBusy(false);setPassword('');setLocalPassword('');setMfaCode('')}}
  async function signIn(provider:'google'|'email'){
@@ -23,17 +23,31 @@ export default function FirebasePanel({api,account=false,allowCreate=true,compac
   });
  }
  if(compact){
-  return <div className="auth-google-signin">
-   {config?<button type="button" className="google-signin-button" disabled={busy} onClick={()=>signIn('google')}>
-    <svg aria-hidden="true" className="google-mark" width="19" height="19" viewBox="0 0 48 48" focusable="false">
+  const isCreating=mode==='create'&&!account;
+  const googleMark=<svg aria-hidden="true" className="google-mark" width="19" height="19" viewBox="0 0 48 48" focusable="false">
      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.75 9.5 24 9.5Z"/>
      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.29 5.48-4.83 7.18l7.73 6C44.34 38.04 46.98 31.9 46.98 24.55Z"/>
      <path fill="#FBBC05" d="M10.53 28.59A14.41 14.41 0 0 1 9.75 24c0-1.6.27-3.14.76-4.59l-7.98-6.2A23.95 23.95 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z"/>
      <path fill="#34A853" d="M24 48c6.47 0 11.9-2.13 15.86-5.8l-7.73-6C29.98 37.65 27.23 38.5 24 38.5c-6.25 0-11.57-4.22-13.47-9.91l-7.97 6.19C6.51 42.62 14.62 48 24 48Z"/>
-    </svg>
-    <span>{busy?t('Connecting securely…','جاري الاتصال بأمان…'):t('Sign in with Google','تسجيل الدخول باستخدام Google')}</span>
-   </button>:<p role="status" className="auth-google-unavailable">{error||t('Google sign-in is not available yet. Use your AEGIS password.','تسجيل الدخول باستخدام Google غير متاح حاليًا. استخدم كلمة مرور AEGIS.')}</p>}
-   {config&&<p className="auth-google-caption">{t('For accounts linked to Google in Account security.','للحسابات المرتبطة بـGoogle من إعدادات أمان الحساب.')}</p>}
+    </svg>;
+  return <div className="auth-google-signin">
+   {config?<div className={isCreating?'auth-google-create':undefined}>
+    {isCreating&&showRecovery&&<div className="auth-google-recovery">
+     <label htmlFor="aegis-google-recovery-password">{t('Account recovery password','كلمة مرور استرداد الحساب')}
+      <input id="aegis-google-recovery-password" type="password" autoComplete="new-password" minLength={12} maxLength={128} required value={localPassword} onChange={e=>setLocalPassword(e.target.value)} placeholder={t('At least 12 characters','12 حرفًا على الأقل')}/>
+     </label>
+     <p>{t('This password lets you recover your AEGIS account if Google is unavailable.','تساعدك كلمة المرور دي تسترد حساب AEGIS لو Google غير متاح.')}</p>
+    </div>}
+    <button type="button" className="google-signin-button" disabled={busy||(isCreating&&showRecovery&&localPassword.length<12)} aria-expanded={isCreating?showRecovery:undefined} onClick={()=>{
+      if(isCreating&&!showRecovery){setShowRecovery(true);return;}
+      void signIn('google');
+    }}>
+     {googleMark}
+     <span>{busy?t('Connecting securely…','جاري الاتصال بأمان…'):isCreating&&showRecovery?t('Create account with Google','إنشاء حساب باستخدام Google'):isCreating?t('Continue with Google','المتابعة باستخدام Google'):t('Sign in with Google','تسجيل الدخول باستخدام Google')}</span>
+    </button>
+    {isCreating&&showRecovery?<button type="button" className="auth-google-back" disabled={busy} onClick={()=>{setShowRecovery(false);setLocalPassword('');setError('')}}>{t('Use email instead','التسجيل بالبريد بدلًا من Google')}</button>:null}
+    <p className="auth-google-caption">{isCreating?t('A recovery password is required for Google registration.','التسجيل باستخدام Google يتطلب كلمة مرور لاسترداد الحساب.'):t('For accounts linked to Google in Account security.','للحسابات المرتبطة بـGoogle من إعدادات أمان الحساب.')}</p>
+   </div>:<p role="status" className="auth-google-unavailable">{error||t('Google sign-in is not available yet. Use your AEGIS password.','تسجيل الدخول باستخدام Google غير متاح حاليًا. استخدم كلمة مرور AEGIS.')}</p>}
    {config&&error&&<p role="alert" className="error auth-feedback">{error}</p>}
    {config&&message&&<p role="status" className="notice auth-feedback">{message}</p>}
   </div>;

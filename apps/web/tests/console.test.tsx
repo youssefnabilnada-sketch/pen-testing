@@ -32,6 +32,25 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   expect(await screen.findByText('· Registration open')).toBeTruthy();
   expect(screen.queryByText('· Limited launch access')).toBeNull();
  });
+ it('keeps mobile registration simple without Firebase configuration controls',async()=>{
+  const f=vi.fn((url:string)=>{
+   if(url.endsWith('/auth/firebase/config'))return response(200,{enabled:true,config:{apiKey:'fixture-api-key',authDomain:'test.firebaseapp.com',projectId:'fixture',appId:'1:fixture:web:test'}});
+   if(url.endsWith('/registration-status'))return response(200,{enabled:true});
+   return response(401,{});
+  });
+  vi.stubGlobal('fetch',f);render(<Console/>);
+  await screen.findByRole('heading',{name:'Welcome back.'});
+  await userEvent.click(screen.getByRole('button',{name:'Register'}));
+  expect(await screen.findByRole('heading',{name:'Create your account.'})).toBeTruthy();
+  expect(await screen.findByRole('button',{name:'Continue with Google'})).toBeTruthy();
+  expect(screen.getByRole('button',{name:'Continue'})).toBeTruthy();
+  expect(screen.queryByText('Continue with Firebase')).toBeNull();
+  expect(screen.queryByLabelText('Firebase action')).toBeNull();
+  expect(screen.queryByText(/Authenticator or recovery code/)).toBeNull();
+  expect(screen.queryByRole('button',{name:'Back to sign in'})).toBeNull();
+  expect(screen.getByRole('button',{name:'Sign in'})).toBeTruthy();
+  expect(screen.queryByLabelText('Account recovery password')).toBeNull();
+ });
  it('registers and opens verification without pretending email is verified',async()=>{
   const f=vi.fn((url:string)=>url.endsWith('/registration-status')?response(200,{enabled:true}):url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
   await screen.findByRole('heading',{name:'Welcome back.'});const user=userEvent.setup();

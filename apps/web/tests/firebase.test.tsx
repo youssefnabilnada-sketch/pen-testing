@@ -36,3 +36,39 @@ it('links only with current AEGIS password and shows provider failure',async()=>
  expect((await screen.findByRole('alert')).textContent).toContain('cancelled');
  expect(api.mock.calls.some(c=>c[0].endsWith('/link'))).toBe(false);
 });
+
+it('keeps Google registration compact and requires recovery password before token exchange',async()=>{
+ mocks.authenticate.mockImplementation(async(c,p,e,pw,create,exchange)=>exchange('fresh-id-token'));
+ const api=vi.fn(async(path:string)=>path.endsWith('/config')?config:{}),done=vi.fn(async()=>{});
+ render(<FirebasePanel api={api} compact initialMode="create" onComplete={done}/>);
+ const user=userEvent.setup();
+ const google=await screen.findByRole('button',{name:'Continue with Google'});
+ expect(screen.queryByText('Continue with Firebase')).toBeNull();
+ expect(screen.queryByText('Firebase action')).toBeNull();
+ expect(screen.queryByText(/Authenticator or recovery code/)).toBeNull();
+ expect(screen.queryByLabelText('Account recovery password')).toBeNull();
+ await user.click(google);
+ const recovery=screen.getByLabelText('Account recovery password');
+ expect(recovery).toBeTruthy();
+ expect((screen.getByRole('button',{name:'Create account with Google'}) as HTMLButtonElement).disabled).toBe(true);
+ expect(mocks.authenticate).not.toHaveBeenCalled();
+ await user.type(recovery,'Recovery-password123!');
+ await user.click(screen.getByRole('button',{name:'Create account with Google'}));
+ await waitFor(()=>expect(done).toHaveBeenCalledOnce());
+ expect(mocks.authenticate.mock.calls[0][4]).toBe(true);
+ expect(api).toHaveBeenCalledWith('/auth/firebase/register','POST',{id_token:'fresh-id-token',recovery_password:'Recovery-password123!'});
+ expect(api).toHaveBeenCalledWith('/auth/firebase/login','POST',{id_token:'fresh-id-token'});
+});
+
+it('allows returning to the compact Google choice without leaving a recovery secret behind',async()=>{
+ const api=vi.fn(async(path:string)=>path.endsWith('/config')?config:{});
+ render(<FirebasePanel api={api} compact initialMode="create" onComplete={vi.fn()}/>);
+ const user=userEvent.setup();
+ await user.click(await screen.findByRole('button',{name:'Continue with Google'}));
+ await user.type(screen.getByLabelText('Account recovery password'),'Recovery-password123!');
+ await user.click(screen.getByRole('button',{name:'Use email instead'}));
+ expect(screen.queryByLabelText('Account recovery password')).toBeNull();
+ await user.click(screen.getByRole('button',{name:'Continue with Google'}));
+ expect((screen.getByLabelText('Account recovery password') as HTMLInputElement).value).toBe('');
+ expect(mocks.authenticate).not.toHaveBeenCalled();
+});
