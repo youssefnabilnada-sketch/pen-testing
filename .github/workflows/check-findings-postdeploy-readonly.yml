@@ -1,0 +1,26 @@
+name: AEGIS findings redesign official-domain read-only smoke
+on:
+  push:
+    branches:
+      - verification/aegis-findings-live-safe-smoke-20261031
+permissions:
+  contents: read
+jobs:
+  public-gateway-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Observe official production page and API statuses without credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://aegis-pentest-eg.vercel.app"
+          for path in /console /guides /api/health; do
+            code="$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --connect-timeout 8 --max-time 20 "$base$path")"
+            echo "$path => HTTP $code"
+            test "$code" = "200"
+          done
+          code="$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --connect-timeout 8 --max-time 20 "$base/api/auth/me")"
+          echo "/api/auth/me (unauthenticated) => HTTP $code"
+          test "$code" = "401"
+          echo "No customer credentials, data changes, assessment calls or Oracle restarts performed."
