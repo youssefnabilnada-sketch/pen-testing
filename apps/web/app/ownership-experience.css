@@ -111,3 +111,49 @@
 .ownership-platform-warning svg{flex:none;margin-top:2px}
 .ownership-platform-guide>small{display:block;color:#97aec4;line-height:1.7;font-size:10.5px}
 @media(max-width:480px){.ownership-platform-guide{padding:13px}.ownership-platform-guide-title{align-items:flex-start}.ownership-platform-guide-title>span{margin-inline-start:30px}}
+
+/* SmartVerify visual tutorials: lightweight, keyboard-operable and no third-party video host. */
+.sv-video-lessons{min-width:0;border:1px solid #7cdef144;border-radius:16px;padding:16px;background:radial-gradient(ellipse at 98% 5%,#27b7e216,transparent 48%),linear-gradient(135deg,#142d40c9,#0e1a2dcf)}
+.sv-video-intro{display:flex;flex-wrap:wrap;align-items:center;gap:13px;justify-content:space-between}
+.sv-video-intro>div{flex:1;min-width:190px}
+.sv-video-eyebrow{display:inline-flex;align-items:center;gap:6px;letter-spacing:.10em;font-size:10px;font-weight:750;color:#8beadb}
+.sv-video-intro h4{font-size:16px;color:#edfffc;margin:8px 0 5px}
+.sv-video-intro p{font-size:11.5px;line-height:1.75;color:#abc5d3;margin:0;max-width:540px}
+.workspace-v2 .sv-video-open{display:inline-flex;align-items:center;gap:8px;padding:11px 13px;border-radius:10px;border:1px solid #8cf2d87b;background:#61d9c82b;color:#d6fff4;font-size:12px;font-weight:700}
+.workspace-v2 .sv-video-open:hover{border-color:#9cfff5;background:#4cc7b34a}
+.sv-video-screen{margin-top:17px;display:grid;gap:12px;min-width:0}
+.sv-video-modes{display:flex;gap:8px;flex-wrap:wrap}
+.sv-video-modes button{font-size:11px;padding:9px 11px;border-radius:10px;color:#a7c2d1;background:#0e2131bd;border:1px solid #7aa1c43e}
+.sv-video-modes button[aria-pressed="true"]{color:#ecfffc;background:#1e5a5973;border-color:#82ead7}
+.sv-video-stage{position:relative;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 30%,#1c7f806a,#0c2135 55%,#090f21);border:1px solid #74c6d54f;min-height:255px;padding:27px 18px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.sv-video-stage:before,.sv-video-stage:after{content:'';position:absolute;inset:0;pointer-events:none}
+.sv-video-stage:before{background-image:linear-gradient(#70cdcc0a 1px,transparent 1px),linear-gradient(90deg,#70cdcc0a 1px,transparent 1px);background-size:29px 29px}
+.sv-video-stage:after{inset:auto -40% -160px; height:200px;filter:blur(65px);background:#43bbaa20}
+.sv-video-step-label{position:absolute;top:11px;inset-inline-start:14px;color:#b3eee0;font-weight:750;font-size:10px;letter-spacing:.12em}
+.sv-video-illustration{display:flex;align-items:center;justify-content:center;gap:15px;margin:10px 0 13px;position:relative}
+.sv-video-orb{height:76px;width:76px;border-radius:20px;display:grid;place-items:center;color:#c5fff2;border:1px solid #7ae9d979;background:linear-gradient(145deg,#397e88aa,#0e3143);box-shadow:0 12px 32px #060d2077}
+.sv-video-orb.secondary{background:linear-gradient(145deg,#294f77dd,#183447cc);color:#88eccf}
+.sv-video-connect{width:48px;height:2px;background:linear-gradient(90deg,#65dcc9,#b9fbed);position:relative;overflow:visible}
+.sv-video-connect span{position:absolute;display:block;top:-5px;left:0;width:12px;height:12px;border-radius:50%;background:#95fff2;box-shadow:0 0 19px #85f9db;animation:sv-travel 5s ease-in-out infinite}
+.sv-video-stage h5{position:relative;z-index:1;margin:7px 0;font-size:17px;font-weight:750;color:#f1fffc}
+.sv-video-scene-copy{position:relative;z-index:1;margin:5px 0 10px;max-width:480px;font-size:13px;line-height:1.8;color:#c7e4e9;animation:sv-appear .35s ease-out}
+.sv-video-demo-label{position:relative;z-index:1;font-size:9px;color:#82aabd;margin-top:12px;line-height:1.4}
+.sv-video-timeline{display:flex;gap:7px;align-items:center}
+.sv-video-timeline button{flex:1;border:0;background:transparent;padding:8px 0;min-width:0}
+.sv-video-timeline button>span{position:relative;display:block;height:5px;border-radius:8px;background:#375568;overflow:hidden}
+.sv-video-timeline button>span.done,.sv-video-timeline button>span i{background:#74e4ce}
+.sv-video-timeline button>span i{position:absolute;inset:0;display:block}
+.sv-video-timeline button>span.current{background:#448f92}
+.sv-video-timeline button>span b{position:absolute;inset:0;display:block;background:#8affed;transform-origin:left;animation:sv-fill 5s linear forwards}
+.experience[dir="rtl"] .sv-video-timeline button>span b{transform-origin:right}
+.sv-video-controls{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.sv-video-controls button{display:flex;align-items:center;gap:6px;justify-content:center;min-height:37px;font-size:11px;padding:8px 11px;border:1px solid #9db4d13d;background:#162a3e;border-radius:9px;color:#ddeef1}
+.sv-video-controls button:disabled{opacity:.4;cursor:not-allowed}
+.sv-video-controls button:not(:disabled):hover{border-color:#8be9dd;background:#234a51}
+.sv-video-safety{display:flex;gap:7px;align-items:flex-start;font-size:10.5px!important;line-height:1.75!important;margin:0;color:#9abdc6}
+.sv-video-safety svg{flex:none;color:#92ead6;margin-top:1px}
+@keyframes sv-travel{0%,8%{transform:translateX(0);opacity:.4}60%,100%{transform:translateX(42px);opacity:1}}
+@keyframes sv-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes sv-appear{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:550px){.sv-video-lessons{padding:13px}.sv-video-open{width:100%;justify-content:center}.sv-video-stage{min-height:250px;padding:26px 13px 16px}.sv-video-orb{height:62px;width:62px}.sv-video-connect{width:32px}.sv-video-connect span{animation:none}.sv-video-stage h5{font-size:15px}.sv-video-scene-copy{font-size:11.5px}.sv-video-controls button{font-size:10px;padding:8px 6px}}
+@media(prefers-reduced-motion:reduce){.sv-video-connect span,.sv-video-timeline button>span b,.sv-video-scene-copy{animation:none!important}.sv-video-timeline button>span b{transform:none}}
