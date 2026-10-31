@@ -105,3 +105,16 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
  .auth-provider{margin-top:17px}
 }
 @media(max-width:360px){.auth-modern{padding-inline:10px}.auth-card-modern{padding-inline:15px}.auth-card-head h2{font-size:27px}}
+
+/* Linked Google identity: visible only on the sign-in screen, without Firebase jargon. */
+.auth-google-section{margin-top:20px;min-width:0}
+.auth-divider{display:flex;align-items:center;gap:14px;margin-bottom:17px;color:#8298af;font-size:12px}
+.auth-divider:before,.auth-divider:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,#c2d7f12c,transparent)}
+.google-signin-button{width:100%;min-height:49px;border:1px solid #d6e4f340;border-radius:11px;background:#f7faff;color:#23304b;display:flex;align-items:center;justify-content:center;gap:13px;padding:11px 14px;box-shadow:0 9px 26px #00000025;font-weight:650;font-size:13px;letter-spacing:.01em}
+.google-signin-button:hover:not(:disabled){background:#fff;border-color:#e4f4ff;transform:translateY(-1px)}
+.google-signin-button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.google-mark{flex:none;width:19px;height:19px}
+.auth-google-caption{color:#96a9bd;font-size:11px;line-height:1.6;text-align:center;margin:10px 0 0}
+.auth-google-unavailable{font-size:12px;line-height:1.7;color:#acbbcf;margin:0;padding:12px;border:1px solid #ffffff17;border-radius:10px}
+.auth-google-signin .auth-feedback{margin-top:11px}
+@media(prefers-reduced-motion:reduce){.google-signin-button{transition:none!important}}
