@@ -26,7 +26,7 @@ const methods: {id:Method;en:string;ar:string;Icon:typeof FileText}[]=[
  {id:'dns',en:'DNS TXT record',ar:'سجل DNS TXT',Icon:Globe2}
 ];
 function GuidesContent(){
- const {t}=useExperience();
+ const {t,language}=useExperience();
  const [provider,setProvider]=useState('unsure');
  const [method,setMethod]=useState<Method>('dns');
  const [videoId,setVideoId]=useState('unsure');
@@ -70,12 +70,13 @@ function GuidesContent(){
    <section className="guides-player-col" aria-label={t('Animated tutorial player','مشغل الشرح المتحرك')}>
     <div className="guides-player-top"><PlayCircle size={19}/><strong>{t('Watch the interactive lesson','شاهد الشرح التفاعلي')}</strong><span>{t('3 short steps','3 خطوات سريعة')}</span></div>
     <div className="guides-mp4">
-     <video key={videoId} controls playsInline preload="metadata" aria-label={t('MP4 tutorial video','فيديو شرح MP4')}>
-      <source src={'/guides/videos/'+videoId+'.mp4'} type="video/mp4"/>
+     <video key={videoId+'-'+language} controls playsInline preload="metadata" aria-label={t('MP4 tutorial video','فيديو شرح MP4')}>
+      <source src={'/guides/videos/'+videoId+'-'+language+'.mp4'} type="video/mp4"/>
+      <track kind="captions" src={'/guides/videos/'+videoId+'-'+language+'.vtt'} srcLang={language} label={language==='ar'?'العربية':'English'} default/>
       {t('Your browser does not support MP4 playback.','متصفحك لا يدعم تشغيل فيديو MP4.')}
      </video>
-     <div className="guides-video-meta"><span>{t('Silent bilingual MP4 explainer · 3 steps','فيديو MP4 توضيحي صامت بالعربي والإنجليزي · 3 خطوات')}</span>
-     <a href={'/guides/videos/'+videoId+'.mp4'} download={videoId+'.mp4'}>{t('Download MP4','تحميل الفيديو')}</a></div>
+     <div className="guides-video-meta"><span>{t('English video with narration and subtitles · 3 steps','فيديو عربي بالصوت والترجمة النصية · 3 خطوات')}</span>
+     <a href={'/guides/videos/'+videoId+'-'+language+'.mp4'} download={videoId+'-'+language+'.mp4'}>{t('Download MP4','تحميل الفيديو')}</a></div>
     </div>
     <div className="guides-interactive-heading">{t('Or follow the interactive walkthrough','أو استخدم الشرح التفاعلي خطوة بخطوة')}</div>
     <SmartVerifyVideoGuide key={provider+'-'+method} platform={provider} method={method} initiallyOpen/>
