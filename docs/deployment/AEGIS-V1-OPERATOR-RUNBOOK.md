@@ -34,12 +34,19 @@ Run in Ubuntu SSH (not Windows PowerShell). This creates a detached worktree and
 
 ```bash
 cd /home/ubuntu/aegis-cloud
-git fetch --prune origin
-git worktree add --detach /home/ubuntu/aegis-v1-final origin/release/aegis-v1-final
+# This OCI checkout has a single-branch fetch refspec. An unqualified
+# 'git fetch origin' updates only deploy/oracle-always-free-prep-20261028.
+# Explicitly fetch exactly the existing release branch, without touching
+# the local deployment branch or changing Git's persistent configuration.
+git fetch origin refs/heads/release/aegis-v1-final:refs/remotes/origin/release/aegis-v1-final
+git show-ref --verify refs/remotes/origin/release/aegis-v1-final
+git worktree add --detach /home/ubuntu/aegis-v1-final refs/remotes/origin/release/aegis-v1-final
 cd /home/ubuntu/aegis-v1-final
 bash scripts/oci-v1-backend-rollout.sh --check
 bash scripts/oci-production-gateway.sh --check
 ```
+
+If you previously saw `fatal: invalid reference: origin/release/aegis-v1-final`, it was because the OCI Git remote is configured to fetch only the legacy deploy branch. The exact-ref fetch above fixes that without changing any tracked source, running service or production deployment. Do not run `--apply` or `--install` when a previous `cd` or worktree command has failed.
 
 **STOP** unless both report `AEGIS_V1_PRECHECK_PASS` and `AEGIS_PRODUCTION_GATEWAY_PREFLIGHT_PASS`. Do not attempt to hand-edit Caddy on a failed baseline check; report the redacted output for a reviewed patch.
 
