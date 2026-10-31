@@ -30,6 +30,22 @@ export default function GuestAuth({
  const [showPassword,setShowPassword]=useState(false);
  const [registrationOpen,setRegistrationOpen]=useState(false);
  const [registrationChecked,setRegistrationChecked]=useState(false);
+ const [resendEmail,setResendEmail]=useState(email);
+ const [resendBusy,setResendBusy]=useState(false);
+ const [resendFeedback,setResendFeedback]=useState('');
+ useEffect(()=>{if(email)setResendEmail(email)},[email]);
+ async function resendVerification(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();
+  const address=resendEmail.trim();
+  if(!address||resendBusy)return;
+  setResendBusy(true);setResendFeedback('');
+  try{
+   await api('/auth/resend-verification','POST',{email:address});
+   setResendFeedback(t('If this email has an unverified AEGIS account, a new verification message will be sent when eligible. Check Inbox and Spam.','لو البريد مرتبط بحساب AEGIS لم يتم تفعيله، سيتم إرسال رسالة جديدة عندما يصبح مؤهلًا. راجع الوارد والبريد غير المرغوب فيه.'));
+  }catch(err){
+   setResendFeedback(err instanceof Error?err.message:t('Resend unavailable. Please try again later.','إعادة الإرسال غير متاحة حاليًا. حاول لاحقًا.'));
+  }finally{setResendBusy(false)}
+ }
  useEffect(()=>{
   let active=true;
   api('/auth/registration-status')
@@ -97,6 +113,14 @@ export default function GuestAuth({
      {!busy&&<ArrowRight size={18} aria-hidden="true"/>}
     </button>
    </form>
+   {isVerify&&<form className="auth-resend-form" onSubmit={resendVerification} aria-label={t('Resend email verification','إعادة إرسال تفعيل البريد')}>
+    <p>{t('Expired code or no email? Request a new verification message without creating another account.','انتهى الكود أو الرسالة ما وصلتش؟ اطلب رسالة تفعيل جديدة من غير ما تنشئ حسابًا تانيًا.')}</p>
+    <label>{t('Account email address','البريد الإلكتروني للحساب')}
+     <input type="email" required value={resendEmail} autoComplete="email" placeholder="name@example.com" onChange={e=>setResendEmail(e.target.value)}/>
+    </label>
+    <button type="submit" disabled={resendBusy||busy||!resendEmail.trim()}>{resendBusy?t('Sending request…','جاري إرسال الطلب…'):t('Resend verification email','إعادة إرسال تفعيل البريد')}</button>
+    {resendFeedback&&<p role="status" className="auth-resend-feedback">{resendFeedback}</p>}
+   </form>}
    {!isRegister&&<nav className="auth-quick-links" aria-label={t('Account help','مساعدة الحساب')}>
     {isLogin?<><button type="button" onClick={()=>go('verify')}><Mail size={15} aria-hidden="true"/>{t('Verify email','تفعيل البريد')}</button>
      <button type="button" onClick={()=>go('reset-request')}><KeyRound size={15} aria-hidden="true"/>{t('Forgot password?','نسيت كلمة المرور؟')}</button></>
