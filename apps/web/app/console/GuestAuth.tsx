@@ -113,7 +113,7 @@ export default function GuestAuth({
     <FirebasePanel api={api} allowCreate={false} compact onComplete={onComplete}/>
    </section>}
    <footer className="auth-card-footer">
-    {isLogin?<p>{t('New to AEGIS?','جديد على AEGIS؟')} <button type="button" onClick={()=>go('register')}>{t('Register','التسجيل')}</button> <span>{t('· Limited launch access','· الدخول الجديد محدود خلال الإطلاق')}</span></p>:<p>{t('Already have an account?','عندك حساب بالفعل؟')} <button type="button" onClick={()=>go('login')}>{t('Sign in','تسجيل الدخول')}</button></p>}
+    {isLogin?<p>{t('New to AEGIS?','جديد على AEGIS؟')} <button type="button" onClick={()=>go('register')}>{t('Register','التسجيل')}</button> <span>{registrationChecked?(registrationOpen?t('· Registration open','· التسجيل متاح الآن'):t('· Limited launch access','· الدخول الجديد محدود خلال الإطلاق')):null}</span></p>:<p>{t('Already have an account?','عندك حساب بالفعل؟')} <button type="button" onClick={()=>go('login')}>{t('Sign in','تسجيل الدخول')}</button></p>}
     <p className="auth-privacy"><LockKeyhole size={13} aria-hidden="true"/>{t('Protected access · No payment required','دخول محمي · بدون دفع')}</p>
    </footer>
   </section>
