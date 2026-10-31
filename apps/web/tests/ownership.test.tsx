@@ -41,8 +41,8 @@ it('selects a universal proof method without starting a scan or assuming success
  });
  const done=vi.fn(async()=>{});render(<OwnershipGuide assetId="asset" api={api} onVerified={done}/>);
  const user=userEvent.setup();
- await user.click(screen.getByRole('button',{name:/HTML meta tag Paste a tag/}));
- expect(screen.getByRole('button',{name:/HTML meta tag Paste a tag/}).getAttribute('aria-pressed')).toBe('true');
+ await user.click(screen.getByRole('button',{name:/HTML meta tag/}));
+ expect(screen.getByRole('button',{name:/HTML meta tag/}).getAttribute('aria-pressed')).toBe('true');
  await user.click(screen.getByRole('button',{name:'Show my secure verification steps'}));
  expect(await screen.findByText('Publish your specific proof')).toBeTruthy();
  expect(api).toHaveBeenCalledWith('/assets/asset/challenge','POST',{method:'meta'});
