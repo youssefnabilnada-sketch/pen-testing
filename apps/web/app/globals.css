@@ -76,7 +76,7 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .auth-provider .panel p{line-height:1.65}
 .auth-provider .panel .form input{height:auto}
 .auth-provider .panel button{min-height:43px}
-.auth-card-footer{margin-top:17px;border-top:1px solid #ffffff14;padding-top:16px}
+.auth-card-footer{display:block;margin-top:17px;border-top:1px solid #ffffff14;padding:16px 0 0}
 .auth-card-footer p{color:#a3b4c9;font-size:12px;margin:0 0 7px;line-height:1.7}
 .auth-card-footer button{background:transparent;border:0;color:var(--cyan);font-size:12px;padding:3px 5px;font-weight:650}
 .auth-card-footer button:hover{background:transparent;text-decoration:underline}
