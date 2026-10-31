@@ -1,6 +1,7 @@
 'use client';
 import {Experience,useExperience} from './Experience';
 import WorkspaceNavigation,{GettingStarted} from './WorkspaceNavigation';
+import PremiumWelcome from './PremiumWelcome';
 import CrmPanel from './CrmPanel';
 import VaultPanel from './VaultPanel';
 import ApiAssessmentPanel from './ApiAssessmentPanel';
@@ -28,7 +29,7 @@ import OwnershipTransferPanel from './OwnershipTransferPanel';
 import AccountPanel from './AccountPanel';
 import MfaPanel from './MfaPanel';
 import {accountLink} from '../../lib/account-link';
-import {ShieldCheck,LayoutDashboard,Globe,ScanLine,TriangleAlert,Wrench,Users,Settings,LogOut,Plus,ArrowUpRight,Activity,FileCheck2,Search,FileDown,CheckCircle2,LockKeyhole} from 'lucide-react';
+import {ShieldCheck,LayoutDashboard,Globe,ScanLine,TriangleAlert,Wrench,Users,Settings,LogOut,Plus,ArrowUpRight,Activity,FileCheck2,Search,FileDown,CheckCircle2,LockKeyhole,UserRound,ChevronRight} from 'lucide-react';
 
 type Org={id:string;name:string;role:string};
 type Me={id:string;email:string;verified:boolean;superadmin:boolean;csrf:string;organizations:Org[]};
@@ -77,7 +78,35 @@ function ConsoleContent(){
 
  const pageTitle=({Assets:'My websites',Assessments:'Security assessments',Findings:'Findings & fixes','Website Health':'Monitoring'} as Record<string,string>)[page]||page;
 
- return <div className="shell"><a className="skip-link" href="#workspace-content">{t('Skip to workspace content','انتقل إلى محتوى مساحة العمل')}</a><aside className="sidebar"><Link href="/" className="brand"><ShieldCheck/> AEGIS</Link><p className="eyebrow" style={{paddingLeft:12}}>SECURITY WORKSPACE</p><WorkspaceNavigation page={page} superadmin={me.superadmin} onNavigate={p=>{setPage(p);setError('');setNotice('')}}/><div className="bottom glass"><span className="dot"/> TESTING ACCESS<p>Payments disabled.<br/>Permission comes first.</p></div></aside><div className="workspace"><header className="topbar"><span className="subtle">Workspace <span style={{padding:'0 10px'}}> / </span> {pageTitle}</span><div style={{display:'flex',gap:12,alignItems:'center'}}><select aria-label="Organization" value={org} onChange={e=>setOrg(e.target.value)}>{me.organizations.map(o=><option value={o.id} key={o.id}>{o.name}</option>)}</select><button aria-label="Sign out" onClick={()=>action(async()=>{await api('/auth/logout','POST');setMe(null);setOrg('')})}><LogOut size={16}/></button></div></header><main id="workspace-content" tabIndex={-1} className="content">{feedback}{!me.verified&&<div className="notice">Email verification is required. Sign out and use “Verify email” with your emailed token.</div>}{!org&&<><AccountPanel api={api} onSignedOut={()=>{setMe(null);setOrg('')}}/><MfaPanel api={api} onDisabled={()=>{setMe(null);setOrg('')}}/><FirebasePanel account api={api} onComplete={identity}/><IncomingInvitations api={api} onAccepted={identity}/></>}{!org?<section className="glass panel"><h2>{t('Create your company workspace.','أنشئ مساحة عمل مؤسستك.')}</h2><form onSubmit={createOrg} className="form"><label>{t('Company name','اسم المؤسسة')}<input required minLength={2} value={name} onChange={e=>setName(e.target.value)}/></label><button disabled={busy||!me.verified} className="primary">{t('Create workspace','إنشاء مساحة عمل')}</button></form></section>:<><div className="page-head"><div><p className="eyebrow">{me.organizations.find(o=>o.id===org)?.name.toUpperCase()}</p><h1>{page==='Overview'?'Your security, in focus.':pageTitle}</h1><p>{page==='Overview'?'Evidence over assumptions. A clear view of your authorized assets.':'Authorized configuration assessments · Free local testing'}</p></div><button onClick={()=>{setPage('Assets');setSelected('')}} className="primary"><Plus size={15}/> Add website</button></div>{loading&&<p role="status" className="loading subtle">Refreshing workspace data…</p>}
+ return <div className="shell workspace-v2">
+ <a className="skip-link" href="#workspace-content">{t('Skip to workspace content','انتقل إلى محتوى مساحة العمل')}</a>
+ <aside className="sidebar premium-sidebar">
+  <div className="premium-brand-lockup">
+   <Link href="/" className="brand premium-brand"><span className="premium-brand-mark"><ShieldCheck size={25} strokeWidth={1.65}/></span><span>AEGIS</span></Link>
+   <span className="premium-brand-descriptor">{t('SECURITY CLOUD','سحابة الأمان')}</span>
+  </div>
+  <div className="premium-sidebar-overline"><span className="premium-sidebar-tick"/>{t('SECURITY WORKSPACE','مساحة العمل الآمنة')}</div>
+  <WorkspaceNavigation page={page} superadmin={me.superadmin} onNavigate={p=>{setPage(p);setError('');setNotice('')}}/>
+  <div className="premium-sidebar-footer"><span className="premium-protected-dot"/><strong>{t('Protected workspace','مساحة عمل محمية')}</strong><p>{t('Verified ownership. Approved assessments. No payments required.','إثبات الملكية، فحوص بموافقتك، بدون دفع.')}</p></div>
+ </aside>
+ <div className="workspace premium-workspace">
+  <header className="topbar premium-topbar">
+   <div className="premium-breadcrumb">
+    <span>{t('AEGIS CLOUD','سحابة AEGIS')} <ChevronRight size={14} aria-hidden="true"/> {org?pageTitle:t('Getting started','البدء')}</span>
+    <small>{t('Your security workspace','مساحة الأمان الخاصة بك')}</small>
+   </div>
+   <div className="premium-topbar-actions">
+    {me.organizations.length>0&&<select aria-label="Organization" value={org} onChange={e=>setOrg(e.target.value)}>{me.organizations.map(o=><option value={o.id} key={o.id}>{o.name}</option>)}</select>}
+    <div className="premium-user-pill" title={me.email}><UserRound size={16} aria-hidden="true"/><span>{me.email}</span></div>
+    <button className="premium-signout" aria-label="Sign out" title={t('Sign out','تسجيل الخروج')} onClick={()=>action(async()=>{await api('/auth/logout','POST');setMe(null);setOrg('')})}><LogOut size={18}/></button>
+   </div>
+  </header>
+  <main id="workspace-content" tabIndex={-1} className="content premium-content">{feedback}{!me.verified&&<div className="notice">Email verification is required. Sign out and use “Verify email” with your emailed token.</div>}{!org?<PremiumWelcome name={name} setName={setName} busy={busy} verified={me.verified} onCreate={createOrg} onVerify={async token=>{await api('/auth/verify','POST',{token});await identity();setNotice(t('Email verified successfully. Your workspace is ready to create.','تم تفعيل بريدك بنجاح. يمكنك الآن إنشاء مساحة العمل.'))}} accountTools={<>
+  <AccountPanel api={api} onSignedOut={()=>{setMe(null);setOrg('')}}/>
+  <MfaPanel api={api} onDisabled={()=>{setMe(null);setOrg('')}}/>
+  <FirebasePanel account api={api} onComplete={identity}/>
+  <IncomingInvitations api={api} onAccepted={identity}/>
+ </>}/>:<><div className="page-head premium-page-head"><div><p className="eyebrow">{me.organizations.find(o=>o.id===org)?.name.toUpperCase()}</p><h1>{page==='Overview'?'Your security, in focus.':pageTitle}</h1><p>{page==='Overview'?t('See what matters. Take the next secure step with confidence.','اعرف الأهم وخذ الخطوة الأمنية التالية بثقة.'):t('Authorized assessments, actionable findings and approved fixes.','فحوص مصرح بها ونتائج قابلة للتنفيذ وإصلاحات بموافقتك.')}</p></div><button onClick={()=>{setPage('Assets');setSelected('')}} className="primary premium-add-website"><Plus size={16}/>{t('Add website','أضف موقعًا')}</button></div>{loading&&<p role="status" className="loading subtle">Refreshing workspace data…</p>}
 {page==='Account security'&&<>{me.organizations.find(o=>o.id===org)?.role==='owner'&&<OwnershipTransferPanel key={org} api={api} org={org} onTransferred={identity}/>}<AccountPanel api={api} onSignedOut={()=>{setMe(null);setOrg('')}}/><MfaPanel api={api} onDisabled={()=>{setMe(null);setOrg('')}}/><FirebasePanel account api={api} onComplete={identity}/><IncomingInvitations api={api} onAccepted={identity}/></>}
 {page==='Threat Intelligence'&&<IntelligencePanel api={api} org={org} assets={assets} isAdmin={me.superadmin}/>}
 {page==='Overview'&&<>{dash&&<GettingStarted assets={dash.assets} verified={dash.verified_assets} completed={dash.completed} onNavigate={setPage}/>}<div className="stats">{[['Registered assets',dash?.assets,'Ownership comes first'],['Completed assessments',dash?.completed,'Verified execution only'],['Open observations',dash?.open_findings,'Review impact and context'],['Remediation requests',dash?.pending_remediation,'Scope approval required']].map(([label,value,sub])=><div className="stat glass" key={String(label)}><span>{label}</span><strong>{value??'—'}</strong><small>{sub}</small></div>)}</div><div className="grid-two"><section className="glass panel"><div className="panel-head"><h3>Assessment observations</h3><span className="badge">Last 20 assessments</span></div>{dash?.trend.length?<div>{[...dash.trend].reverse().map(t=><div className="row" key={t.job_id}><span className="subtle">{new Date(t.date*1000).toLocaleDateString()}</span><div className="bar"><i style={{width:`${Math.max(2,t.count/Math.max(...dash.trend.map(t=>t.count),1)*100)}%`}}/></div><b>{t.count}</b></div>)}<p className="subtle">Counts reflect individual root-response assessments, not an overall security score.</p></div>:empty('Your baseline starts with an assessment.','Verify an asset and run an authorized check to see real results.')}</section><section className="glass panel"><h3>Open finding distribution</h3><div className="donut"><div className="ring">{dash?.open_findings??'—'}<small>OPEN OBSERVATIONS</small></div></div><div>{Object.entries(dash?.severity||{}).map(([s,n])=><div className="split row" key={s}><span className={'status '+s}>{s}</span><span>{n}</span></div>)}</div></section></div><div className="grid-two"><section className="glass panel"><div className="panel-head"><h3>Asset overview</h3><button onClick={()=>setPage('Assets')}>Manage <ArrowUpRight size={14}/></button></div>{assets.length?assets.slice(0,4).map(a=><div className="row" key={a.id}><Globe size={18}/><div className="grow"><strong>{a.origin}</strong><small>Exact origin · root path only</small></div><span className="status">{a.verified?'Verified':'Awaiting verification'}</span></div>):empty('No assets registered.','Your first website belongs here.')}</section><section className="glass panel"><h3>Recent activity</h3>{dash?.activity.length?dash.activity.slice(0,6).map((a,i)=><div className="row" key={i}><Activity size={14}/><div><strong>{a.action.replaceAll('.',' / ')}</strong><small>{date(a.created)}</small></div></div>):empty('No activity yet.','Your workspace audit trail appears here.')}</section></div></>}
