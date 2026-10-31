@@ -29,7 +29,7 @@ test('isolated workspace fixture supports primary navigation, reports and Arabic
  await page.getByRole('button',{name:'التبديل إلى العربية'}).click();
  await expect(page.locator('.experience')).toHaveAttribute('dir','rtl');
  await page.getByRole('button',{name:'النتائج والإصلاحات',exact:true}).click();
- await expect(page.getByText('طريق واضح لإصلاح تم التحقق منه')).toBeVisible();
+ await expect(page.getByRole('heading',{name:/من الدليل إلى إصلاح تم التحقق منه/})).toBeVisible();
  await page.getByRole('button',{name:/الأدوات والإعدادات/}).click();
  await expect(page.getByRole('button',{name:'أمان الحساب',exact:true})).toBeVisible();
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
@@ -51,7 +51,7 @@ test('isolated FastFix fixture keeps evidence and guidance separate from applied
  await expect(page.getByText('Controlled fixture response omitted X-Content-Type-Options.')).toBeVisible();
  await page.getByRole('button',{name:'Choose a remediation path'}).click();
  await expect(page.getByText('Guidance only · no change applied')).toBeVisible();
- await page.getByText('Engineering review and validation',{exact:true}).click();
+ await page.getByText('Required tests and rollback before marking fixed',{exact:true}).click();
  await expect(page.getByText('Run the approved full reassessment.')).toBeVisible();
  await expect(page.getByRole('button',{name:'Request remediation'})).toHaveCount(0);
  expect(mutations).toEqual([]);
