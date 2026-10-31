@@ -14,9 +14,24 @@ describe('auth path boundary',()=>{
  });
 });
 describe('preview secret and exact origin',()=>{
- it('does not add a privileged header in normal production or unconfigured preview',()=>{
-  expect(previewProxyGate({VERCEL_ENV:'production'},preview,preview,'POST')).toEqual({allowed:true});
+ it('fails closed in production without its own gateway, while preserving unconfigured preview behavior',()=>{
+  expect(previewProxyGate({VERCEL_ENV:'production'},preview,preview,'POST')).toEqual({allowed:false,status:503});
+  expect(previewProxyGate({VERCEL_ENV:'production',AEGIS_PREVIEW_AUTH_ENABLED:'true',
+    AEGIS_PREVIEW_GATEWAY_KEY:secret},preview,preview,'POST')).toEqual({allowed:false,status:503});
   expect(previewProxyGate({VERCEL_ENV:'preview'},preview,preview,'POST')).toEqual({allowed:true});
+ });
+ it('requires a dedicated strong production gateway key and exact browser Origin',()=>{
+  const enabled={VERCEL_ENV:'production',AEGIS_PRODUCTION_GATEWAY_ENABLED:'true'};
+  for(const key of ['', 'short', 'x'.repeat(64)+'!']){
+   expect(previewProxyGate({...enabled,AEGIS_PRODUCTION_GATEWAY_KEY:key},preview,preview,'POST'))
+    .toEqual({allowed:false,status:503});
+  }
+  const configured={...enabled,AEGIS_PRODUCTION_GATEWAY_KEY:secret};
+  expect(previewProxyGate(configured,preview,preview,'POST')).toEqual({allowed:true,secret});
+  expect(previewProxyGate(configured,null,preview,'GET')).toEqual({allowed:true,secret});
+  expect(previewProxyGate(configured,null,preview,'POST')).toEqual({allowed:false,status:403});
+  expect(previewProxyGate(configured,'https://evil.vercel.app',preview,'POST'))
+    .toEqual({allowed:false,status:403});
  });
  it('requires a strong key in a preview deployment',()=>{
   for(const bad of ['', 'short','a'.repeat(64)+'!']){
