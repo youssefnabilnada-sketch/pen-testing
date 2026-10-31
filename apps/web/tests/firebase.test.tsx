@@ -3,7 +3,7 @@ import {render,screen,cleanup,waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach,beforeEach,it,expect,vi} from 'vitest';
 import FirebasePanel from '../app/console/FirebasePanel';
-const mocks=vi.hoisted(()=>({authenticate:vi.fn(),reset:vi.fn(),redirectReady:vi.fn(()=>false),beginRedirect:vi.fn(),finishRedirect:vi.fn(async()=>null)}));
+const mocks=vi.hoisted(()=>({authenticate:vi.fn(),reset:vi.fn(),redirectReady:vi.fn(()=>false),beginRedirect:vi.fn(),finishRedirect:vi.fn(async():Promise<{idToken:string;email:string}|null>=>null)}));
 vi.mock('../lib/firebase-client',()=>({authenticate:mocks.authenticate,resetFirebasePassword:mocks.reset,googleRedirectReady:mocks.redirectReady,beginGoogleRedirect:mocks.beginRedirect,finishGoogleRedirect:mocks.finishRedirect,friendlyError:(e:Error)=>e.message}));
 afterEach(cleanup);
 beforeEach(()=>{vi.clearAllMocks();mocks.redirectReady.mockReturnValue(false);mocks.finishRedirect.mockResolvedValue(null)});
