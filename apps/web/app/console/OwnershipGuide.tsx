@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {useExperience} from './Experience';
 import VerificationRetry from './VerificationRetry';
 import SmartVerifyPlatformGuide from './SmartVerifyPlatformGuide';
+import SmartVerifyVideoGuide from './SmartVerifyVideoGuide';
 import {Github,Globe2,Cloud,FileCheck2,Server,HelpCircle,CheckCircle2,ExternalLink,ShieldCheck} from 'lucide-react';
 type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
 function githubRepository(value:string){
@@ -72,6 +73,7 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
   <div><span>02</span><strong>{t('Publish a simple proof','انشر رمز التحقق')}</strong></div>
   <div><span>03</span><strong>{t('Confirm ownership','أكد الملكية')}</strong></div>
  </div>
+ <SmartVerifyVideoGuide platform={host} method={method}/>
  <SmartVerifyPlatformGuide platform={host}/>
  <div className="ownership-choice">
   <p>{t('Recommended proof:','طريقة التحقق المقترحة:')} <strong>{method==='file'?t('Verification file','ملف تحقق'):method==='dns'?t('DNS TXT record','سجل DNS TXT'):t('HTML meta tag','وسم HTML')}</strong></p>
