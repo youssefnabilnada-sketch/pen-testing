@@ -86,3 +86,42 @@
 @media(max-width:760px){.finding-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.finding-journey{grid-template-columns:repeat(2,minmax(0,1fr))}.finding-filter-grid{grid-template-columns:1fr}.finding-search-form{flex-wrap:wrap}.finding-search-form>button{width:100%}.finding-hero-head>div{min-width:0}}
 @media(max-width:430px){.finding-hero-head{gap:12px}.finding-metrics{gap:8px}.finding-metric{padding:12px}.finding-result-card{padding:14px}.finding-result-actions button{width:100%}.finding-result-heading h4{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.finding-workspace *{scroll-behavior:auto!important}}
+
+/* Evidence-guided FastFix prevents claiming any repair without access and retest */
+.fastfix-entry{margin-top:12px}
+.fastfix-launch{min-height:36px;padding:8px 12px;border-radius:9px;border:1px solid #81d6ca51;background:#4bdbc517;color:#c5f6ee;display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:750}
+.fastfix-launch:hover{background:#4bdbc536}
+.fastfix-guidance{margin-top:12px;padding:clamp(12px,2vw,20px);border-radius:12px;background:linear-gradient(138deg,#112d39,#0b1c2d);border:1px solid #73cfc05e;display:grid;gap:13px}
+.fastfix-guidance header{margin:0}
+.fastfix-guidance header h4{font-size:18px;color:#ebfff9;margin:9px 0}
+.fastfix-guidance header p{font-size:11px;line-height:1.75;margin:0}
+.fastfix-guidance label{display:grid;gap:6px;color:#b3d4df;font-size:11px;font-weight:700}
+.fastfix-guidance select{width:100%;padding:9px;border-radius:9px;border:1px solid #8bb5bf5c;background:#071929;color:#e8f9f9}
+.fastfix-eyebrow{font-size:10px;letter-spacing:.085em;color:#8cefe0;display:flex;align-items:center;gap:7px;font-weight:800}
+.fastfix-truth{padding:13px;border-radius:10px;border:1px solid #f0bb8561;background:#61442826;display:flex;align-items:flex-start;gap:10px}
+.fastfix-truth svg{flex:none;color:#ffce9a}
+.fastfix-truth strong{color:#fff0d2;font-size:12px}
+.fastfix-truth p{font-size:11px;color:#d2c5b2;line-height:1.65;margin:5px 0 0}
+.fastfix-access-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.fastfix-access-grid>div{border-radius:10px;border:1px solid #8fc7b84c;background:#142d3c9c;padding:12px;display:grid;align-content:start;gap:8px}
+.fastfix-access-grid svg{color:#85e5d6}
+.fastfix-access-grid strong{font-size:11px;color:#e2faf4;line-height:1.5}
+.fastfix-access-grid span{font-size:10.5px;line-height:1.6;color:#b3c9d7}
+.fastfix-implementation{border:1px solid #7eacc641;border-radius:10px;padding:15px;background:#0a192b7f}
+.fastfix-implementation h5,.fastfix-proposal h5{font-size:13px;font-weight:800;color:#dcf7ee;margin:0 0 12px}
+.fastfix-route{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #a8d2d01c}
+.fastfix-route:last-child{border-bottom:0}
+.fastfix-route>span{flex:none;color:#6eecda;font-size:10px;font-weight:850;background:#6bdfd019;border:1px solid #65d3be4a;border-radius:8px;padding:5px}
+.fastfix-route strong{color:#d8f4f0;font-size:11.5px}
+.fastfix-route p{font-size:11px;line-height:1.7;color:#aac8d4;margin:5px 0 0}
+.fastfix-adapter{border:1px solid #78d3c94d;background:#437e782b;border-radius:9px;padding:12px;color:#c9f0e4!important;font-size:11px;line-height:1.6;display:flex;gap:8px;align-items:flex-start}
+.fastfix-adapter svg{flex:none}
+.fastfix-proposal{border:1px solid #87b4c84d;background:#10263a75;border-radius:10px;padding:15px}
+.fastfix-proposal strong{font-size:11px;color:#c5e4db;display:block;margin-top:10px}
+.fastfix-proposal p{font-size:11px;line-height:1.7;overflow-wrap:anywhere}
+.fastfix-validation{padding:12px;border:1px solid #8fc7c14b;border-radius:9px}
+.fastfix-validation summary{display:flex;align-items:center;gap:7px;cursor:pointer;color:#b2f2e9;font-size:11px;font-weight:750}
+.fastfix-validation li{font-size:11px;margin:5px 0;color:#b7cfda}
+.fastfix-warning{color:#f6d5ac!important;font-size:10px;line-height:1.7}
+.fastfix-download{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;border:1px solid #77ddcb;padding:10px 14px;border-radius:10px;color:#062d2f;background:#77e6db;font-size:12px;font-weight:800;justify-self:start}
+@media(max-width:720px){.fastfix-access-grid{grid-template-columns:1fr}}
