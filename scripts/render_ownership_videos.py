@@ -119,14 +119,20 @@ async def _edge_voice(text:str,language:str,target:Path):
 def speak(text:str,language:str,output:Path)->Path:
     """Use a natural neural voice when available; offline language-correct fallback."""
     if EDGE_ENABLED[language]:
-        try:
-            asyncio.run(_edge_voice(text,language,output))
-            if output.stat().st_size<1000 or duration(output)<0.5:
-                raise ValueError("TTS returned empty audio")
-            return output
-        except Exception as exc:
-            EDGE_ENABLED[language]=False
-            logging.warning("Neural %s voice unavailable (%s); using offline speech",language,type(exc).__name__)
+        for attempt in range(3):
+            try:
+                output.unlink(missing_ok=True)
+                asyncio.run(_edge_voice(text,language,output))
+                if output.stat().st_size<1000 or duration(output)<0.5:
+                    raise ValueError("TTS returned empty audio")
+                return output
+            except Exception as exc:
+                if attempt<2:
+                    import time
+                    time.sleep(attempt+1)
+                else:
+                    EDGE_ENABLED[language]=False
+                    logging.warning("Neural %s voice unavailable after retries (%s); using offline speech",language,type(exc).__name__)
     target=output.with_suffix(".wav")
     subprocess.run(["espeak-ng","-v",VOICE_FALLBACK[language],"-s",
                     "135" if language=="ar" else "145","-w",str(target),text],check=True)
