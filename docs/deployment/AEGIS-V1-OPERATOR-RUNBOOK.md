@@ -14,11 +14,13 @@
 Generate and save a 64-character random URL-safe key using a trusted password manager, or run in PowerShell (the key goes to the clipboard, never appears in the terminal):
 
 ```powershell
-$b = [byte[]]::new(48)
-[System.Security.Cryptography.RandomNumberGenerator]::Fill($b)
+$b = New-Object byte[] 48
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$rng.GetBytes($b)
 $key = [Convert]::ToBase64String($b).TrimEnd('=').Replace('+','-').Replace('/','_')
 Set-Clipboard $key
-Remove-Variable key,b
+$rng.Dispose()
+Remove-Variable key,b,rng
 Write-Host "64-character gateway secret copied to clipboard; never send it in chat."
 ```
 
