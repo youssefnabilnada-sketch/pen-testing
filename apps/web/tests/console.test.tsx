@@ -85,6 +85,23 @@ it('localizes the sign-in form while keeping its authentication contract',async(
 });
 
 
+it('shows a branded Google sign-in without Firebase jargon on the primary login screen',async()=>{
+ const f=vi.fn((url:string)=>{
+  if(url.endsWith('/auth/me'))return response(401,{});
+  if(url.endsWith('/auth/firebase/config'))return response(200,{enabled:true,config:{apiKey:'fixture-api-key',authDomain:'test.firebaseapp.com',projectId:'fixture',appId:'1:fixture:web:test'}});
+  return response(401,{});
+ });
+ vi.stubGlobal('fetch',f);
+ const {container}=render(<Console/>);
+ await screen.findByRole('heading',{name:'Welcome back.'});
+ const google=await screen.findByRole('button',{name:'Sign in with Google'});
+ expect(google).toBeTruthy();
+ expect(container.querySelector('.google-signin-button svg.google-mark')).not.toBeNull();
+ expect(screen.queryByText('Continue with Firebase')).toBeNull();
+ await userEvent.click(screen.getByRole('button',{name:'Verify email'}));
+ expect(screen.queryByRole('button',{name:'Sign in with Google'})).toBeNull();
+});
+
 it('guides real pilot login, separates email tokens from MFA and clears stale form errors on navigation',async()=>{
  vi.stubGlobal('fetch',vi.fn((url:string)=>url.endsWith('/auth/me')?response(401,{}):response(401,{detail:'Invalid email or password.'})));
  render(<Console/>);
