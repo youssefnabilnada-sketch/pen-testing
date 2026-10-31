@@ -1,5 +1,8 @@
 name: AEGIS production read-only observation
 on:
+  pull_request:
+    branches:
+      - release/aegis-v1-final
   push:
     branches:
       - feature/aegis-v1-integrated-launch-candidate-20261031
