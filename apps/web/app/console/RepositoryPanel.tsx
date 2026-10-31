@@ -13,7 +13,7 @@ export default function RepositoryPanel({api,org,requests,role,onOpenFindings}:{
  const {t}=useExperience();
  const [connections,setConnections]=useState<Connection[]>([]),[patches,setPatches]=useState<Patch[]>([]),[repos,setRepos]=useState<Repository[]>([]);
  const [connection,setConnection]=useState(''),[repository,setRepository]=useState(''),[request,setRequest]=useState(''),[consent,setConsent]=useState(false);
- const [approved,setApproved]=useState(''),[code,setCode]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[fetchingRepos,setFetchingRepos]=useState(false);
+ const [proposalConsent,setProposalConsent]=useState(false),[approved,setApproved]=useState(''),[code,setCode]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[fetchingRepos,setFetchingRepos]=useState(false);
  const [callback,setCallback]=useState<{code:string;state:string}|null>(null),[adapter,setAdapter]=useState('vercel'),[repoPage,setRepoPage]=useState(1);
  const canWrite=['owner','admin'].includes(role),hasConnection=connections.some(c=>!c.revoked);
  const blocked=error.toLowerCase().includes('github app configuration')||error.toLowerCase().includes('github integration is not configured');
@@ -24,7 +24,7 @@ export default function RepositoryPanel({api,org,requests,role,onOpenFindings}:{
  },[api,org,canWrite]);
  useEffect(()=>{setConnections([]);setPatches([]);setConnection('');setRepos([]);setRepository('');setRequest('');setConsent(false);setApproved('');setError('');refresh().catch(e=>setError(e.message))},[refresh]);
  useEffect(()=>{const params=new URLSearchParams(window.location.search);if(params.get('code')&&params.get('state'))setCallback({code:params.get('code')!,state:params.get('state')!})},[]);
- useEffect(()=>{setApproved('')},[connection,repository,request,adapter]);
+ useEffect(()=>{setConsent(false);setProposalConsent(false);setApproved('')},[connection,repository,request,adapter]);
  async function run(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn();await refresh()}catch(e){setError((e as Error).message)}finally{setBusy(false);setCode('')}}
  async function loadRepositories(id:string,page:number){
   setRepoPage(page);setRepository('');setRepos([]);if(!id)return;
@@ -33,7 +33,7 @@ export default function RepositoryPanel({api,org,requests,role,onOpenFindings}:{
   catch(e){setError((e as Error).message)}
   finally{setFetchingRepos(false)}
  }
- const canPropose=canWrite&&Boolean(connection&&repository&&request&&consent)&&!busy;
+ const canPropose=canWrite&&Boolean(connection&&repository&&request&&proposalConsent)&&!busy;
  return <section className="repo-journey" aria-label={t('Repository review and proposed fixes','مراجعة المستودع والإصلاحات المقترحة')}>
   <header className="ops-hero">
    <div className="ops-eyebrow"><GitPullRequest size={15}/>{t('OPTIONAL · CODE-ASSISTED FIXES','اختياري · إصلاحات مدعومة بالكود')}</div>
@@ -74,6 +74,7 @@ export default function RepositoryPanel({api,org,requests,role,onOpenFindings}:{
       <label>{t('Hosting platform','منصة الاستضافة')}<select value={adapter} onChange={e=>setAdapter(e.target.value)}><option value="vercel">Vercel — vercel.json</option><option value="netlify">Netlify — static netlify.toml</option></select></label>
       <label>{t('Finding with a remediation request','ملاحظة لها طلب إصلاح')}<select value={request} onChange={e=>setRequest(e.target.value)}><option value="">{t('Choose a request','اختار طلب إصلاح')}</option>{requests.map(r=><option key={r.id} value={r.id}>{r.finding_title||r.id}</option>)}</select></label>
       {!requests.length&&<p className="ops-muted">{t('No remediation requests yet. Start from a finding first.','مفيش طلبات إصلاح لسه. ابدأ من إحدى نتائج الفحص أولًا.')}</p>}
+      <label className="ops-consent"><input type="checkbox" checked={proposalConsent} onChange={e=>setProposalConsent(e.target.checked)}/><span>{t('I authorize this specific repository and finding to be analyzed for a reviewable proposal. Changing the selection requires new consent.','أوافق على مراجعة هذا المستودع وهذه الملاحظة فقط لتجهيز اقتراح. تغيير الاختيار يحتاج موافقة جديدة.')}</span></label>
       <button className="primary" disabled={!canPropose} onClick={()=>run(async()=>{await api('/repository-patches','POST',{connection_id:connection,repository,adapter,remediation_id:request,accepted:true})})}><Code2 size={16}/>{t('Prepare reviewable change','جهّز تعديلًا للمراجعة')}</button>
     </div>:<div className="ops-empty"><LockKeyhole size={24}/><strong>{t('Repository not selected yet','لسه مفيش مستودع محدد')}</strong><p>{t('Connect an authorized account first. This step will unlock only after explicit consent.','اربط حسابًا مصرحًا أولًا. المرحلة دي مش هتتفعل إلا بعد موافقتك.')}</p></div>}
    </section>
