@@ -93,7 +93,7 @@ export default function GuestAuth({
    {isLogin&&<details className="auth-provider">
     <summary>{t('Other sign-in options · Google / Firebase','طرق دخول أخرى · Google / Firebase')}</summary>
     <p className="auth-provider-hint">{t('Only for accounts already linked to AEGIS. First-time users should sign in with their AEGIS email.','للحسابات المرتبطة مسبقًا بـAEGIS فقط. ابدأ بالدخول باستخدام بريد AEGIS.')}</p>
-    <FirebasePanel api={api} onComplete={onComplete}/>
+    <FirebasePanel api={api} allowCreate={false} onComplete={onComplete}/>
    </details>}
    <footer className="auth-card-footer">
     {isLogin?<p>{t('New to AEGIS?','جديد على AEGIS؟')} <button type="button" onClick={()=>go('register')}>{t('Register','التسجيل')}</button> <span>{t('· Limited launch access','· الدخول الجديد محدود خلال الإطلاق')}</span></p>:<p>{t('Already have an account?','عندك حساب بالفعل؟')} <button type="button" onClick={()=>go('login')}>{t('Sign in','تسجيل الدخول')}</button></p>}
