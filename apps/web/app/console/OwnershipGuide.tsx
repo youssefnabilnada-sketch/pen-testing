@@ -2,25 +2,64 @@
 import {useEffect,useState} from 'react';
 import {useExperience} from './Experience';
 import VerificationRetry from './VerificationRetry';
-import VerificationRecommendation from './VerificationRecommendation';
+import {Github,Globe2,Cloud,FileCheck2,Server,HelpCircle,CheckCircle2,ExternalLink,ShieldCheck} from 'lucide-react';
 type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
  const {t}=useExperience();
  const [autoChecking,setAutoChecking]=useState(false);
+ const [host,setHost]=useState('unsure'),[branch,setBranch]=useState('main');
  const [recommendation,setRecommendation]=useState<{method:string;reason:string;source:string}|null>(null),[history,setHistory]=useState<any[]>([]);
  useEffect(()=>{let active=true;api(`/assets/${assetId}/verification-recommendation`,'POST',{platform:'auto'}).then(r=>{if(active)setRecommendation(r)}).catch(()=>{});return()=>{active=false}},[assetId,api]);
  const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('file'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [cfZone,setCfZone]=useState(''),[cfToken,setCfToken]=useState(''),[cfApproved,setCfApproved]=useState(false),[cfMfa,setCfMfa]=useState(''),[cfPreview,setCfPreview]=useState<{name:string;content:string;ttl:number}|null>(null);
  useEffect(()=>{setCfToken('');setCfZone('');setCfApproved(false);setCfMfa('');setCfPreview(null);let active=true;api(`/assets/${assetId}/challenge`).then(v=>{if(active){setC(v);if(v)setMethod(v.method)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[assetId,api]);
  async function act(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
- return <section aria-label="Ownership guide"><h3>{t('Prove that you control this website','أثبت ملكيتك للموقع')}</h3><p className="subtle">{t('Verify your exact website using a file, DNS record or HTML tag. GitHub is optional; choose the method you can access.','أثبت ملكية موقعك بملف تحقق أو سجل DNS أو وسم HTML. ربط GitHub اختياري؛ اختر الطريقة المتاحة لك.')}</p>{error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
- {recommendation&&<div className="notice"><strong>Suggested method: {recommendation.method}</strong><p>{recommendation.reason} ({recommendation.source})</p><button onClick={()=>{setMethod(recommendation.method);setC(null);setLink('');setCfPreview(null);setCfToken('')}}>{t('Use website suggestion','استخدام الطريقة المقترحة')}</button></div>}
- <button onClick={()=>act(async()=>setHistory(await api(`/assets/${assetId}/verification-history`)))}>{t('View verification history','سجل التحقق')}</button>
- {history.map(h=><p key={h.id}>{h.method} · {h.state} · {new Date(h.created*1000).toLocaleString()}</p>)}
- <VerificationRecommendation onChoose={m=>{setMethod(m);setC(null);setLink('');setCfPreview(null);setCfToken('')}}/>
- <label className="form">{t('Verification method','طريقة إثبات الملكية')}<select value={method} onChange={e=>{setMethod(e.target.value);setC(null);setLink('');setCfPreview(null);setCfToken('')}}><option value="file">{t('Verification file (GitHub optional)','ملف التحقق — لا يتطلب GitHub')}</option><option value="dns">{t('DNS TXT record','سجل DNS TXT')}</option><option value="meta">{t('HTML meta tag','وسم HTML')}</option></select></label>
- <button disabled={busy} onClick={()=>act(async()=>{setC(await api(`/assets/${assetId}/challenge`,'POST',{method}));setLink('');setCfPreview(null);setCfToken('')})}>{t('Get verification instructions','عرض خطوات التحقق')}</button>
- {c&&<><ol className="verification-steps"><li>{c.method==='file'?'Download the verification file below. Keep its name and contents unchanged.':c.method==='dns'?'Open the DNS settings for your domain and add a TXT record.':'Open the homepage HTML and place the supplied meta tag inside <head>.'}</li><li>{c.method==='file'?'Upload it to the exact .well-known address shown below. For Next.js, put it inside public/.well-known/.':c.method==='dns'?'Use the record name in the instructions and copy the verification value. DNS changes may take time to appear.':'Save and deploy your website, then clear any page cache.'}</li><li>{t('Return here and choose Check ownership. This does not start a scan.','ارجع هنا واضغط تحقق من الملكية. هذه الخطوة لا تبدأ فحصًا.')}</li></ol><div className="code" dir="ltr">{c.instruction}</div><p>Expires: {new Date(c.expires*1000).toLocaleString()}. Reopening instructions keeps the same valid token.</p><button disabled={busy} onClick={()=>act(async()=>{await navigator.clipboard.writeText(c.method==='meta'?c.instruction:c.token);setNotice('Copied.')})}>{t('Copy verification value','نسخ قيمة التحقق')}</button>
+ return <section aria-label="Ownership guide" className="ownership-wizard">
+ <div className="ownership-welcome">
+  <span className="ownership-eyebrow"><ShieldCheck size={17}/>{t('STEP 2 · OWNERSHIP VERIFICATION','الخطوة ٢ · إثبات الملكية')}</span>
+  <h3>{t('Verify your website, without the complexity.','أثبت ملكية موقعك بدون تعقيد.')}</h3>
+  <p>{t('Where do you manage your website? Pick one option — we’ll show the simplest safe path.','موقعك على أي منصة؟ اختار واحدة وهنعرض لك أسهل طريقة آمنة.')}</p>
+ </div>
+ {error&&<p role="alert" className="error">{error}</p>}
+ {notice&&<p role="status" className="notice">{notice}</p>}
+ <div className="ownership-hosts" role="group" aria-label={t('Where is your website managed?','موقعك على أي منصة؟')}>
+ {([
+  ['github','GitHub / GitHub Pages','GitHub / GitHub Pages',Github,'file'],
+  ['vercel','Vercel + GitHub','Vercel + GitHub',Globe2,'file'],
+  ['wordpress','WordPress','ووردبريس',FileCheck2,'meta'],
+  ['cloudflare','Cloudflare / DNS','كلاودفلير / DNS',Cloud,'dns'],
+  ['cpanel','cPanel / Plesk','سي بانل / بليسك',Server,'file'],
+  ['unsure','Other / not sure','أخرى / مش متأكد',HelpCircle,'dns']
+ ] as const).map(([id,en,ar,Icon,choice])=><button key={id} type="button" disabled={busy||autoChecking}
+  aria-pressed={host===id} className={'ownership-host'+(host===id?' selected':'')}
+  onClick={()=>{setHost(id);setMethod(choice);if(c?.method!==choice)setC(null);setLink('');setCfPreview(null);setCfToken('');setDirectory(id==='vercel'?'public':'');setError('');setNotice('')}}>
+  <Icon size={22} aria-hidden="true"/><span>{t(en,ar)}</span>{host===id&&<CheckCircle2 size={16} aria-hidden="true"/>}
+ </button>)}
+ </div>
+ <div className="ownership-simple-steps">
+  <div><span>01</span><strong>{t('Choose your platform','اختر منصتك')}</strong></div>
+  <div><span>02</span><strong>{t('Publish a simple proof','انشر رمز التحقق')}</strong></div>
+  <div><span>03</span><strong>{t('Confirm ownership','أكد الملكية')}</strong></div>
+ </div>
+ <div className="ownership-choice">
+  <p>{t('Recommended proof:','طريقة التحقق المقترحة:')} <strong>{method==='file'?t('Verification file','ملف تحقق'):method==='dns'?t('DNS TXT record','سجل DNS TXT'):t('HTML meta tag','وسم HTML')}</strong></p>
+  <details className="ownership-advanced-method"><summary>{t('Choose another verification method','اختر طريقة تحقق أخرى')}</summary>
+   <label className="form">{t('Verification method','طريقة إثبات الملكية')}
+    <select value={method} onChange={e=>{setMethod(e.target.value);if(c?.method!==e.target.value)setC(null);setLink('');setCfPreview(null);setCfToken('')}}>
+     <option value="file">{t('Verification file (GitHub optional)','ملف التحقق — GitHub اختياري')}</option>
+     <option value="dns">{t('DNS TXT record','سجل DNS TXT')}</option>
+     <option value="meta">{t('HTML meta tag','وسم HTML')}</option>
+    </select>
+   </label>
+  </details>
+ </div>
+ {!c&&<button className="primary ownership-prepare" disabled={busy} onClick={()=>act(async()=>{setC(await api('/assets/'+assetId+'/challenge','POST',{method}));setLink('');setCfPreview(null);setCfToken('')})}>{t('Get verification instructions','عرض خطوات التحقق')} <ExternalLink size={16}/></button>}
+ <details className="ownership-extra-settings"><summary>{t('Help and verification history','المساعدة وسجل التحقق')}</summary>
+  <p>{t('A GitHub repository alone is not enough: AEGIS always checks the exact published website.','مجرد ملكية مستودع GitHub غير كافي. AEGIS بيتأكد من الموقع المنشور نفسه.')}</p>
+  <button onClick={()=>act(async()=>setHistory(await api('/assets/'+assetId+'/verification-history')))}>{t('View verification history','سجل التحقق')}</button>
+  {history.map(h=><p key={h.id}>{h.method} · {h.state} · {new Date(h.created*1000).toLocaleString()}</p>)}
+ </details>
+ {c&&<><div className="ownership-challenge-card"><p className="eyebrow">{t('YOUR THREE-STEP GUIDE','دليلك في ٣ خطوات')}</p><ol className="verification-steps"><li>{c.method==='file'?'Download the verification file below. Keep its name and contents unchanged.':c.method==='dns'?'Open the DNS settings for your domain and add a TXT record.':'Open the homepage HTML and place the supplied meta tag inside <head>.'}</li><li>{c.method==='file'?'Upload it to the exact .well-known address shown below. For Next.js, put it inside public/.well-known/.':c.method==='dns'?'Use the record name in the instructions and copy the verification value. DNS changes may take time to appear.':'Save and deploy your website, then clear any page cache.'}</li><li>{t('Return here and choose Check ownership. This does not start a scan.','ارجع هنا واضغط تحقق من الملكية. هذه الخطوة لا تبدأ فحصًا.')}</li></ol><div className="code" dir="ltr">{c.instruction}</div><p>Expires: {new Date(c.expires*1000).toLocaleString()}. Reopening instructions keeps the same valid token.</p><button disabled={busy} onClick={()=>act(async()=>{await navigator.clipboard.writeText(c.method==='meta'?c.instruction:c.token);setNotice('Copied.')})}>{t('Copy verification value','نسخ قيمة التحقق')}</button>
  {c.method==='meta'&&c.wordpress&&<details><summary>{t('Use the AEGIS WordPress plugin','استخدام إضافة AEGIS في WordPress')}</summary><p>Install the supplied AEGIS verification plugin as a WordPress administrator. Open Settings → AEGIS verification, paste this challenge, save and clear the page cache. Then check ownership below.</p><pre className="code">{JSON.stringify(c.wordpress)}</pre><button onClick={()=>act(async()=>{await navigator.clipboard.writeText(JSON.stringify(c.wordpress));setNotice('WordPress challenge copied.')})}>{t('Copy WordPress challenge','نسخ بيانات تحقق WordPress')}</button></details>}
  {c.method==='dns'&&<details><summary>{t('Publish this TXT proof using Cloudflare (optional)','نشر سجل التحقق عبر Cloudflare (اختياري)')}</summary>
  <p>This creates one AEGIS TXT record in the Cloudflare zone you control. It cannot edit other DNS records or authorize website scanning. Use a Cloudflare token restricted to this zone with <strong>Zone Read and DNS Write</strong> permissions. The token is used only for this request; it is not stored in your AEGIS account.</p>
@@ -38,7 +77,9 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
  </details>}
  {c.method==='dns'&&<VerificationRetry disabled={busy} key={c.id} assetId={assetId} challengeId={c.id} api={api} onRunning={setAutoChecking} onVerified={async()=>{setC(null);await onVerified()}}/>}
  {c.method==='file'&&<a className="button" href={`/api/assets/${assetId}/challenge/${c.id}/file`}>{t('Download verification file','تنزيل ملف التحقق')}</a>}
- {c.method==='file'&&<details><summary>{t('My website deploys from GitHub','موقعي يُنشر عبر GitHub')}</summary><div className="form"><label>Repository (owner/name)<input value={repository} placeholder="your-account/your-site" onChange={e=>{setRepository(e.target.value);setLink('')}}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><button disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/challenge/${c.id}/github`,'POST',{repository,directory,branch:'main'});setLink(r.url)})}>Prepare GitHub file</button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">Open prepared file on GitHub ↗</a><p>Review and commit on branch main, wait for hosting deployment, then check ownership below.</p></>}</div></details>}
- <button disabled={busy||autoChecking} onClick={()=>act(async()=>{const r=await api(`/assets/${assetId}/verify/${c.id}`,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?t('Working…','جارٍ التحقق…'):t('Check ownership','تحقق من الملكية')}</button></>}
- <p className="subtle">{t('Ownership verification does not grant scanning or AutoFix permission. Cloudflare assistance can publish only an approved TXT proof; other hosting integrations remain guided/manual.','إثبات الملكية لا يمنح إذن الفحص أو الإصلاح. مساعدة Cloudflare تنشر سجل تحقق معتمدًا فقط، أما الاستضافات الأخرى فتستخدم الخطوات اليدوية الموضحة.')}</p></section>
+ {c.method==='file'&&<details className="ownership-github" open={host==='github'||host==='vercel'?true:undefined}><summary>{t('My website deploys from GitHub','موقعي يُنشر عبر GitHub')}</summary>
+ <p>{t('This shortcut opens GitHub to prepare a verification file. Sign in on GitHub, review and commit it, and wait for your website to deploy. AEGIS does not get your GitHub password or repository access.','الاختصار ده بيفتح GitHub ويجهز ملف التحقق. سجّل دخولك هناك، راجع الملف واحفظه، وانتظر نشر الموقع. AEGIS مش بياخد كلمة السر أو صلاحيات المستودع.')}</p><div className="form"><label>Repository (owner/name)<input value={repository} placeholder="your-account/your-site" onChange={e=>{setRepository(e.target.value);setLink('')}}/></label><label>Public files directory<select value={directory} onChange={e=>{setDirectory(e.target.value);setLink('')}}><option value="">Root — static HTML</option><option value="public">public — Next.js / Vite</option></select></label><details><summary>{t('My deployment branch is not main','فرع النشر مش main')}</summary><label>{t('Deployment branch','فرع النشر')}<input value={branch} onChange={e=>{setBranch(e.target.value);setLink('')}} maxLength={100}/></label></details>
+ <button className="primary" disabled={busy||!repository} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/challenge/'+c.id+'/github','POST',{repository,directory,branch});setLink(r.url)})}>{t('Prepare file on GitHub','جهّز الملف على GitHub')} <ExternalLink size={16}/></button>{link&&<><a className="button" href={link} target="_blank" rel="noopener noreferrer">Open prepared file on GitHub ↗</a><p>Review and commit on branch main, wait for hosting deployment, then check ownership below.</p></>}</div></details>}
+ <button className="primary ownership-check" disabled={busy||autoChecking} onClick={()=>act(async()=>{const r=await api('/assets/'+assetId+'/verify/'+c.id,'POST');setNotice(r.message);setC(null);await onVerified()})}>{busy?t('Working…','جارٍ التحقق…'):t('Check ownership','تحقق من الملكية')} <CheckCircle2 size={17}/></button></div></>}
+ <p className="subtle ownership-trust"><ShieldCheck size={16} aria-hidden="true"/>{t('Ownership proof does not permit scanning or AutoFix. Every assessment needs separate authorization.','إثبات الملكية لا يسمح بالفحص أو الإصلاح التلقائي. كل فحص يحتاج موافقة منفصلة.')}</p></section>
 }
