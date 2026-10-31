@@ -11,6 +11,10 @@ on:
       - .github/workflows/production-gateway-live-acceptance.yml
       - scripts/oci-live-web-smoke.sh
       - apps/web/e2e/production-live.spec.ts
+      - apps/web/app/console/GuestAuth.tsx
+      - apps/web/app/console/FirebasePanel.tsx
+      - apps/web/app/console/page.tsx
+      - apps/web/app/globals.css
 permissions:
   contents: read
 concurrency:
@@ -47,7 +51,7 @@ jobs:
         with: {node-version: '22', cache: npm, cache-dependency-path: apps/web/package-lock.json}
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Live production desktop/mobile guest and Arabic/Firebase UI acceptance
+      - name: Live production desktop/mobile guest and Arabic/Google UI acceptance
         env:
           E2E_BASE_URL: https://aegis-pentest-eg.vercel.app
         run: npx playwright test e2e/production-live.spec.ts --project=desktop --project=mobile --reporter=line
