@@ -15,7 +15,13 @@ it('shows all public verification tutorials and plays steps without login or API
  expect(screen.getByRole('heading',{name:/Verify your website/})).toBeTruthy();
  expect(screen.getByText(/No account required to watch/)).toBeTruthy();
  expect(screen.getByRole('button',{name:'Shopify'})).toBeTruthy();
+ expect(screen.getByLabelText('MP4 tutorial video').querySelector('source')?.getAttribute('src')).toBe('/guides/videos/unsure-en.mp4');
  await user.click(screen.getByRole('button',{name:'Shopify'}));
+ expect(screen.getByLabelText('MP4 tutorial video').querySelector('source')?.getAttribute('src')).toBe('/guides/videos/shopify-en.mp4');
+ await user.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));
+ expect(screen.getByLabelText('فيديو شرح MP4').querySelector('source')?.getAttribute('src')).toBe('/guides/videos/shopify-ar.mp4');
+ expect(screen.getByLabelText('فيديو شرح MP4').querySelector('track')?.getAttribute('srclang')).toBe('ar');
+ await user.click(screen.getByRole('button',{name:'Switch to English'}));
  expect(screen.getByText(/published theme in your Shopify Online Store/)).toBeTruthy();
  await user.click(screen.getByRole('button',{name:'Verification method'}));
  expect(screen.getByText('Verify with an HTML meta tag')).toBeTruthy();
