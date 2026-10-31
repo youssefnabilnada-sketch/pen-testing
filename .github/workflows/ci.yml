@@ -275,6 +275,7 @@ jobs:
         run: |
           set -euo pipefail
           bash -n scripts/oci-production-gateway.sh
+          bash -n scripts/oci-rotate-production-gateway.sh
           bash -n scripts/oci-v1-backend-rollout.sh
           docker run --rm -e AEGIS_PRODUCTION_GATEWAY_KEY=ci-only-placeholder-not-for-any-production-use-123456789012345678901234567890 \
             -v "$PWD/infrastructure/deployment/Caddyfile.production-gated:/etc/caddy/Caddyfile:ro" \
