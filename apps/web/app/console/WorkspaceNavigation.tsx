@@ -89,7 +89,7 @@ export function GettingStarted({assets,verified,completed,onNavigate}:{assets:nu
     <h2>{labels[step]}</h2>
     <p>{descriptions[step]}</p>
     <button className="primary premium-journey-action" onClick={()=>onNavigate(step===3?'Findings':'Assets')}>{labels[step]} →</button>
-    <small><ShieldCheck size={15} aria-hidden="true"/>{t('Ownership verification and assessment permission are always separate.','إثبات الملكية والإذن بالفحص خطوتان منفصلتان دائمًا.')}</small>
+    <small><ShieldCheck size={15} aria-hidden="true"/>{t('Ownership verification and assessment permission are always separate.','إثبات الملكية منفصل عن الإذن بفحص موقعك أو تعديله.')}</small>
    </div>
    <ol className="premium-journey-steps">
     {labels.map((label,i)=><li key={label} aria-current={i===step?'step':undefined} className={i<step?'completed-step':''}>
