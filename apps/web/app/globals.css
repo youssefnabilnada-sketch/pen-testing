@@ -139,3 +139,13 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
  .experience:has(.auth-modern) .language-toggle{position:absolute;top:14px;bottom:auto;inset-inline-end:16px;min-height:40px;padding:8px 13px;font-size:12px}
  .experience .auth-modern{padding-top:70px}
 }
+
+/* Signup recovery: verification resend stays compact and readable on mobile. */
+.auth-resend-form{display:grid;gap:10px;margin-top:17px;padding:16px;border:1px solid #9fbada32;border-radius:12px;background:#18304763;color:#b9cbda}
+.auth-resend-form p{font-size:12px;line-height:1.6;margin:0}
+.auth-resend-form label{display:grid;gap:8px;font-size:12px;font-weight:600;color:#cbd9e7}
+.auth-resend-form input{min-width:0;width:100%;height:46px;background:#0a1423;border:1px solid #9fbada32;border-radius:10px;padding:10px 13px;color:#eff8ff;font-size:14px}
+.auth-resend-form input:focus-visible{outline:2px solid #79e3df;outline-offset:2px}
+.auth-resend-form button{min-height:44px;padding:11px 13px;background:#1e4551;border:1px solid #63d8d4aa;color:#b7fff7;border-radius:10px;font-weight:650;cursor:pointer;font-size:13px}
+.auth-resend-form button:disabled{opacity:.6;cursor:not-allowed}
+.auth-resend-form .auth-resend-feedback{color:#b7fff7}
