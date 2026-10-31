@@ -60,8 +60,12 @@ def main():
     # HTTPS checks restricted to AEGIS's own domain and explicitly selected routes.
     expected = {
         "/health": 200,
-        "/auth/me": 503,
+        # Read-only account lookups reach FastAPI; anonymous users get 401,
+        # not Caddy's 503 reserved for untrusted account writes.
+        "/auth/me": 401,
+        "/auth/firebase/config": 200,
         "/auth/firebase/login": 503,
+        "/organizations": 503,
         "/openapi.json": 503,
     }
     for path, wanted in expected.items():
