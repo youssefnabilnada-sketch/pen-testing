@@ -117,8 +117,10 @@ def link(data: LinkInput, request: Request, u=Depends(current), db=Depends(datab
 @router.post('/login')
 def login(data: IdentityInput, request: Request, response: Response, db=Depends(database)):
     from .main import throttle
-    throttle('firebase-login:'+request.client.host)
+    # Avoid a shared Vercel egress IP becoming a 12-user/minute lockout.
+    throttle('firebase-login:source:'+request.client.host, limit=240)
     project, claims = verified_identity(data.id_token)
+    throttle('firebase-login:identity:'+digest(claims['sub']))
     subject = claims['sub']
     identity = db.scalar(select(FirebaseIdentity).where(FirebaseIdentity.project==project,FirebaseIdentity.subject==subject))
     u = db.get(User,identity.user_id) if identity else None
@@ -179,8 +181,9 @@ def status(u=Depends(current), db=Depends(database)):
 @router.post('/register', status_code=201)
 def register(data: RegisterInput, request: Request, udb=Depends(database)):
     from .main import throttle
-    throttle('firebase-register:'+request.client.host)
+    throttle('firebase-register:source:'+request.client.host, limit=240)
     project, claims = verified_identity(data.id_token)
+    throttle('firebase-register:identity:'+digest(claims['sub']))
     email = claims.get('email', '')
     if not isinstance(email,str) or len(email)>254 or not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+',email):
         raise HTTPException(422,'A verified email address is required.')
