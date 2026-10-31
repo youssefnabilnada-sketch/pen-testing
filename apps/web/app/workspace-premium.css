@@ -263,3 +263,13 @@
 @media(max-width:860px){.experience[dir=rtl] .workspace-v2 .premium-sidebar{border-left:0}}
 @media(max-width:630px){.experience[dir=rtl] .workspace-v2 .premium-welcome-art{transform:scale(-.48,.48)}}
 @media(prefers-reduced-motion:reduce){.workspace-v2 *,.workspace-v2 *:before,.workspace-v2 *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Signed-in email verification stays in the same journey, not a logout detour. */
+.premium-verification{border:1px solid #f1bd7d28;border-radius:12px;background:#ecb15f08;margin:0 0 22px;padding:13px}
+.premium-verification .premium-warning{border:0;background:transparent;margin:0 0 8px;padding:6px 3px;font-size:12px}
+.premium-inline-verify{display:flex;align-items:end;gap:10px;flex-wrap:wrap}
+.premium-inline-verify label{flex:1 1 220px;min-width:0;display:grid;gap:8px;font-size:11px;color:#e1cdad}
+.premium-inline-verify input{min-height:44px}
+.premium-inline-verify button{min-height:44px;background:#274a52;border:1px solid #8ddec5a1;color:#c6f7e9;white-space:nowrap;font-weight:650}
+.premium-inline-verify button:hover{background:#2b6265}
+.premium-verification .error{margin:12px 0 0;font-size:12px}
