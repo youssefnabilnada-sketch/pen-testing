@@ -31,9 +31,9 @@ const platformNames:Record<string,TextPair> = {
  netlify:['Netlify','نتليفاي'],google:['Google Search Console','جوجل سيرش كونسول'],
  unsure:['Any website','أي موقع']
 };
-export default function SmartVerifyVideoGuide({platform,method}:{platform:string;method:string}){
+export default function SmartVerifyVideoGuide({platform,method,initiallyOpen=false}:{platform:string;method:string;initiallyOpen?:boolean}){
  const {t}=useExperience();
- const [open,setOpen]=useState(false);
+ const [open,setOpen]=useState(initiallyOpen);
  const [mode,setMode]=useState<'platform'|'proof'>('platform');
  const [step,setStep]=useState(0);
  const [playing,setPlaying]=useState(false);
