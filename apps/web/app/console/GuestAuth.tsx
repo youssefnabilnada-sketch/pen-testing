@@ -1,5 +1,5 @@
 'use client';
-import {useState,type FormEvent} from 'react';
+import {useEffect,useState,type FormEvent} from 'react';
 import Link from 'next/link';
 import {ShieldCheck,LockKeyhole,CheckCircle2,Eye,EyeOff,ArrowRight,Mail,KeyRound} from 'lucide-react';
 import {useExperience} from './Experience';
@@ -28,6 +28,16 @@ export default function GuestAuth({
 }:Props){
  const {t}=useExperience();
  const [showPassword,setShowPassword]=useState(false);
+ const [previewSignInUnavailable,setPreviewSignInUnavailable]=useState(false);
+ useEffect(()=>{
+  let active=true;
+  fetch('/api/account-access-status',{cache:'no-store'}).then(async response=>{
+   if(!response.ok)return;
+   const info=await response.json();
+   if(active)setPreviewSignInUnavailable(info.preview===true&&info.signInConfigured===false);
+  }).catch(()=>{}); // Nonessential UI hint: the protected proxy still fails closed.
+  return()=>{active=false};
+ },[]);
  const heading=headings[mode as AuthMode]||headings.login;
  const isLogin=mode==='login',isRegister=mode==='register',isVerify=mode==='verify',isReset=mode==='reset';
  const needsEmail=isLogin||isRegister||mode==='reset-request';
@@ -44,6 +54,7 @@ export default function GuestAuth({
     <div><CheckCircle2 size={18} aria-hidden="true"/><span>{t('Every change requires your approval','كل تغيير يتطلب موافقتك')}</span></div>
     <div><LockKeyhole size={18} aria-hidden="true"/><span>{t('Your workspace is private by design','مساحة عملك خاصة ومحمية')}</span></div>
    </div>
+   <Link href="/guides" className="auth-tutorials-link">{t('Watch website verification tutorials before signing in','شاهد شروحات إثبات ملكية الموقع قبل تسجيل الدخول')} <ArrowRight size={15}/></Link>
   </section>
   <section className="glass auth-card auth-card-modern" aria-label={t('Account access','الدخول للحساب')}>
    <header className="auth-card-head">
@@ -62,9 +73,14 @@ export default function GuestAuth({
    </header>
    {isLogin&&<p className="auth-guidance">{t('Use your exact AEGIS account email, including any +alias.','استخدم بريد حساب AEGIS بالكامل، بما فيه +alias إن وُجد.')}</p>}
    {isRegister&&<p className="auth-release-note" role="status">{t('Public registration is not open yet. Already have an account? Sign in instead.','التسجيل العام لم يُفتح بعد. لديك حساب بالفعل؟ سجّل الدخول بدلًا من ذلك.')}</p>}
-   {error&&<div role="alert" className="error auth-feedback">{error}</div>}
+   {isLogin&&previewSignInUnavailable&&<div className="auth-preview-guidance" role="status">
+    <strong>{t('Preview sign-in is not configured','تسجيل الدخول غير مُفعّل في نسخة المعاينة')}</strong>
+    <p>{t('This preview shows the new design and tutorials, but its private account gateway is not enabled. Use the official AEGIS website to access your real workspace.','نسخة المعاينة بتعرض التصميم الجديد والشروحات، لكن بوابة الحسابات الخاصة بها غير مفعلة. ادخل على موقع AEGIS الرسمي للوصول إلى حسابك الحقيقي.')}</p>
+    <a className="button" href="https://aegis-pentest-eg.vercel.app/console">{t('Open official sign-in','افتح تسجيل الدخول الرسمي')}</a>
+   </div>}
+   {error&&!(previewSignInUnavailable&&error.includes('HTTP 503'))&&<div role="alert" className="error auth-feedback">{error}</div>}
    {notice&&<div role="status" className="notice auth-feedback">{notice}</div>}
-   <form className="form auth-form" onSubmit={onSubmit}>
+   <form className="form auth-form" onSubmit={event=>{if(isLogin&&previewSignInUnavailable){event.preventDefault();return;}return onSubmit(event)}}>
     {needsEmail&&<label>{t('Email address','البريد الإلكتروني')}<input type="email" required value={email} autoComplete="email" onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/></label>}
     {needsPassword&&<label>{isLogin?t('Password','كلمة المرور'):t('Password · at least 12 characters','كلمة المرور · 12 حرفًا على الأقل')}
      <span className="auth-password">
@@ -78,7 +94,7 @@ export default function GuestAuth({
      <p>{t('Leave this empty unless you have enabled MFA. This is not your email verification token.','اتركها فارغة ما لم تكن فعّلت المصادقة الثنائية. هذا ليس رمز تفعيل البريد.')}</p>
     </details>}
     {(isVerify||isReset)&&<label>{t('One-time token from email','الرمز المرسل بالبريد الإلكتروني')}<input required autoComplete="off" value={token} onChange={e=>setToken(e.target.value)}/></label>}
-    <button disabled={busy} className="primary auth-submit" type="submit">
+    <button disabled={busy||(isLogin&&previewSignInUnavailable)} className="primary auth-submit" type="submit">
      {busy?t('Please wait…','يرجى الانتظار…'):isLogin?t('Sign in','تسجيل الدخول'):isVerify?t('Verify email','تفعيل البريد'):isReset?t('Reset password','تغيير كلمة المرور'):mode==='reset-request'?t('Send recovery email','إرسال بريد الاسترداد'):t('Continue','متابعة')}
      {!busy&&<ArrowRight size={18} aria-hidden="true"/>}
     </button>
@@ -90,7 +106,7 @@ export default function GuestAuth({
     {mode==='reset-request'&&<button type="button" onClick={()=>go('reset')}>{t('I have a reset token','لدي رمز الاستعادة')}</button>}
     {isReset&&<button type="button" onClick={()=>go('reset-request')}>{t('Request a reset email','طلب بريد الاستعادة')}</button>}
    </nav>
-   {isLogin&&<section className="auth-google-section" aria-label={t('Sign in with Google','تسجيل الدخول باستخدام Google')}>
+   {isLogin&&!previewSignInUnavailable&&<section className="auth-google-section" aria-label={t('Sign in with Google','تسجيل الدخول باستخدام Google')}>
     <div className="auth-divider"><span>{t('or','أو')}</span></div>
     <FirebasePanel api={api} allowCreate={false} compact onComplete={onComplete}/>
    </section>}

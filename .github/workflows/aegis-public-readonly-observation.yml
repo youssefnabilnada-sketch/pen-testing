@@ -1,0 +1,29 @@
+name: AEGIS production read-only observation
+on:
+  pull_request:
+    branches:
+      - release/aegis-v1-final
+  push:
+    branches:
+      - feature/aegis-v1-integrated-launch-candidate-20261031
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aegis-launch-readonly-observation
+  cancel-in-progress: true
+jobs:
+  public-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout reviewed AEGIS candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Observe official public gateway (GET-only; no secrets)
+        run: python scripts/launch_readonly_probe.py

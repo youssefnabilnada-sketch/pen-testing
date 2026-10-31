@@ -18,6 +18,16 @@ async function proxyAuth(request: NextRequest, context: Context): Promise<Respon
     request.method,
   );
   if (!gate.allowed) return new Response('Protected acceptance mode.', {status: gate.status});
+  // A UI-only Preview without its own approved gateway must never relay a
+  // state-changing account request to the production Oracle backend.
+  // Read-only public configuration endpoints remain available.
+  if (process.env.VERCEL_ENV === 'preview' &&
+      process.env.AEGIS_PREVIEW_AUTH_ENABLED !== 'true' &&
+      !['GET','HEAD','OPTIONS'].includes(request.method.toUpperCase())) {
+    return Response.json({
+      detail:'This preview is for interface testing only. Sign in through the official AEGIS website.',
+    },{status:503,headers:{'Cache-Control':'no-store'}});
+  }
 
   const backend = apiOrigin(process.env);
   const target = backend + path + request.nextUrl.search;

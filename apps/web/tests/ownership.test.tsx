@@ -57,3 +57,36 @@ it('guides an owned GitHub website without auto-authorizing an assessment',async
  expect(await screen.findByRole('link',{name:/Open prepared file on GitHub/})).toBeTruthy();
  expect(posts.some(x=>x.path.includes('/assessments')||x.path.includes('/authorize'))).toBe(false);
 });
+
+it('guides a Shopify owner to a real meta proof without any scan or account connector',async()=>{
+ const calls:Array<[string,string|undefined,unknown]>=[];
+ const api=vi.fn(async(path:string,method?:string,data?:unknown)=>{
+  calls.push([path,method,data]);
+  if(path.endsWith('/challenge')&&method==='GET')return null;
+  if(path.endsWith('/challenge')&&method==='POST')return {id:'proof',method:(data as {method:string}).method,token:'token',instruction:'Exact meta tag',expires:4102444800};
+  return null;
+ });
+ const done=vi.fn(async()=>{});render(<OwnershipGuide assetId="owned" api={api} onVerified={done}/>);
+ const user=userEvent.setup();
+ await user.click(screen.getByRole('button',{name:'Shopify'}));
+ expect(screen.getByText(/published theme in your Shopify Online Store/)).toBeTruthy();
+ expect(calls.filter(([path,method])=>method==='POST')).toHaveLength(0);
+ await user.click(screen.getByRole('button',{name:/Get verification instructions/}));
+ expect(await screen.findByText('Exact meta tag')).toBeTruthy();
+ expect(calls).toContainEqual(['/assets/owned/challenge','POST',{method:'meta'}]);
+ expect(calls.every(([path])=>!path.includes('/assessments')&&!path.includes('/authorize'))).toBe(true);
+ expect(done).not.toHaveBeenCalled();
+});
+it('offers Wix, Squarespace and Google without claiming unsupported direct Google ownership',async()=>{
+ const api=vi.fn(async(_path:string,_method?:string)=>null);
+ render(<OwnershipGuide assetId="a" api={api} onVerified={vi.fn()}/>);
+ const user=userEvent.setup();
+ await user.click(screen.getByText('More options: Wix, Squarespace and Google Search Console'));
+ const google=screen.getByRole('button',{name:'Google Search Console'});
+ await user.click(google);
+ expect(google.getAttribute('aria-pressed')).toBe('true');
+ expect(screen.getByText(/Direct Google Search Console authorization is not connected yet/)).toBeTruthy();
+ await user.click(screen.getByRole('button',{name:'Wix'}));
+ expect(screen.getByText(/DNS proof requires control of the domain/)).toBeTruthy();
+ expect(api.mock.calls.some(([path,method])=>method==='POST'||path.includes('/verify/'))).toBe(false);
+});

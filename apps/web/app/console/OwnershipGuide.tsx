@@ -2,6 +2,9 @@
 import {useEffect,useState} from 'react';
 import {useExperience} from './Experience';
 import VerificationRetry from './VerificationRetry';
+import SmartVerifyPlatformGuide from './SmartVerifyPlatformGuide';
+import SmartVerifyVideoGuide from './SmartVerifyVideoGuide';
+import Link from 'next/link';
 import {Github,Globe2,Cloud,FileCheck2,Server,HelpCircle,CheckCircle2,ExternalLink,ShieldCheck} from 'lucide-react';
 type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
 function githubRepository(value:string){
@@ -14,13 +17,19 @@ function githubRepository(value:string){
  }catch{return trimmed}
 }
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
- const {t}=useExperience();
+ const {t,language}=useExperience();
  const [autoChecking,setAutoChecking]=useState(false);
  const [host,setHost]=useState('unsure'),[branch,setBranch]=useState('main');
  const [history,setHistory]=useState<any[]>([]);
  const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('dns'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [cfZone,setCfZone]=useState(''),[cfToken,setCfToken]=useState(''),[cfApproved,setCfApproved]=useState(false),[cfMfa,setCfMfa]=useState(''),[cfPreview,setCfPreview]=useState<{name:string;content:string;ttl:number}|null>(null);
  useEffect(()=>{setCfToken('');setCfZone('');setCfApproved(false);setCfMfa('');setCfPreview(null);let active=true;api(`/assets/${assetId}/challenge`).then(v=>{if(active){setC(v);if(v)setMethod(v.method)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[assetId,api]);
+ function chooseHost(id:string,choice:string){
+  if(busy||autoChecking)return;
+  setHost(id);setMethod(choice);if(c?.method!==choice)setC(null);
+  setLink('');setCfPreview(null);setCfToken('');setDirectory(id==='vercel'?'public':'');
+  setError('');setNotice('');
+ }
  async function act(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
  return <section aria-label="Ownership guide" className="ownership-wizard">
  <div className="ownership-welcome">
@@ -38,19 +47,44 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
   ['cloudflare','Cloudflare / DNS','كلاودفلير / DNS',Cloud,'dns'],
   ['cpanel','cPanel / Plesk','سي بانل / بليسك',Server,'file'],
   ['netlify','Netlify','نتليفاي',Globe2,'file'],
-  ['builders','Wix / Shopify / Squarespace','Wix / Shopify / Squarespace',Cloud,'dns'],
+  ['shopify','Shopify','شوبيفاي',Cloud,'meta'],
   ['unsure','Other / not sure','أخرى / مش متأكد',HelpCircle,'dns']
  ] as const).map(([id,en,ar,Icon,choice])=><button key={id} type="button" disabled={busy||autoChecking}
   aria-pressed={host===id} className={'ownership-host'+(host===id?' selected':'')}
-  onClick={()=>{setHost(id);setMethod(choice);if(c?.method!==choice)setC(null);setLink('');setCfPreview(null);setCfToken('');setDirectory(id==='vercel'?'public':'');setError('');setNotice('')}}>
+  onClick={()=>chooseHost(id,choice)}>
   <Icon size={22} aria-hidden="true"/><span>{t(en,ar)}</span>{host===id&&<CheckCircle2 size={16} aria-hidden="true"/>}
  </button>)}
  </div>
+ <details className="ownership-other-platforms">
+  <summary>{t('More options: Wix, Squarespace and Google Search Console','منصات أخرى: Wix وSquarespace وGoogle Search Console')}</summary>
+  <div className="ownership-hosts" role="group" aria-label={t('Additional website platforms','منصات مواقع إضافية')}>
+   {([
+    ['wix','Wix','ويكس',Cloud,'dns'],
+    ['squarespace','Squarespace','سكوير سبيس',Globe2,'dns'],
+    ['google','Google Search Console','جوجل سيرش كونسول',Globe2,'dns']
+   ] as const).map(([id,en,ar,Icon,choice])=><button key={id} type="button" disabled={busy||autoChecking}
+    aria-pressed={host===id} className={'ownership-host'+(host===id?' selected':'')}
+    onClick={()=>chooseHost(id,choice)}>
+    <Icon size={22} aria-hidden="true"/><span>{t(en,ar)}</span>{host===id&&<CheckCircle2 size={16} aria-hidden="true"/>}
+   </button>)}
+  </div>
+ </details>
  <div className="ownership-simple-steps">
   <div><span>01</span><strong>{t('Choose your platform','اختر منصتك')}</strong></div>
   <div><span>02</span><strong>{t('Publish a simple proof','انشر رمز التحقق')}</strong></div>
   <div><span>03</span><strong>{t('Confirm ownership','أكد الملكية')}</strong></div>
  </div>
+ <section className="ownership-direct-videos" aria-label={t('Ownership verification video','فيديو إثبات الملكية')}>
+  <div><strong>{t('See a short MP4 tutorial','شاهد فيديو شرح سريع MP4')}</strong><Link href={'/guides?platform='+encodeURIComponent(host)+'&method='+encodeURIComponent(method)}>{t('All tutorials','كل الشروحات')} <ExternalLink size={13}/></Link></div>
+  <video controls playsInline preload="metadata" key={host+'-'+language} aria-label={t('Selected platform verification video','فيديو إثبات ملكية المنصة المحددة')}>
+   <source src={'/guides/videos/'+(['unsure','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google'].includes(host)?host:'unsure')+'-'+language+'.mp4'} type="video/mp4"/>
+   <track kind="captions" src={'/guides/videos/'+(['unsure','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google'].includes(host)?host:'unsure')+'-'+language+'.vtt'} srcLang={language} label={language==='ar'?'العربية':'English'} default/>
+   {t('Your browser does not support MP4 playback.','متصفحك لا يدعم تشغيل MP4.')}
+  </video>
+  <small>{t('Original English narration and captions. No account credentials are shown.','شرح عربي بالصوت والترجمة النصية، بدون عرض أي بيانات حساب.')}</small>
+ </section>
+ <SmartVerifyVideoGuide platform={host} method={method}/>
+ <SmartVerifyPlatformGuide platform={host}/>
  <div className="ownership-choice">
   <p>{t('Recommended proof:','طريقة التحقق المقترحة:')} <strong>{method==='file'?t('Verification file','ملف تحقق'):method==='dns'?t('DNS TXT record','سجل DNS TXT'):t('HTML meta tag','وسم HTML')}</strong></p>
   <details className="ownership-advanced-method"><summary>{t('Choose another verification method','اختر طريقة تحقق أخرى')}</summary>
