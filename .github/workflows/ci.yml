@@ -269,6 +269,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check Oracle protected rollout shell syntax
+        run: bash -n scripts/oci-guarded-backend-rollout.sh
       - name: Require all pre-deployment test jobs to succeed
         env:
           AEGIS_CI_NEEDS_JSON: ${{ toJSON(needs) }}
