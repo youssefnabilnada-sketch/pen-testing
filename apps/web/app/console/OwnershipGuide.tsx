@@ -4,6 +4,7 @@ import {useExperience} from './Experience';
 import VerificationRetry from './VerificationRetry';
 import SmartVerifyPlatformGuide from './SmartVerifyPlatformGuide';
 import SmartVerifyVideoGuide from './SmartVerifyVideoGuide';
+import Link from 'next/link';
 import {Github,Globe2,Cloud,FileCheck2,Server,HelpCircle,CheckCircle2,ExternalLink,ShieldCheck} from 'lucide-react';
 type Challenge={id:string;method:string;token:string;instruction:string;expires:number;wordpress?:{origin:string;token:string;expires:number}};
 function githubRepository(value:string){
@@ -73,6 +74,14 @@ export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;
   <div><span>02</span><strong>{t('Publish a simple proof','انشر رمز التحقق')}</strong></div>
   <div><span>03</span><strong>{t('Confirm ownership','أكد الملكية')}</strong></div>
  </div>
+ <section className="ownership-direct-videos" aria-label={t('Ownership verification video','فيديو إثبات الملكية')}>
+  <div><strong>{t('See a short MP4 tutorial','شاهد فيديو شرح سريع MP4')}</strong><Link href={'/guides?platform='+encodeURIComponent(host)+'&method='+encodeURIComponent(method)}>{t('All tutorials','كل الشروحات')} <ExternalLink size={13}/></Link></div>
+  <video controls playsInline preload="metadata" key={host} aria-label={t('Selected platform verification video','فيديو إثبات ملكية المنصة المحددة')}>
+   <source src={'/guides/videos/'+(['unsure','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google'].includes(host)?host:'unsure')+'.mp4'} type="video/mp4"/>
+   {t('Your browser does not support MP4 playback.','متصفحك لا يدعم تشغيل MP4.')}
+  </video>
+  <small>{t('Original illustrative animation in Arabic and English. No account credentials are shown.','شرح توضيحي أصلي بالعربي والإنجليزي بدون عرض أي بيانات حساب.')}</small>
+ </section>
  <SmartVerifyVideoGuide platform={host} method={method}/>
  <SmartVerifyPlatformGuide platform={host}/>
  <div className="ownership-choice">
