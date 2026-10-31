@@ -18,7 +18,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   vi.stubGlobal('fetch',vi.fn(()=>response(401,{})));render(<Console/>);
   expect(await screen.findByRole('heading',{name:'Welcome back.'})).toBeTruthy();
   expect(screen.getByLabelText('Email address')).toBeTruthy();
-  expect(screen.getByText(/Payments are disabled/)).toBeTruthy();
+  expect(screen.getByText(/Protected access · No payment required/)).toBeTruthy();
  });
  it('renders a useful service error instead of success',async()=>{
   vi.stubGlobal('fetch',vi.fn(()=>response(503,{})));render(<Console/>);
@@ -31,7 +31,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   await user.click(screen.getByRole('button',{name:'Register'}));
   await user.type(screen.getByLabelText('Email address'),'test@example.test');
   await user.type(screen.getByLabelText(/Password ·/),'Long-password123!');
-  await user.click(screen.getByRole('button',{name:'Continue →'}));
+  await user.click(screen.getByRole('button',{name:'Continue'}));
   expect(await screen.findByRole('heading',{name:'Verify your email.'})).toBeTruthy();
   expect(f.mock.calls.some(c=>c[0]==='/api/auth/register')).toBe(true);
  });
@@ -78,9 +78,9 @@ it('localizes the sign-in form while keeping its authentication contract',async(
  await screen.findByLabelText('Email address');
  await userEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));
  expect(screen.getByLabelText('البريد الإلكتروني')).toBeTruthy();
- expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل')).toBeTruthy();
- expect(screen.getByRole('button',{name:'تسجيل الدخول ←'})).toBeTruthy();
- expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل').getAttribute('minlength')).toBe('12');
+ expect(screen.getByLabelText('كلمة المرور')).toBeTruthy();
+ expect(screen.getByRole('button',{name:'تسجيل الدخول'})).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور').getAttribute('minlength')).toBe('12');
  localStorage.removeItem('aegis-language');
 });
 
@@ -92,14 +92,15 @@ it('guides real pilot login, separates email tokens from MFA and clears stale fo
  expect(screen.getByText(/Enter the exact account email, including any \+alias/)).toBeTruthy();
  const user=userEvent.setup();
  await user.type(screen.getByLabelText('Email address'),'pilot+aegis-pilot@gmail.com');
- await user.type(screen.getByLabelText('Password · at least 12 characters'),'Fixture-only-password123!');
+ await user.type(screen.getByLabelText('Password'),'Fixture-only-password123!');
+ await user.click(screen.getByText('Using an authenticator? Add your code'));
  await user.type(screen.getByLabelText('Authenticator or recovery code (if enabled)'),'this-is-not-a-mfa-code');
- await user.click(screen.getByRole('button',{name:'Sign in →'}));
+ await user.click(screen.getByRole('button',{name:'Sign in'}));
  expect(await screen.findByText(/Check the exact AEGIS account address/)).toBeTruthy();
  await user.click(screen.getByRole('button',{name:'Verify email'}));
  expect(screen.queryByText(/Check the exact AEGIS account address/)).toBeNull();
  expect(screen.getByText(/not the old mail delivery test/)).toBeTruthy();
  await user.click(screen.getByRole('button',{name:'Sign in'}));
  expect((screen.getByLabelText('Authenticator or recovery code (if enabled)') as HTMLInputElement).value).toBe('');
- expect((screen.getByLabelText('Password · at least 12 characters') as HTMLInputElement).value).toBe('');
+ expect((screen.getByLabelText('Password') as HTMLInputElement).value).toBe('');
 });
