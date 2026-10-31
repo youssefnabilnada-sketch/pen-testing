@@ -31,3 +31,21 @@ it.each(['file','dns','meta'])('explains %s verification without granting assess
  expect(api.mock.calls.some(([p])=>p.includes('/verify/'))).toBe(false);
  expect(done).not.toHaveBeenCalled();
 });
+
+it('selects a universal proof method without starting a scan or assuming success',async()=>{
+ const api=vi.fn(async(path:string,method?:string,data?:unknown)=>{
+  if(path.endsWith('/verification-recommendation'))return null;
+  if(path.endsWith('/challenge')&&method==='GET')return null;
+  if(path.endsWith('/challenge')&&method==='POST')return {id:'new',method:(data as {method:string}).method,token:'proof',instruction:'Publish your specific proof',expires:2000000000};
+  throw new Error('unexpected API request: '+path);
+ });
+ const done=vi.fn(async()=>{});render(<OwnershipGuide assetId="asset" api={api} onVerified={done}/>);
+ const user=userEvent.setup();
+ await user.click(screen.getByRole('button',{name:/HTML meta tag Paste a tag/}));
+ expect(screen.getByRole('button',{name:/HTML meta tag Paste a tag/}).getAttribute('aria-pressed')).toBe('true');
+ await user.click(screen.getByRole('button',{name:'Show my secure verification steps'}));
+ expect(await screen.findByText('Publish your specific proof')).toBeTruthy();
+ expect(api).toHaveBeenCalledWith('/assets/asset/challenge','POST',{method:'meta'});
+ expect(api.mock.calls.some(([path])=>path.includes('/verify/')||path.includes('/assessments'))).toBe(false);
+ expect(done).not.toHaveBeenCalled();
+});
