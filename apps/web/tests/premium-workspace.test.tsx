@@ -30,6 +30,6 @@ it('supports the Arabic first-use journey without hiding the account options',()
  render(<Experience><PremiumWelcome {...props}/></Experience>);
  fireEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));
  expect(screen.getByRole('heading',{name:'أنشئ مساحة عملك'})).toBeTruthy();
- expect(screen.getByText('إثبات الملكية')).toBeTruthy();
+ expect(screen.getByText('أثبت الملكية')).toBeTruthy();
  expect(screen.getByText('الحساب والأمان والدعوات')).toBeTruthy();
 });
