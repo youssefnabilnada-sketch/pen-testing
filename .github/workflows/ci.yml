@@ -75,6 +75,10 @@ jobs:
           assert not (required - tables), f'Missing tables: {sorted(required - tables)}'
           print('PostgreSQL migrations 014-017: schema present after round-trip')
           PYPOSTGRES
+      - name: Rehearse backup and restore with disposable synthetic data
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: docker exec -i -e AEGIS_DISPOSABLE_RESTORE=ci-fixture-only "$POSTGRES_CONTAINER" sh < scripts/ci-postgres-restore.sh
 
   integrated-postgres-redis:
     runs-on: ubuntu-latest

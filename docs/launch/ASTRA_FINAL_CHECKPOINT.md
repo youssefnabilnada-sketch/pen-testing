@@ -28,3 +28,8 @@
 7. Integration: review this branch diff against the verified base; merge only after approval. Rollback: revert reviewed commits in a new branch; no force reset, database rollback or production changes are implied.
 
 RELEASE READY: NO. No current complete launch acceptance or production approval.
+
+## Follow-up evidence and recovery gate
+- Full local frontend: 124 tests / 37 files passed (6.79s).
+- Candidate implementation remote commit: 94a32fbc6e762a3a694610d6177d2426371b13ec; CI https://github.com/youssefnabilnada-sketch/pen-testing/actions/runs/41186662677 started, not yet accepted as passed.
+- Added disposable CI PostgreSQL dump/restore rehearsal: migrated schema, revision and synthetic tenant rows are compared after restore. No production data is read. Local shell syntax and refusal without explicit CI-fixture opt-in passed; actual PostgreSQL execution is pending CI (no local PostgreSQL/Docker binary).
