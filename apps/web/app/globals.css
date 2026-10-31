@@ -84,3 +84,10 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 @media(max-width:850px){.smartverify-providers{grid-template-columns:repeat(2,minmax(0,1fr))}.smartverify-method-grid{grid-template-columns:1fr}.smartverify-method-card{min-height:94px}.smartverify-progress{gap:6px}.smartverify-progress span{font-size:10px;flex-direction:column;align-items:flex-start}}
 @media(max-width:520px){.smartverify-hero{padding:15px;gap:11px}.smartverify-hero-icon{width:44px;height:44px}.smartverify-recommendation{padding:13px}.smartverify-provider{min-height:68px}.smartverify-guidance,.smartverify-challenge{padding:13px}.smartverify-section-head{flex-wrap:wrap}.smartverify-progress span{padding:7px}.smartverify-progress b{width:22px;height:22px}}
 @media(prefers-reduced-motion:reduce){.smartverify-provider,.smartverify-method-card{transition:none}}
+
+/* Assets gets a wider proof workspace while the existing layout remains intact elsewhere. */
+.assets-onboarding-layout{grid-template-columns:minmax(235px,.7fr) minmax(0,1.65fr)}
+.assets-onboarding-layout > *{min-width:0}
+.smartverify-providers{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+.smartverify-method-grid{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}
+@media(max-width:950px){.assets-onboarding-layout{grid-template-columns:1fr}}
