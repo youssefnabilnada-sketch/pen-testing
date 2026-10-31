@@ -180,6 +180,8 @@ def status(u=Depends(current), db=Depends(database)):
 
 @router.post('/register', status_code=201)
 def register(data: RegisterInput, request: Request, udb=Depends(database)):
+    if os.getenv('AEGIS_ENV') == 'production' and os.getenv('AEGIS_PUBLIC_REGISTRATION_ENABLED') != 'true':
+        raise HTTPException(503, 'Registration is unavailable until launch approval.')
     from .main import throttle
     throttle('firebase-register:source:'+request.client.host, limit=240)
     project, claims = verified_identity(data.id_token)
