@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.084
+Download the AEGIS HTML verification file.
+
+00:00:05.084 --> 00:00:10.840
+Place it under public/.well-known in your website project.
+
+00:00:10.840 --> 00:00:16.452
+Deploy to the exact website URL and confirm ownership.

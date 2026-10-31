@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.988
+Open the DNS panel for your Wix custom domain.
+
+00:00:04.988 --> 00:00:10.936
+Create the AEGIS TXT record using its exact name and value.
+
+00:00:10.936 --> 00:00:16.644
+After DNS propagation, confirm ownership in AEGIS.

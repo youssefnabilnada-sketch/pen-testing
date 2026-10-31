@@ -118,3 +118,6 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .auth-google-unavailable{font-size:12px;line-height:1.7;color:#acbbcf;margin:0;padding:12px;border:1px solid #ffffff17;border-radius:10px}
 .auth-google-signin .auth-feedback{margin-top:11px}
 @media(prefers-reduced-motion:reduce){.google-signin-button{transition:none!important}}
+
+.auth-tutorials-link{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:22px;padding:10px 0;font-size:12px;font-weight:650;color:#89e9d9;text-decoration:underline;text-underline-offset:5px}.auth-tutorials-link:hover{color:#c4fff3}
+.ownership-watch-again{margin:8px 0 12px!important;font-size:11px}.ownership-watch-again a{color:#8aeada;display:inline-flex;align-items:center;gap:7px;text-decoration:underline;text-underline-offset:4px}
