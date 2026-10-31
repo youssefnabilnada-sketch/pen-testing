@@ -16,13 +16,13 @@ function githubRepository(value:string){
 }
 export default function OwnershipGuide({assetId,api,onVerified}:{assetId:string;api:(p:string,m?:string,d?:unknown)=>Promise<any>;onVerified:()=>Promise<void>}){
  const {t,language}=useExperience();
- const recommendedVideoMethod:Record<string,string>={github:'file',vercel:'file',wordpress:'meta',cloudflare:'dns',cpanel:'file',netlify:'file'};
- const videoSlug=host==='builders'||host==='unsure'||recommendedVideoMethod[host]!==method?method:host;
  const [autoChecking,setAutoChecking]=useState(false);
  const [host,setHost]=useState('unsure'),[branch,setBranch]=useState('main');
  const [history,setHistory]=useState<any[]>([]);
  const [c,setC]=useState<Challenge|null>(null),[method,setMethod]=useState('dns'),[repository,setRepository]=useState(''),[directory,setDirectory]=useState(''),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [cfZone,setCfZone]=useState(''),[cfToken,setCfToken]=useState(''),[cfApproved,setCfApproved]=useState(false),[cfMfa,setCfMfa]=useState(''),[cfPreview,setCfPreview]=useState<{name:string;content:string;ttl:number}|null>(null);
+ const recommendedVideoMethod:Record<string,string>={github:'file',vercel:'file',wordpress:'meta',cloudflare:'dns',cpanel:'file',netlify:'file'};
+ const videoSlug=host==='builders'||host==='unsure'||recommendedVideoMethod[host]!==method?method:host;
  useEffect(()=>{setCfToken('');setCfZone('');setCfApproved(false);setCfMfa('');setCfPreview(null);let active=true;api(`/assets/${assetId}/challenge`).then(v=>{if(active){setC(v);if(v)setMethod(v.method)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[assetId,api]);
  async function act(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
  return <section aria-label="Ownership guide" className="ownership-wizard">
