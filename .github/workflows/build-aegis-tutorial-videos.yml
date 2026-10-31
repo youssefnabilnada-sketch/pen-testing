@@ -15,6 +15,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: aegis-owned-tutorial-videos
+  cancel-in-progress: true
 jobs:
   render-tutorials:
     runs-on: ubuntu-latest
@@ -44,6 +47,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p /tmp/aegis-rendered-videos
+          cp apps/web/public/guides/videos/*.mp4 /tmp/aegis-rendered-videos/
+          git fetch origin feature/aegis-v1-integrated-launch-candidate-20261031
+          git checkout -B feature/aegis-v1-integrated-launch-candidate-20261031 FETCH_HEAD
+          mkdir -p apps/web/public/guides/videos
+          cp /tmp/aegis-rendered-videos/*.mp4 apps/web/public/guides/videos/
           git add apps/web/public/guides/videos
           if git diff --cached --quiet; then
             echo "Video assets already current"
