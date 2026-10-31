@@ -27,9 +27,11 @@ describe('server-only Vercel auth proxy',()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
   vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','false');
   vi.stubEnv('VERCEL_ENV','production');
+  vi.stubEnv('AEGIS_PRODUCTION_GATEWAY_ENABLED','true');
+  vi.stubEnv('AEGIS_PRODUCTION_GATEWAY_KEY',secret);
   const stub=vi.fn(async (_url:string, options:RequestInit)=>{
    const h=new Headers(options.headers);
-   expect(h.has('X-AEGIS-Preview-Gateway')).toBe(false);
+   expect(h.get('X-AEGIS-Preview-Gateway')).toBe(secret); // trusted server-only, not browser header
    expect(h.has('X-Forwarded-For')).toBe(false);
    expect(h.get('Cookie')).toBe('aegis_session='+('v'.repeat(43)));
    return new Response('{"csrf":"generated"}',{status:200,headers:{
@@ -53,6 +55,8 @@ describe('server-only Vercel auth proxy',()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
   vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','false');
   vi.stubEnv('VERCEL_ENV','production');
+  vi.stubEnv('AEGIS_PRODUCTION_GATEWAY_ENABLED','true');
+  vi.stubEnv('AEGIS_PRODUCTION_GATEWAY_KEY',secret);
   const upstream=vi.fn(async (_url:string,options:RequestInit)=>{
     expect(options.body).toBeUndefined();
     return new Response('{"message":"Signed out."}',{status:200});
@@ -67,6 +71,20 @@ describe('server-only Vercel auth proxy',()=>{
   malformed.headers.set('content-type','text/plain');
   expect((await POST(malformed,context(['logout']))).status).toBe(415);
   expect(upstream).toHaveBeenCalledOnce();
+ });
+ it('denies production auth upstream calls without a dedicated configured gateway',async()=>{
+  vi.stubEnv('API_INTERNAL_URL',backend);
+  vi.stubEnv('VERCEL_ENV','production');
+  vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','true');
+  vi.stubEnv('AEGIS_PREVIEW_GATEWAY_KEY',secret);
+  const upstream=vi.fn();
+  vi.stubGlobal('fetch',upstream);
+  expect((await POST(request('POST','auth/login',preview),context(['login']))).status).toBe(503);
+  vi.stubEnv('AEGIS_PRODUCTION_GATEWAY_ENABLED','true');
+  expect((await POST(request('POST','auth/login',preview),context(['login']))).status).toBe(503);
+  vi.stubEnv('AEGIS_PRODUCTION_GATEWAY_KEY',secret);
+  expect((await POST(request('POST','auth/login','https://evil.test'),context(['login']))).status).toBe(403);
+  expect(upstream).not.toHaveBeenCalled();
  });
  it('staging requires a server secret and exact browser Origin before proxying writes',async()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
