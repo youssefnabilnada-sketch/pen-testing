@@ -5,6 +5,7 @@ on:
       - feature/aegis-v1-integrated-launch-candidate-20261031
     paths:
       - scripts/render_ownership_videos.py
+      - .github/workflows/build-aegis-tutorial-videos.yml
   workflow_dispatch:
 permissions:
   contents: write
