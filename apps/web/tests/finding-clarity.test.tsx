@@ -52,7 +52,7 @@ it('distinguishes scheduled 6 hour sync from last successful advisory refresh',a
  expect(await screen.findByText('Not yet synchronized')).toBeTruthy();
  expect(screen.getByText('Recent successful update')).toBeTruthy();
  expect(screen.getByText('Sync error')).toBeTruthy();
- expect(screen.getByText('Every 6 hours')).toBeTruthy();
+ expect(screen.getAllByText('Every 6 hours')).toHaveLength(3);
  expect(screen.getByText('Queue dispatch failed')).toBeTruthy();
  expect(api).toHaveBeenCalledWith('/intelligence/sources');
 });
