@@ -1,4 +1,5 @@
 """Explicit GitHub consent, bounded configuration proposals and reviewed PRs."""
+import hashlib
 import base64
 import difflib
 import json
@@ -138,6 +139,11 @@ class Proposal(BaseModel):
     remediation_id:str
     accepted:bool
 
+def finding_snapshot(finding):
+    """Bind review to stored evidence, never to untrusted instructions in evidence."""
+    fields = ('id', 'org_id', 'asset_id', 'job_id', 'rule', 'evidence', 'confidence', 'status', 'last_observed')
+    return hashlib.sha256(json.dumps({key: getattr(finding, key) for key in fields}, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
 @router.post('/repository-patches')
 def propose(data:Proposal,u=Depends(current),db=Depends(database)):
     c,token=connection(db,u,data.connection_id,write=True)
@@ -163,7 +169,7 @@ def propose(data:Proposal,u=Depends(current),db=Depends(database)):
         original=base64.b64decode(''.join(file['content'].split()),validate=True).decode('utf-8');proposed=(propose_nosniff if data.adapter=='vercel' else propose_netlify_nosniff)(original)
     except (ValueError,KeyError,UnicodeError):raise HTTPException(409,'Configuration needs engineer review; no change proposed.')
     diff=''.join(difflib.unified_diff(original.splitlines(True),proposed.splitlines(True),fromfile='a/'+filename,tofile='b/'+filename,n=0))
-    patch=RepositoryPatch(org_id=c.org_id,connection_id=c.id,remediation_id=r.id,repository=data.repository,base_branch=branch,base_sha=head,file_sha=file['sha'],proposed_content=gh.cipher().encrypt(proposed.encode()).decode(),diff=gh.cipher().encrypt(diff.encode()).decode(),test_evidence={'adapter':data.adapter,'file':filename,'configuration_preserved':True,'configuration_valid':True,'json_valid':data.adapter=='vercel','limitations':'Netlify static responses only; functions, SSR, proxy responses and competing _headers require separate review.' if data.adapter=='netlify' else 'Vercel configuration only; deployment unverified.','application_tests':'not run','staging':'not verified'})
+    patch=RepositoryPatch(org_id=c.org_id,connection_id=c.id,remediation_id=r.id,repository=data.repository,base_branch=branch,base_sha=head,file_sha=file['sha'],proposed_content=gh.cipher().encrypt(proposed.encode()).decode(),diff=gh.cipher().encrypt(diff.encode()).decode(),test_evidence={'finding_snapshot':finding_snapshot(finding),'adapter':data.adapter,'file':filename,'configuration_preserved':True,'configuration_valid':True,'json_valid':data.adapter=='vercel','limitations':'Netlify static responses only; functions, SSR, proxy responses and competing _headers require separate review.' if data.adapter=='netlify' else 'Vercel configuration only; deployment unverified.','application_tests':'not run','staging':'not verified'})
     db.add(patch);db.flush()
     from .autofix_recovery import create_backup
     create_backup(db,patch,original,proposed)
@@ -193,6 +199,9 @@ def create_pr(patch_id:str,data:Approval,u=Depends(current),db=Depends(database)
     remediation=db.get(Remediation,p.remediation_id)
     paused=db.get(Setting,'repository_writes_paused')
     if (paused and paused.value) or not remediation or remediation.org_id!=p.org_id or remediation.status not in ('accepted','in_progress','ready_for_retest'):raise HTTPException(409,'Repository publication is paused or remediation scope is inactive.')
+    finding=db.get(Finding,remediation.finding_id)
+    if not finding or finding.org_id!=p.org_id or p.test_evidence.get('finding_snapshot')!=finding_snapshot(finding):
+        raise HTTPException(409,'Finding evidence changed or is unversioned; generate and review a fresh proposal.')
     if not data.accepted or p.status!='review_required':raise HTTPException(409,'Explicit approval of a pending diff is required.')
     mfa=db.get(MfaState,u.id)
     if not mfa or not mfa.enabled:raise HTTPException(403,'Enable authenticator MFA before authorizing repository writes.')

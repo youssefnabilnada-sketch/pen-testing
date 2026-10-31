@@ -33,3 +33,9 @@ RELEASE READY: NO. No current complete launch acceptance or production approval.
 - Full local frontend: 124 tests / 37 files passed (6.79s).
 - Candidate implementation remote commit: 94a32fbc6e762a3a694610d6177d2426371b13ec; CI https://github.com/youssefnabilnada-sketch/pen-testing/actions/runs/41186662677 started, not yet accepted as passed.
 - Added disposable CI PostgreSQL dump/restore rehearsal: migrated schema, revision and synthetic tenant rows are compared after restore. No production data is read. Local shell syntax and refusal without explicit CI-fixture opt-in passed; actual PostgreSQL execution is pending CI (no local PostgreSQL/Docker binary).
+
+## Evidence-bound publication gate
+- Repository proposals now record a SHA-256 snapshot of finding identity, organization, asset, assessment, detector, evidence, confidence, status and observation timestamp. PR publication refuses stale or unversioned snapshots before any GitHub call. Historical proposals remain readable but need regeneration/reapproval for publication; no database migration required.
+- 37 repository/Netlify/AutoFix recovery tests passed, including changed evidence, resolved status and legacy proposal rejection with zero provider calls. Ruff and diff whitespace check passed.
+- Local production build passed. Full frontend result remains 124 passed; subsequent changes only backend/CI/docs.
+- Recovery candidate CI: https://github.com/youssefnabilnada-sketch/pen-testing/actions/runs/41186736086 (in progress when recorded; subsequent commit supersedes it).
