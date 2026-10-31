@@ -29,6 +29,7 @@ function GuidesContent(){
  const {t}=useExperience();
  const [provider,setProvider]=useState('unsure');
  const [method,setMethod]=useState<Method>('dns');
+ const [videoId,setVideoId]=useState('unsure');
  return <main className="guides-public">
   <nav className="guides-nav">
    <Link href="/" className="brand"><ShieldCheck size={24}/> AEGIS <small>SECURITY CLOUD</small></Link>
@@ -45,19 +46,28 @@ function GuidesContent(){
     <h2>{t('Choose your platform','اختار منصة موقعك')}</h2>
     <p>{t('Not sure? Choose “Any website”. You can switch methods at any time.','مش عارف المنصة؟ اختار «أي موقع». وتقدر تغير الطريقة في أي وقت.')}</p>
     <div className="guides-provider-grid">
-     {providers.map(item=><button key={item.id} type="button" aria-pressed={provider===item.id} onClick={()=>{setProvider(item.id);setMethod(item.method)}} className={provider===item.id?'chosen':''}>
+     {providers.map(item=><button key={item.id} type="button" aria-pressed={provider===item.id} onClick={()=>{setProvider(item.id);setMethod(item.method);setVideoId(item.id)}} className={provider===item.id?'chosen':''}>
       <Globe2 size={17}/><span>{t(item.en,item.ar)}</span>{provider===item.id&&<CheckCircle2 size={15}/>}
      </button>)}
     </div>
     <h3>{t('Or explore a universal method','أو اختار طريقة إثبات عامة')}</h3>
     <div className="guides-method-grid">
-     {methods.map(({id,en,ar,Icon})=><button key={id} type="button" aria-pressed={method===id} onClick={()=>setMethod(id)} className={method===id?'chosen':''}><Icon size={19}/><span>{t(en,ar)}</span></button>)}
+     {methods.map(({id,en,ar,Icon})=><button key={id} type="button" aria-pressed={method===id} onClick={()=>{setMethod(id);setVideoId(id)}} className={method===id?'chosen':''}><Icon size={19}/><span>{t(en,ar)}</span></button>)}
     </div>
    </section>
    <section className="guides-player-col" aria-label={t('Animated tutorial player','مشغل الشرح المتحرك')}>
     <div className="guides-player-top"><PlayCircle size={19}/><strong>{t('Watch the interactive lesson','شاهد الشرح التفاعلي')}</strong><span>{t('3 short steps','3 خطوات سريعة')}</span></div>
+    <div className="guides-mp4">
+     <video key={videoId} controls playsInline preload="metadata" aria-label={t('MP4 tutorial video','فيديو شرح MP4')}>
+      <source src={'/guides/videos/'+videoId+'.mp4'} type="video/mp4"/>
+      {t('Your browser does not support MP4 playback.','متصفحك لا يدعم تشغيل فيديو MP4.')}
+     </video>
+     <div className="guides-video-meta"><span>{t('Silent bilingual MP4 explainer · 3 steps','فيديو MP4 توضيحي صامت بالعربي والإنجليزي · 3 خطوات')}</span>
+     <a href={'/guides/videos/'+videoId+'.mp4'} download={videoId+'.mp4'}>{t('Download MP4','تحميل الفيديو')}</a></div>
+    </div>
+    <div className="guides-interactive-heading">{t('Or follow the interactive walkthrough','أو استخدم الشرح التفاعلي خطوة بخطوة')}</div>
     <SmartVerifyVideoGuide key={provider+'-'+method} platform={provider} method={method} initiallyOpen/>
-    <p className="guides-note">{t('These are original illustrative animations, not recordings of third-party control panels or downloadable MP4 files. The actual AEGIS ownership token is generated only in your signed-in workspace.','دي شروحات توضيحية متحركة أصلية، مش تسجيلات فعلية من لوحات المنصات أو ملفات MP4 قابلة للتنزيل. رمز التحقق الحقيقي بيتولد داخل لوحة حسابك بعد الدخول.')}</p>
+    <p className="guides-note">{t('These are original illustrative MP4 and interactive lessons, not real screen recordings of hosting providers. Actual verification tokens are generated only after you sign in to your workspace.','دي فيديوهات MP4 توضيحية أصلية وشروحات تفاعلية، مش تسجيلات حقيقية من حسابات المنصات. رمز الإثبات الحقيقي بيتولد داخل حسابك بعد تسجيل الدخول.')}</p>
     <Link href="/console" className="guides-next">{t('Ready? Open your AEGIS workspace','جاهز؟ افتح لوحة AEGIS')}<ArrowRight size={17}/></Link>
    </section>
   </div>
