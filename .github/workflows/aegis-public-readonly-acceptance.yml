@@ -1,0 +1,34 @@
+name: AEGIS public release read-only acceptance probe
+on:
+  push:
+    branches:
+      - verification/aegis-launch-readiness-public-readonly-20261031
+permissions:
+  contents: read
+jobs:
+  official-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Observe production gateway without credentials or changing state
+        shell: bash
+        run: |
+          set -euo pipefail
+          check() {
+            local host="$1" path="$2" label="$3"
+            local status
+            status=$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --connect-timeout 8 --max-time 20 --header 'Cache-Control: no-cache' "$host$path")
+            echo "$label => HTTP $status"
+          }
+          site="https://aegis-pentest-eg.vercel.app"
+          oracle="https://aegis-pentest-eg-api.duckdns.org"
+          check "$site" "/" "AEGIS landing"
+          check "$site" "/console" "AEGIS console"
+          check "$site" "/guides" "Public tutorials"
+          check "$site" "/api/health" "AEGIS API health proxy"
+          check "$site" "/api/auth/me" "Unauthenticated session endpoint"
+          check "$site" "/api/auth/firebase/config" "Public Firebase config"
+          check "$site" "/api/ready" "Readiness gateway"
+          check "$oracle" "/health" "Oracle public health"
+          check "$oracle" "/ready" "Oracle guarded readiness"
+          echo "Observed statuses do NOT prove account creation, successful worker execution, email delivery or production readiness."
