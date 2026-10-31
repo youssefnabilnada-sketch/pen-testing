@@ -1,5 +1,11 @@
 name: Build original AEGIS tutorial MP4s
 on:
+  pull_request:
+    branches:
+      - release/aegis-v1-final
+    paths:
+      - scripts/render_ownership_videos.py
+      - .github/workflows/build-aegis-tutorial-videos.yml
   push:
     branches:
       - feature/aegis-v1-integrated-launch-candidate-20261031
