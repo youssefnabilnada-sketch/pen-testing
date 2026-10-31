@@ -30,6 +30,6 @@ test('live guest account entry supports keyboard use and Arabic RTL',async({page
  await page.getByRole('button',{name:'التبديل إلى العربية'}).click();
  await expect(page.locator('.experience')).toHaveAttribute('dir','rtl');
  await expect(page.getByRole('heading',{name:'مرحبًا بعودتك.'})).toBeVisible();
- await expect(page.getByRole('button',{name:'تسجيل الدخول'})).toBeEnabled();
+ await expect(page.getByRole('button',{name:'تسجيل الدخول',exact:true})).toBeEnabled();
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
