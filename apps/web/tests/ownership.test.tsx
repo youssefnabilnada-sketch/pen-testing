@@ -10,7 +10,7 @@ it('recovers a challenge and prepares a link without claiming verification',asyn
  const done=vi.fn(async()=>{});render(<OwnershipGuide assetId="a" api={api} onVerified={done}/>);
  expect(await screen.findByText('Publish proof')).toBeTruthy();
  const user=userEvent.setup();await user.click(screen.getByText('My website deploys from GitHub'));
- await user.type(screen.getByLabelText('Repository (owner/name)'),'owner/site');
+ await user.type(screen.getByLabelText('GitHub repository link (or owner/name)'),'owner/site');
  await user.click(screen.getByRole('button',{name:'Prepare file on GitHub'}));
  expect(await screen.findByRole('link',{name:/Open prepared/})).toBeTruthy();
  expect(done).not.toHaveBeenCalled();
@@ -50,7 +50,7 @@ it('guides an owned GitHub website without auto-authorizing an assessment',async
  expect(posts).toHaveLength(0);
  await user.click(screen.getByRole('button',{name:'Get verification instructions'}));
  expect(posts[0]).toMatchObject({path:'/assets/owned-asset/challenge',data:{method:'file'}});
- await user.type(screen.getByLabelText('Repository (owner/name)'),'owner/site');
+ await user.type(screen.getByLabelText('GitHub repository link (or owner/name)'),'https://github.com/owner/site');
  await user.click(screen.getByRole('button',{name:'Prepare file on GitHub'}));
  expect(posts[1]).toMatchObject({path:'/assets/owned-asset/challenge/proof-fixture/github',
   data:{repository:'owner/site',branch:'main',directory:''}});
