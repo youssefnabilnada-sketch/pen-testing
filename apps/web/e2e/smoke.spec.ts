@@ -69,3 +69,38 @@ test('account entry is keyboard operable and retains labelled validation',async(
  await expect(page.getByLabel('Password',{exact:true})).toHaveAttribute('minlength','12');
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
+
+
+test('premium first-use guides an approved owner from onboarding to a workspace',async({page})=>{
+ // Synthetic UI contract only: no production account or network assessment.
+ const writes:string[]=[];
+ let created=false;
+ await page.route('**/api/**',async route=>{
+  const path=new URL(route.request().url()).pathname;
+  const method=route.request().method();
+  if(method!=='GET')writes.push(method+' '+path);
+  if(path==='/api/auth/me'){
+   const organizations=created?[{id:'workspace-fixture',name:'Studio Example',role:'owner'}]:[];
+   return route.fulfill({json:{id:'fixture-owner',email:'owner@fixture.test',csrf:'fixture-csrf',verified:true,superadmin:false,organizations}});
+  }
+  if(path==='/api/organizations'&&method==='POST'){
+   created=true;
+   return route.fulfill({status:201,json:{id:'workspace-fixture',name:'Studio Example'}});
+  }
+  if(path.endsWith('/dashboard'))return route.fulfill({json:{assets:0,verified_assets:0,completed:0,active:0,open_findings:0,resolved:0,severity:{},pending_remediation:0,trend:[],activity:[]}});
+  if(path.endsWith('/remediation-page'))return route.fulfill({json:{items:[],total:0}});
+  return route.fulfill({json:[]});
+ });
+ await page.goto('/console');
+ await expect(page.getByRole('heading',{name:'Create your workspace'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Your security, in focus.'})).toHaveCount(0);
+ await expect(page.getByText('Nothing will be scanned or changed automatically.',{exact:false})).toBeVisible();
+ await page.getByLabel('Company / workspace name').fill('Studio Example');
+ await page.getByRole('button',{name:/Create my workspace/}).click();
+ await expect(page.getByRole('heading',{name:'Your security, in focus.'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Add your website'})).toBeVisible();
+ await page.getByRole('button',{name:'My websites',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'1. Add your website'})).toBeVisible();
+ expect(writes).toEqual(['POST /api/organizations']);
+ expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
+});
