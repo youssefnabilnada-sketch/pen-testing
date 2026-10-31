@@ -97,16 +97,16 @@ export default function GuestAuth({
      {!busy&&<ArrowRight size={18} aria-hidden="true"/>}
     </button>
    </form>
-   <nav className="auth-quick-links" aria-label={t('Account help','مساعدة الحساب')}>
+   {!isRegister&&<nav className="auth-quick-links" aria-label={t('Account help','مساعدة الحساب')}>
     {isLogin?<><button type="button" onClick={()=>go('verify')}><Mail size={15} aria-hidden="true"/>{t('Verify email','تفعيل البريد')}</button>
      <button type="button" onClick={()=>go('reset-request')}><KeyRound size={15} aria-hidden="true"/>{t('Forgot password?','نسيت كلمة المرور؟')}</button></>
      :<button type="button" onClick={()=>go('login')}>{t('Back to sign in','العودة لتسجيل الدخول')}</button>}
     {mode==='reset-request'&&<button type="button" onClick={()=>go('reset')}>{t('I have a reset token','لدي رمز الاستعادة')}</button>}
     {isReset&&<button type="button" onClick={()=>go('reset-request')}>{t('Request a reset email','طلب بريد الاستعادة')}</button>}
-   </nav>
+   </nav>}
    {isRegister&&registrationOpen&&<section className="auth-google-section" aria-label={t('Create with Google','إنشاء حساب باستخدام Google')}>
     <div className="auth-divider"><span>{t('or','أو')}</span></div>
-    <FirebasePanel api={api} allowCreate initialMode="create" onComplete={onComplete}/>
+    <FirebasePanel api={api} allowCreate compact initialMode="create" onComplete={onComplete}/>
    </section>}
    {isLogin&&<section className="auth-google-section" aria-label={t('Sign in with Google','تسجيل الدخول باستخدام Google')}>
     <div className="auth-divider"><span>{t('or','أو')}</span></div>
