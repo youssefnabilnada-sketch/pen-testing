@@ -4,8 +4,8 @@ test('authorized health dashboard configures checks and displays real history',a
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/console');
  await page.getByLabel('Email address',{exact:true}).fill('owner@example.test');
- await page.getByLabel('Password · at least 12 characters',{exact:true}).fill('Long-password123!');
- await page.getByRole('button',{name:'Sign in →',exact:true}).click();
+ await page.getByLabel('Password',{exact:true}).fill('Long-password123!');
+ await page.getByRole('button',{name:'Sign in',exact:true}).click();
  await page.getByRole('navigation',{name:'Workspace navigation'}).getByRole('button',{name:'Monitoring',exact:true}).click();
  await page.getByLabel('Verified website').selectOption({label:'https://example.test'});
  await page.getByLabel(/I authorize one bounded/).check();
