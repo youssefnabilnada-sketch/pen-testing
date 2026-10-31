@@ -1,0 +1,46 @@
+name: Build original AEGIS tutorial MP4s
+on:
+  push:
+    branches:
+      - feature/aegis-v1-integrated-launch-candidate-20261031
+    paths:
+      - scripts/render_ownership_videos.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render-tutorials:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout current feature branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install video and text rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-core
+          python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Render bilingual original MP4 explainer clips
+        run: |
+          python scripts/render_ownership_videos.py
+          test "$(find apps/web/public/guides/videos -name '*.mp4' | wc -l)" -eq 14
+          for file in apps/web/public/guides/videos/*.mp4; do
+            ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 "$file"
+          done
+      - name: Commit generated public video assets to feature branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/guides/videos
+          if git diff --cached --quiet; then
+            echo "Video assets already current"
+          else
+            git commit -m "build(guides): generated bilingual MP4 tutorial library [skip ci]"
+            git push origin HEAD:feature/aegis-v1-integrated-launch-candidate-20261031
+          fi
