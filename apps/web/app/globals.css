@@ -133,3 +133,9 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .auth-google-back:hover{background:transparent;text-decoration:underline}
 .auth-google-create .auth-google-caption{margin-top:11px}
 @media(max-width:700px){.auth-google-create .google-signin-button{min-height:50px}.auth-google-recovery{margin-top:2px}}
+
+/* On mobile account entry, place the language switch above the form rather than over user inputs. */
+@media(max-width:700px){
+ .experience:has(.auth-modern) .language-toggle{position:absolute;top:14px;bottom:auto;inset-inline-end:16px;min-height:40px;padding:8px 13px;font-size:12px}
+ .experience .auth-modern{padding-top:70px}
+}
