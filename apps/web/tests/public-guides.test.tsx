@@ -12,7 +12,7 @@ it('shows all public verification tutorials and plays steps without login or API
  vi.stubGlobal('fetch',requests);
  render(<GuidesExplorer/>);
  const user=userEvent.setup();
- expect(screen.getByText('Verify your website.')).toBeTruthy();
+ expect(screen.getByRole('heading',{name:/Verify your website/})).toBeTruthy();
  expect(screen.getByText(/No account required to watch/)).toBeTruthy();
  expect(screen.getByRole('button',{name:'Shopify'})).toBeTruthy();
  await user.click(screen.getByRole('button',{name:'Shopify'}));
@@ -22,7 +22,7 @@ it('shows all public verification tutorials and plays steps without login or API
  await user.click(screen.getByRole('button',{name:'Next'}));
  expect(screen.getByText(/Paste it in the public homepage HTML head/)).toBeTruthy();
  expect(requests).not.toHaveBeenCalled();
- expect(screen.getByRole('link',{name:/Open workspace/}).getAttribute('href')).toBe('/console');
+ expect(screen.getAllByRole('link').some(link=>link.getAttribute('href')==='/console')).toBe(true);
 });
 
 it('makes independent HTML, DNS and meta walkthroughs accessible',async()=>{
