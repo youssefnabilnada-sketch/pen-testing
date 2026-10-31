@@ -27,9 +27,19 @@ export function businessGate(
     && !env.VERCEL_ENV
     && /^http:\/\/(?:localhost|127\.0\.0\.1):8000\/?$/.test(localBackend);
   if (isolatedTest) return {allowed:true};
-  if (env.VERCEL_ENV !== 'preview' || env.AEGIS_PREVIEW_AUTH_ENABLED !== 'true')
+  // Neither a preview key nor a preview opt-in may unlock production.
+  // Production remains closed until its own server-only key and gateway
+  // are provisioned and explicitly enabled.
+  let secret = '';
+  if (env.VERCEL_ENV === 'production') {
+    if (env.AEGIS_PRODUCTION_GATEWAY_ENABLED !== 'true')
+      return {allowed:false,status:503};
+    secret = env.AEGIS_PRODUCTION_GATEWAY_KEY ?? '';
+  } else if (env.VERCEL_ENV === 'preview' && env.AEGIS_PREVIEW_AUTH_ENABLED === 'true') {
+    secret = env.AEGIS_PREVIEW_GATEWAY_KEY ?? '';
+  } else {
     return {allowed:false,status:503};
-  const secret = env.AEGIS_PREVIEW_GATEWAY_KEY ?? '';
+  }
   if (secret.length < 48 || !/^[A-Za-z0-9_-]+$/.test(secret))
     return {allowed:false,status:503};
   if (!['GET','HEAD','POST','PUT','PATCH','DELETE'].includes(method))
