@@ -48,7 +48,7 @@ class ResetInput(TokenInput):
 class OrgInput(BaseModel):
     name: str = Field(min_length=2, max_length=120)
 
-def throttle(key):
+def throttle(key, limit=12):
     if os.getenv('TESTING') == '1':
         return
     import redis
@@ -57,10 +57,23 @@ def throttle(key):
         r = redis.Redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379/0'))
         # Atomic counter/expiry; fixed window, fail closed when coordination is unavailable.
         n = r.eval("local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],60) end; return n", 1, 'rate:'+key)
-        if n > 12:
+        if n > limit:
             raise HTTPException(429, 'Too many attempts. Try again in one minute.')
     except RedisError:
         raise HTTPException(503, 'Authentication coordination unavailable.')
+
+def throttle_public_account(request, action, email):
+    """Bound credential stuffing without treating shared reverse-proxy IPs as a single user.
+
+    The source cap guards abusive high-cardinality attempts; the hashed account
+    key provides a much tighter per-identity cap. Untrusted X-Forwarded-For is
+    deliberately ignored rather than granting clients control of rate keys.
+    """
+    normalized = email.strip().lower()
+    identity = digest(normalized)
+    throttle('public:'+action+':source:'+request.client.host, limit=240)
+    throttle('public:'+action+':identity:'+identity)
+
 
 def email_token(db, user, purpose):
     token = secrets.token_urlsafe(32)
@@ -91,8 +104,8 @@ def connections(u=Depends(current)):
 
 @app.post('/auth/register', status_code=201)
 def register(data: Credentials, request: Request, db=Depends(database)):
-    throttle(request.client.host)
     email = data.email.strip().lower()
+    throttle_public_account(request, 'register', email)
     if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', email):
         raise HTTPException(422, 'Enter a valid email address.')
     if db.scalar(select(User).where(User.email == email)):
@@ -121,7 +134,7 @@ def verify_email(data: TokenInput, db=Depends(database)):
 
 @app.post('/auth/login')
 def login(data: Credentials, request: Request, response: Response, db=Depends(database)):
-    throttle(request.client.host)
+    throttle_public_account(request, 'login', data.email)
     u = db.scalar(select(User).where(User.email == data.email.strip().lower()))
     try:
         hasher.verify(u.password if u else DUMMY_HASH, data.password)
@@ -156,7 +169,7 @@ def logout(request: Request, response: Response, u=Depends(current), db=Depends(
 
 @app.post('/auth/reset-request')
 def reset_request(data: EmailInput, request: Request, db=Depends(database)):
-    throttle(request.client.host)
+    throttle_public_account(request, 'reset-request', data.email)
     u = db.scalar(select(User).where(User.email == data.email.strip().lower(), User.active.is_(True)))
     if u:
         email_token(db, u, 'reset')
