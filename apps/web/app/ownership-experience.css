@@ -1,0 +1,95 @@
+
+/* AEGIS Ownership Experience: simple provider-first verification.
+   No changes to scanning permissions, authentication or verification APIs. */
+.workspace-v2 .ownership-flow{display:grid;grid-template-columns:minmax(0,.76fr) minmax(0,1.24fr);gap:20px;align-items:start}
+.workspace-v2 .ownership-flow>.panel{margin:0;min-width:0}
+.workspace-v2 .ownership-asset-card{padding:clamp(22px,2.8vw,32px)}
+.workspace-v2 .ownership-action-card{padding:clamp(22px,2.7vw,34px);overflow:hidden}
+.ownership-flow-heading .eyebrow{font-size:10px;letter-spacing:.16em;margin:0 0 12px}
+.ownership-flow-heading h2{font-size:clamp(23px,2.4vw,31px);letter-spacing:-.035em;font-weight:680;margin:0 0 11px}
+.ownership-flow-heading p{font-size:12.5px;color:#a7bed1;margin:0 0 24px;line-height:1.85}
+.ownership-add-form{display:grid;gap:12px}
+.ownership-add-form label{display:grid;gap:10px;color:#cbdde9;font-size:12px;font-weight:650}
+.ownership-add-form input{min-height:51px;font-size:13px}
+.ownership-add-form .primary{min-height:47px;border-radius:11px}
+.ownership-asset-list{margin-top:30px;padding-top:19px;border-top:1px solid #99b8d224}
+.ownership-list-label{color:#859db5;font-size:10px;font-weight:750;letter-spacing:.15em;margin:0 0 14px}
+.ownership-asset-row{display:flex;gap:11px;align-items:center;padding:13px 10px;border:1px solid transparent;border-radius:11px}
+.ownership-asset-row.is-active{background:#5bcbb412;border-color:#70ddca3b}
+.ownership-asset-row>svg{flex:none;color:#83ddd5}
+.ownership-asset-row .grow{min-width:0}
+.ownership-asset-row strong{font-size:11.5px;overflow-wrap:anywhere}
+.ownership-asset-row small{font-size:10px;line-height:1.7}
+.ownership-asset-row button{min-height:38px;padding:7px 10px;white-space:nowrap;font-size:11px}
+.ownership-target{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:10px;background:#7bded810;border:1px solid #88d8d837;color:#b8dedc;font-size:12px;overflow-wrap:anywhere;margin-bottom:25px}
+.ownership-target svg{color:#75efdc;flex:none}
+.ownership-wizard{min-width:0;display:grid;gap:18px}
+.ownership-welcome{position:relative;padding:0 0 11px}
+.ownership-eyebrow,.ownership-step-label{display:flex;align-items:center;gap:8px;color:#7ce5d6;font-size:10px;font-weight:750;letter-spacing:.16em}
+.ownership-welcome h3{margin:13px 0 8px;font-size:clamp(22px,2.3vw,30px);line-height:1.2;letter-spacing:-.04em;font-weight:680}
+.ownership-welcome p{margin:0;color:#a9c3d5;font-size:12.5px;line-height:1.8}
+.ownership-hosts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.workspace-v2 .ownership-host{
+ display:flex;align-items:center;justify-content:flex-start;gap:10px;text-align:start;min-width:0;
+ border:1px solid #91b1c632;background:#111f30b8;color:#c6d8e8;padding:14px 11px;
+ border-radius:13px;min-height:67px;transition:background .18s,border-color .18s,transform .18s;
+}
+.workspace-v2 .ownership-host>svg:first-child{flex:none;color:#93d6db}
+.workspace-v2 .ownership-host>span{font-size:11.5px;font-weight:600;min-width:0;flex:1;line-height:1.45}
+.workspace-v2 .ownership-host>svg:last-child:not(:first-child){flex:none;color:#72efcf}
+.workspace-v2 .ownership-host:hover{background:#233b4c;border-color:#72dcd78c;transform:translateY(-1px)}
+.workspace-v2 .ownership-host.selected{background:linear-gradient(110deg,#1e6c6545,#1b3c5550);border-color:#83e5d99c;color:#f0fffc;box-shadow:inset 0 1px #ffffff0c}
+.ownership-simple-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:5px}
+.ownership-simple-steps>div{display:flex;gap:8px;align-items:flex-start}
+.ownership-simple-steps span{display:grid;place-items:center;flex:none;width:27px;height:27px;border:1px solid #7eddd667;border-radius:9px;color:#7ff1e5;font-size:10px;font-weight:750;background:#52cdbf16}
+.ownership-simple-steps strong{font-size:10.2px;line-height:1.55;color:#b6c9d9;font-weight:600}
+.ownership-choice{border:1px solid #9bb4d328;border-radius:12px;background:#13253971;padding:14px 16px}
+.ownership-choice>p{font-size:12px;color:#a2b8ca;margin:0;line-height:1.65}
+.ownership-choice strong{color:#92efe0;font-weight:700}
+.ownership-advanced-method{margin-top:8px}
+.ownership-advanced-method>summary,.ownership-extra-settings>summary,.ownership-github>summary,.ownership-approval details>summary{cursor:pointer;color:#b3d5db;font-size:11.5px;line-height:1.5;padding:10px 0}
+.ownership-advanced-method>summary:hover,.ownership-github>summary:hover{color:#8affea}
+.ownership-advanced-method label{display:grid;gap:6px;margin-top:8px;font-size:11px;color:#b2c6d4}
+.ownership-advanced-method select{min-height:44px}
+.workspace-v2 .ownership-prepare{width:100%;min-height:48px;border-radius:11px;font-size:12.5px;justify-content:center}
+.ownership-extra-settings{border-top:1px solid #a4bad51c}
+.ownership-extra-settings p{font-size:11.5px;color:#9cb7c8;line-height:1.75}
+.ownership-challenge-card{border:1px solid #8ed4d33b;background:linear-gradient(125deg,#17353e94,#132238b3);border-radius:15px;padding:clamp(18px,2.4vw,26px);min-width:0}
+.ownership-challenge-card>.eyebrow{margin:0 0 18px}
+.ownership-challenge-card .verification-steps{list-style:decimal;padding-inline-start:20px;line-height:1.75;color:#d1dfe8;font-size:12px}
+.ownership-challenge-card .verification-steps li{padding-inline-start:5px;margin-bottom:11px}
+.ownership-challenge-card .code{max-width:100%;min-width:0;overflow-wrap:anywhere;background:#081a26a8;border:1px solid #a0bfc235;border-radius:10px;line-height:1.8;white-space:pre-wrap;font-size:11px}
+.ownership-challenge-card>p{font-size:11px;line-height:1.8}
+.ownership-challenge-card>a.button{display:inline-flex;margin:9px 0}
+.ownership-challenge-card button{margin:6px 5px 6px 0}
+.ownership-github,.ownership-challenge-card>details{border-top:1px solid #a0bdce24;margin-top:16px;padding-top:10px}
+.ownership-github>p{font-size:11.5px;line-height:1.75}
+.ownership-github>.form{gap:13px}
+.ownership-github>.form label{font-size:11.5px}
+.ownership-github .primary{font-size:12px}
+.ownership-github .code{margin:10px 0}
+.ownership-check{width:100%;min-height:49px;justify-content:center;margin-top:18px!important}
+.ownership-trust{display:flex;align-items:flex-start;gap:10px;padding:13px 15px;background:#61d7ba0a;border:1px solid #79dcce2e;border-radius:11px;color:#9fb6c6!important;font-size:11px!important;margin:2px 0 0}
+.ownership-trust svg{flex:none;color:#81e9d4}
+.ownership-locked-step{display:flex;align-items:flex-start;gap:13px;padding:17px 18px;margin-top:20px;border:1px solid #8ab1c02e;border-radius:12px;background:#a9bed40a}
+.ownership-locked-step svg{color:#89e3da;flex:none}
+.ownership-locked-step strong{font-size:12px;color:#c3e1e4}
+.ownership-locked-step p{font-size:11.5px;margin:6px 0 0;color:#90aebd;line-height:1.7}
+.ownership-approval{border-top:1px solid #a7dcd039;margin-top:26px;padding-top:28px}
+.ownership-approval h3{font-size:clamp(22px,2.4vw,29px);margin:15px 0 9px;font-weight:650}
+.ownership-approval>p{font-size:12px;line-height:1.85;color:#aac5d4}
+.ownership-approval>.check{font-size:12px;line-height:1.7;margin:18px 0 11px;background:#54c4b312}
+.ownership-approval>.actions{flex-wrap:wrap}
+.ownership-approval>.actions button{min-height:43px}
+.ownership-scope-details{border-top:1px solid #b3d0d421;margin-top:18px;padding-top:10px}
+.ownership-scope-details>p{font-size:11px;color:#95a9be}
+.ownership-scope-details textarea{min-height:90px}
+.workspace-v2 .ownership-empty-step{text-align:center;padding:60px 26px}
+.ownership-empty-step>svg{color:#80e4d9}
+.ownership-empty-step h3{margin:13px 0 5px}
+.ownership-empty-step p{font-size:12px}
+@media(max-width:1280px){.workspace-v2 .ownership-flow{grid-template-columns:1fr}.workspace-v2 .ownership-hosts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:750px){.workspace-v2 .ownership-hosts{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace-v2 .ownership-flow{gap:13px}.workspace-v2 .ownership-action-card{padding:20px}}
+@media(max-width:440px){.workspace-v2 .ownership-hosts{grid-template-columns:1fr}.workspace-v2 .ownership-host{min-height:56px}.ownership-simple-steps{gap:5px}.ownership-simple-steps>div{gap:4px}.ownership-simple-steps span{width:23px;height:23px}.ownership-simple-steps strong{font-size:9px}}
+.experience[dir=rtl] .ownership-host,.experience[dir=rtl] .ownership-asset-row{text-align:right}
+@media(prefers-reduced-motion:reduce){.workspace-v2 .ownership-host{transition:none!important;transform:none!important}}
