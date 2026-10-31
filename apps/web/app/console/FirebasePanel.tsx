@@ -1,8 +1,10 @@
 'use client';
 import {useEffect,useState} from 'react';
 import type {FirebaseWebConfig} from '../../lib/firebase-client';
+import {useExperience} from './Experience';
 type API=(path:string,method?:string,data?:unknown)=>Promise<any>;
-export default function FirebasePanel({api,account=false,allowCreate=true,onComplete}:{api:API;account?:boolean;allowCreate?:boolean;onComplete:()=>Promise<void>}){
+export default function FirebasePanel({api,account=false,allowCreate=true,compact=false,onComplete}:{api:API;account?:boolean;allowCreate?:boolean;compact?:boolean;onComplete:()=>Promise<void>}){
+ const {t}=useExperience();
  const [config,setConfig]=useState<FirebaseWebConfig|null>(null),[linked,setLinked]=useState(false),[mode,setMode]=useState('login'),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[localPassword,setLocalPassword]=useState(''),[mfaCode,setMfaCode]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
  useEffect(()=>{let active=true;api('/auth/firebase/config').then(r=>{if(active&&r.enabled)setConfig(r.config)}).catch(()=>{if(active)setError('Firebase sign-in settings could not be checked because the account API is unavailable. This does not mean Firebase credentials are missing.')});if(account)api('/auth/firebase/status').then(r=>{if(active)setLinked(r.linked)}).catch(()=>{if(active)setError('Unable to load linked identity.')});return()=>{active=false}},[api,account]);
  async function run(fn:()=>Promise<void>){setBusy(true);setError('');setMessage('');try{await fn()}catch(e){const {friendlyError}=await import('../../lib/firebase-client');setError(friendlyError(e))}finally{setBusy(false);setPassword('');setLocalPassword('');setMfaCode('')}}
@@ -19,7 +21,23 @@ export default function FirebasePanel({api,account=false,allowCreate=true,onComp
    });
   });
  }
- if(!config)return account?<p role="status">{error||'Firebase is not configured on this server. Your local account remains available.'}</p>:error?<p role="status">{error}</p>:null;
+ if(compact){
+  return <div className="auth-google-signin">
+   {config?<button type="button" className="google-signin-button" disabled={busy} onClick={()=>signIn('google')}>
+    <svg aria-hidden="true" className="google-mark" width="19" height="19" viewBox="0 0 48 48" focusable="false">
+     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.75 9.5 24 9.5Z"/>
+     <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.29 5.48-4.83 7.18l7.73 6C44.34 38.04 46.98 31.9 46.98 24.55Z"/>
+     <path fill="#FBBC05" d="M10.53 28.59A14.41 14.41 0 0 1 9.75 24c0-1.6.27-3.14.76-4.59l-7.98-6.2A23.95 23.95 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z"/>
+     <path fill="#34A853" d="M24 48c6.47 0 11.9-2.13 15.86-5.8l-7.73-6C29.98 37.65 27.23 38.5 24 38.5c-6.25 0-11.57-4.22-13.47-9.91l-7.97 6.19C6.51 42.62 14.62 48 24 48Z"/>
+    </svg>
+    <span>{busy?t('Connecting securely…','جاري الاتصال بأمان…'):t('Sign in with Google','تسجيل الدخول باستخدام Google')}</span>
+   </button>:<p role="status" className="auth-google-unavailable">{error||t('Google sign-in is not available yet. Use your AEGIS password.','تسجيل الدخول باستخدام Google غير متاح حاليًا. استخدم كلمة مرور AEGIS.')}</p>}
+   {config&&<p className="auth-google-caption">{t('For accounts linked to Google in Account security.','للحسابات المرتبطة بـGoogle من إعدادات أمان الحساب.')}</p>}
+   {config&&error&&<p role="alert" className="error auth-feedback">{error}</p>}
+   {config&&message&&<p role="status" className="notice auth-feedback">{message}</p>}
+  </div>;
+ }
+ if(!config)return account?<p role="status">{error||'Google identity is not configured on this server. Your AEGIS password remains available.'}</p>:error?<p role="status">{error}</p>:null;
  return <section aria-label="Firebase identity" className="glass panel" style={{marginTop:20}}><h3>{account?'Connected identity':'Continue with Firebase'}</h3><p className="subtle">{account?'Link your current account after confirming your AEGIS password.':allowCreate?'Existing AEGIS users: sign in locally first, then link from Account security. New users: select Create account.':'Only linked AEGIS accounts can use Firebase sign-in. Sign in with your AEGIS password first, then link Google in Account security.'}</p>{error&&<p role="alert" className="error">{error}</p>}{message&&<p role="status">{message}</p>}
  {<label className="form">Authenticator or recovery code (if enabled)<input autoComplete="one-time-code" maxLength={64} value={mfaCode} onChange={e=>setMfaCode(e.target.value)}/></label>}{!account&&allowCreate&&<label className="form">Firebase action<select value={mode} disabled={busy} onChange={e=>setMode(e.target.value)}><option value="login">Sign in to linked account</option><option value="create">Create a new AEGIS account</option></select></label>}
  {(account||mode==='create')&&<label className="form">{account?'Current AEGIS password':'New AEGIS recovery password · minimum 12 characters'}<input type="password" value={localPassword} minLength={12} maxLength={128} autoComplete={account?'current-password':'new-password'} onChange={e=>setLocalPassword(e.target.value)}/></label>}
