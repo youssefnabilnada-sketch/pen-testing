@@ -1,0 +1,48 @@
+# AEGIS v1 production-gated API. Never publish directly without a strong,
+# private AEGIS_PRODUCTION_GATEWAY_KEY in Caddy's systemd EnvironmentFile.
+# No password/session cookies are required on public health/read-only routes.
+# The server-to-server header name retains "Preview" for compatibility with
+# Next.js proxy code, but its VALUE must be a dedicated production-only key.
+aegis-pentest-eg-api.duckdns.org {
+    tls {
+        issuer acme https://acme-v02.api.letsencrypt.org/directory
+    }
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        -Server
+    }
+    @health {
+        method GET
+        path /health
+    }
+    @authReadOnly {
+        method GET
+        path /auth/me /auth/firebase/config
+    }
+    @productionGateway {
+        header X-AEGIS-Preview-Gateway {$AEGIS_PRODUCTION_GATEWAY_KEY}
+        method GET HEAD POST PUT PATCH DELETE
+        not path /ready /openapi.json /docs /docs/* /redoc /redoc/* /gateway-check
+    }
+    handle @health {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle @authReadOnly {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle @productionGateway {
+        reverse_proxy 127.0.0.1:8000 {
+            # Never let application code treat the gateway credential as a
+            # client-controlled authentication identity or echo it in logs.
+            header_up -X-AEGIS-Preview-Gateway
+        }
+    }
+    handle /gateway-check {
+        respond "AEGIS HTTPS gateway is reachable. Production routes require a private gateway key." 200
+    }
+    handle {
+        respond "AEGIS API pending authenticated production acceptance." 503
+    }
+}
