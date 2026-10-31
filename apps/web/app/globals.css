@@ -126,3 +126,5 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .auth-preview-guidance .button{display:inline-flex;align-items:center;justify-content:center;justify-self:start;min-height:39px;padding:9px 14px;border-radius:9px;border:1px solid #69dbcc9c;background:#59cdb836;color:#effffb;font-size:12px;font-weight:700;text-decoration:none}
 .auth-preview-guidance .button:hover{background:#52c9b45c}
 .auth-submit:disabled{cursor:not-allowed;opacity:.55}
+
+.auth-tutorials-link{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:22px;padding:10px 0;font-size:12px;font-weight:650;color:#89e9d9;text-decoration:underline;text-underline-offset:5px}.auth-tutorials-link:hover{color:#c4fff3}
