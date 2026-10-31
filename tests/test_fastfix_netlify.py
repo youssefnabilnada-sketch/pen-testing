@@ -78,3 +78,15 @@ def test_invalid_provider_file_never_creates_a_proposal(client,mail,monkeypatch,
     result=client.post('/repository-patches',json={'connection_id':cid,'repository':'owned/site','remediation_id':rid,'accepted':True,'adapter':'netlify'})
     assert result.status_code==409
     assert not any(method in ('POST','PUT') for _,method,_ in github)
+
+
+@pytest.mark.parametrize('source', [
+    '[context.production]\ncommand="build"',
+    '[[redirects]]\nfrom="/*"\nto="https://upstream.invalid/:splat"\nstatus=200',
+    '[functions]\ndirectory="functions"',
+    '[[edge_functions]]\npath="/*"\nfunction="headers"',
+    '[[plugins]]\npackage="custom-plugin"',
+])
+def test_dynamic_or_context_configuration_requires_manual_review(source):
+    with pytest.raises(ValueError, match='manual review'):
+        propose_netlify_nosniff(source)

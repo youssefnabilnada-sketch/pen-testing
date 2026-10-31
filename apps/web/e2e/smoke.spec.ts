@@ -57,3 +57,15 @@ test('isolated FastFix fixture keeps evidence and guidance separate from applied
  expect(mutations).toEqual([]);
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
+
+test('account entry is keyboard operable and retains labelled validation',async({page})=>{
+ await page.goto('/console');
+ const email=page.getByLabel('Email address');
+ await expect(email).toBeVisible();
+ await email.focus();
+ await page.keyboard.type('owner@example.test');
+ await page.keyboard.press('Tab');
+ await expect(page.getByLabel('Password',{exact:true})).toBeFocused();
+ await expect(page.getByLabel('Password',{exact:true})).toHaveAttribute('minlength','12');
+ expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
+});
