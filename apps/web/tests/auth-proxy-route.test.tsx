@@ -23,6 +23,19 @@ const context=(segments:string[])=>({params:Promise.resolve({path:segments})});
 afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals()});
 
 describe('server-only Vercel auth proxy',()=>{
+ it('blocks preview account writes before Oracle without its own authorized gateway',async()=>{
+  vi.stubEnv('API_INTERNAL_URL',backend);
+  vi.stubEnv('VERCEL_ENV','preview');
+  vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','false');
+  const upstream=vi.fn();
+  vi.stubGlobal('fetch',upstream);
+  const response=await POST(request('POST','auth/login',preview),context(['login']));
+  expect(response.status).toBe(503);
+  expect(response.headers.get('Cache-Control')).toBe('no-store');
+  expect((await response.json()).detail).toMatch(/preview is for interface testing only/i);
+  expect(upstream).not.toHaveBeenCalled();
+ });
+
  it('never reveals or forwards a supplied browser gateway header',async()=>{
   vi.stubEnv('API_INTERNAL_URL',backend);
   vi.stubEnv('AEGIS_PREVIEW_AUTH_ENABLED','false');
