@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.484
+Open your website's hosting file manager.
+
+00:00:04.484 --> 00:00:09.712
+Upload the AEGIS proof to the public .well-known directory.
+
+00:00:09.712 --> 00:00:14.748
+Check the public file URL and verify ownership.
