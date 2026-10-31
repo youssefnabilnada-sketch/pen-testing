@@ -1,6 +1,7 @@
 import {getApps,initializeApp,FirebaseOptions} from 'firebase/app';
 import {initializeAuth,inMemoryPersistence,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,signOut} from 'firebase/auth';
 import {connectAuthEmulator} from 'firebase/auth';
+import {firstPartyFirebaseConfig} from './firebase-first-party';
 export type FirebaseWebConfig=FirebaseOptions & {emulatorUrl?:string};
 const connectedEmulators=new WeakSet<object>();
 function configureEmulator(auth:ReturnType<typeof initializeAuth>,config:FirebaseWebConfig){
@@ -9,7 +10,13 @@ function configureEmulator(auth:ReturnType<typeof initializeAuth>,config:Firebas
  if(!connectedEmulators.has(auth)){connectAuthEmulator(auth,config.emulatorUrl);connectedEmulators.add(auth)}
 }
 function aegisAuth(config:FirebaseWebConfig){
- const app=getApps().find(a=>a.name==='aegis-web')||initializeApp(config,'aegis-web');
+ const siteConfig=firstPartyFirebaseConfig(
+  config,
+  typeof window==='undefined'?'':window.location.hostname,
+  {NEXT_PUBLIC_AEGIS_FIREBASE_FIRST_PARTY:process.env.NEXT_PUBLIC_AEGIS_FIREBASE_FIRST_PARTY,
+   NEXT_PUBLIC_AEGIS_FIREBASE_HELPER_PROJECT_ID:process.env.NEXT_PUBLIC_AEGIS_FIREBASE_HELPER_PROJECT_ID}
+ );
+ const app=getApps().find(a=>a.name==='aegis-web')||initializeApp(siteConfig,'aegis-web');
  // No asynchronous setup between the click and Google popup (critical on iOS).
  const auth=initializeAuth(app,{persistence:inMemoryPersistence,popupRedirectResolver:browserPopupRedirectResolver});
  configureEmulator(auth,config);
