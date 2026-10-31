@@ -78,7 +78,7 @@ it('guides a Shopify owner to a real meta proof without any scan or account conn
  expect(done).not.toHaveBeenCalled();
 });
 it('offers Wix, Squarespace and Google without claiming unsupported direct Google ownership',async()=>{
- const api=vi.fn(async()=>null);
+ const api=vi.fn(async(_path:string,_method?:string)=>null);
  render(<OwnershipGuide assetId="a" api={api} onVerified={vi.fn()}/>);
  const user=userEvent.setup();
  await user.click(screen.getByText('More options: Wix, Squarespace and Google Search Console'));
