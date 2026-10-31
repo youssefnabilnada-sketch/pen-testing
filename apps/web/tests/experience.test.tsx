@@ -1,0 +1,7 @@
+import {render,screen,fireEvent,cleanup} from '@testing-library/react';
+import {afterEach,it,expect,vi} from 'vitest';
+import {Experience,SafetyJourney} from '../app/console/Experience';
+import Navigation from '../app/console/WorkspaceNavigation';
+afterEach(()=>{cleanup();localStorage.clear();vi.restoreAllMocks()});
+it('switches navigation and remediation guidance to Arabic with RTL and restores English',()=>{const go=vi.fn();const {container}=render(<Experience><Navigation page="Findings" onNavigate={go}/><SafetyJourney/></Experience>);fireEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));expect(container.firstChild).toHaveProperty('dir','rtl');expect(screen.getByRole('button',{name:'النتائج والإصلاحات'})).toBeTruthy();expect(screen.getByText(/هذه خطوات العمل وليست إجراءات مكتملة/)).toBeTruthy();expect(go).not.toHaveBeenCalled();expect(localStorage.getItem('aegis-language')).toBe('ar');fireEvent.click(screen.getByRole('button',{name:'Switch to English'}));expect(container.firstChild).toHaveProperty('dir','ltr');});
+it('works when browser preference storage is unavailable',()=>{vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('disabled')});render(<Experience><SafetyJourney/></Experience>);fireEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));expect(screen.getByText('طريق واضح لإصلاح تم التحقق منه')).toBeTruthy();});

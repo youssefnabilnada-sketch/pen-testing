@@ -75,6 +75,10 @@ jobs:
           assert not (required - tables), f'Missing tables: {sorted(required - tables)}'
           print('PostgreSQL migrations 014-017: schema present after round-trip')
           PYPOSTGRES
+      - name: Rehearse backup and restore with disposable synthetic data
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: docker exec -i -e AEGIS_DISPOSABLE_RESTORE=ci-fixture-only "$POSTGRES_CONTAINER" sh < scripts/ci-postgres-restore.sh
 
   integrated-postgres-redis:
     runs-on: ubuntu-latest
@@ -243,11 +247,25 @@ jobs:
             exit 1
           fi
 
+  public-repository-history:
+    # This detects selected historical secret indicators before publishing code.
+    # Passing is NOT full privacy/secret review or production authorization.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify historical exposure guard with isolated fixtures
+        run: python -m unittest discover -s tests -p 'test_public_repository_audit.py' -v
+      - name: Examine all reachable Git history before public visibility
+        run: python scripts/check_public_repo_history.py
+
   predeploy-ci-evidence:
     # Configure as a required branch-protection check after reviewing CI.
     # This checks the disposable CI environment, NOT a live production release.
     if: ${{ always() }}
-    needs: [backend, web, postgres-migrations, integrated-postgres-redis, browser-health, browser-smoke, native-runtime, wordpress-runtime]
+    needs: [backend, web, postgres-migrations, integrated-postgres-redis, browser-health, browser-smoke, native-runtime, wordpress-runtime, public-repository-history]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -23,7 +23,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
  it('renders a useful service error instead of success',async()=>{
   vi.stubGlobal('fetch',vi.fn(()=>response(503,{})));render(<Console/>);
   expect(await screen.findByRole('alert')).toBeTruthy();
-  expect(screen.getByText(/Account service unavailable/)).toBeTruthy();
+  expect(screen.getByText(/Account sign-in is temporarily unavailable \(HTTP 503\)/)).toBeTruthy();
  });
  it('registers and opens verification without pretending email is verified',async()=>{
   const f=vi.fn((url:string)=>url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
@@ -46,7 +46,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
    return response(200,[]);
   }));render(<Console/>);const user=userEvent.setup();
   await screen.findByRole('heading',{name:'Your security, in focus.'});
-  await user.click(screen.getByRole('button',{name:'Assets'}));
+  await user.click(screen.getByRole('button',{name:'My websites'}));
   await user.click(await screen.findByRole('button',{name:'Configure'}));
   const launch=screen.getByRole('button',{name:'Launch assessment'}) as HTMLButtonElement;
   expect(launch.disabled).toBe(true);
@@ -70,4 +70,16 @@ it('browses older remediation pages and resets pagination for filters',async()=>
  await waitFor(()=>expect(fetcher.mock.calls.some(([p])=>p.includes('/remediation-page?offset=25'))).toBe(true));
  await user.selectOptions(screen.getByLabelText('Remediation status'),'closed');
  await waitFor(()=>expect(fetcher.mock.calls.some(([p])=>p.includes('/remediation-page?offset=0&limit=25&status=closed'))).toBe(true));
+});
+it('localizes the sign-in form while keeping its authentication contract',async()=>{
+ localStorage.removeItem('aegis-language');
+ vi.stubGlobal('fetch',vi.fn(async()=>new Response('{}',{status:401,headers:{'Content-Type':'application/json'}})));
+ render(<Console/>);
+ await screen.findByLabelText('Email address');
+ await userEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));
+ expect(screen.getByLabelText('البريد الإلكتروني')).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل')).toBeTruthy();
+ expect(screen.getByRole('button',{name:'تسجيل الدخول ←'})).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل').getAttribute('minlength')).toBe('12');
+ localStorage.removeItem('aegis-language');
 });

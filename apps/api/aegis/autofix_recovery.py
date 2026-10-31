@@ -1,5 +1,6 @@
 """Backup integrity and isolated restore rehearsal. No repository scripts execute."""
-import hashlib,json,tempfile,difflib
+import hashlib,json,tempfile,difflib,tomllib
+from .fastfix_adapters import patch_file
 from pathlib import Path
 from fastapi import APIRouter,Depends,HTTPException
 from pydantic import BaseModel
@@ -10,21 +11,23 @@ from .models import PatchBackup,RepositoryPatch,Remediation,Finding,Job,Report,A
 from . import github_client as gh
 router=APIRouter(tags=['AutoFix recovery'])
 
-def restore_rehearsal(ciphertext,sha256,proposed):
+def restore_rehearsal(ciphertext,sha256,proposed,filename="vercel.json"):
+    if filename not in ("vercel.json","netlify.toml"):raise ValueError("Unsupported backup file.")
     original=gh.cipher().decrypt(ciphertext.encode())
     if hashlib.sha256(original).hexdigest()!=sha256:raise ValueError('Backup integrity mismatch.')
-    if not isinstance(json.loads(original),dict):raise ValueError('Backup is not a JSON object.')
+    parsed=tomllib.loads(original.decode()) if filename=='netlify.toml' else json.loads(original)
+    if not isinstance(parsed,dict):raise ValueError('Backup is not a JSON object.')
     with tempfile.TemporaryDirectory(prefix='aegis-restore-') as directory:
-        target=Path(directory)/'vercel.json'
+        target=Path(directory)/filename
         target.write_bytes(proposed.encode());target.write_bytes(original)
         if target.read_bytes()!=original:raise ValueError('Restore rehearsal failed.')
     return original
 
 def create_backup(db,patch,original,proposed):
     encrypted=gh.cipher().encrypt(original.encode()).decode();digest=hashlib.sha256(original.encode()).hexdigest()
-    restore_rehearsal(encrypted,digest,proposed)
+    restore_rehearsal(encrypted,digest,proposed,patch_file(patch))
     db.add(PatchBackup(patch_id=patch.id,encrypted_content=encrypted,sha256=digest,restore_verified=True))
-    patch.test_evidence={**patch.test_evidence,'backup_sha256':digest,'restore_rehearsal':'isolated byte-for-byte restoration passed','backup_scope':'vercel.json only; not database or whole-site backup'}
+    patch.test_evidence={**patch.test_evidence,'backup_sha256':digest,'restore_rehearsal':'isolated byte-for-byte restoration passed','backup_scope':patch_file(patch)+' only; not database or whole-site backup'}
 
 @router.post('/repository-patches/{patch_id}/rollback-preview')
 def rollback_preview(patch_id:str,u=Depends(current),db=Depends(database)):
@@ -35,9 +38,9 @@ def rollback_preview(patch_id:str,u=Depends(current),db=Depends(database)):
     if not backup:raise HTTPException(409,'No verified original backup exists for this proposal.')
     try:
         proposed=gh.cipher().decrypt(p.proposed_content.encode()).decode()
-        original=restore_rehearsal(backup.encrypted_content,backup.sha256,proposed).decode()
+        original=restore_rehearsal(backup.encrypted_content,backup.sha256,proposed,patch_file(p)).decode()
     except Exception as exc:raise HTTPException(409,'Backup verification failed. No rollback authorized or applied.') from exc
-    diff=''.join(difflib.unified_diff(proposed.splitlines(True),original.splitlines(True),fromfile='proposed/vercel.json',tofile='restored/vercel.json'))
+    diff=''.join(difflib.unified_diff(proposed.splitlines(True),original.splitlines(True),fromfile='proposed/'+patch_file(p),tofile='restored/'+patch_file(p)))
     audit(db,u,'autofix.rollback_previewed',p.id,p.org_id);db.commit()
     return {'diff':diff,'backup_sha256':backup.sha256,'restore_verified':True,'applied':False,'warning':'Review current repository state before applying rollback; later changes must not be overwritten.'}
 
