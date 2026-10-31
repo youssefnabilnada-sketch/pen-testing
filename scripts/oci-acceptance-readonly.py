@@ -73,10 +73,11 @@ def main():
                 ok = ok and json.loads(data).get("database") == "reachable"
             if path == "/auth/firebase/config" and got == 200:
                 public = json.loads(data)
-                config = public.get("config", {})
-                ok = ok and public.get("enabled") is True and isinstance(config, dict)
-                ok = ok and config.get("projectId") == "aegis-d034c"
-                ok = ok and not any(key in config for key in ("private_key", "client_email", "emulatorUrl"))
+                config = public.get("config", {}) if isinstance(public, dict) else {}
+                ok = ok and isinstance(public, dict) and public.get("enabled") is True
+                ok = ok and isinstance(config, dict) and config.get("projectId") == "aegis-d034c"
+                ok = ok and "private_key" not in config and "client_email" not in config
+                ok = ok and not config.get("emulatorUrl")
             checks.append(out("Public HTTPS "+path, ok, f"HTTP {got} (expected {wanted})"))
         except (ValueError, URLError, OSError, TimeoutError) as exc:
             checks.append(out("Public HTTPS "+path, False, type(exc).__name__))
