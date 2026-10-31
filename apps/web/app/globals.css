@@ -149,3 +149,12 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .auth-resend-form button{min-height:44px;padding:11px 13px;background:#1e4551;border:1px solid #63d8d4aa;color:#b7fff7;border-radius:10px;font-weight:650;cursor:pointer;font-size:13px}
 .auth-resend-form button:disabled{opacity:.6;cursor:not-allowed}
 .auth-resend-form .auth-resend-feedback{color:#b7fff7}
+
+/* Google first-party redirect continuation: a popup-free choice, never credential storage. */
+.auth-google-redirect-result{display:grid;gap:12px;padding:16px;border:1px solid #9fbada44;border-radius:12px;background:#152b405e;color:#cbd9e7}
+.auth-google-redirect-result p{font-size:12px;line-height:1.6;margin:0}
+.auth-google-redirect-result label{display:grid;gap:8px;font-size:12px;font-weight:600;color:#cbd9e7}
+.auth-google-redirect-result input{width:100%;min-width:0;background:#0a1423;color:#eff8ff;border:1px solid #9fbada44;border-radius:10px;min-height:46px;padding:10px 13px}
+.auth-google-redirect-result input:focus-visible{outline:2px solid #79e3df;outline-offset:2px}
+.auth-google-redirect-result button{min-height:44px;padding:11px 13px;border-radius:10px;color:#b7fff7;border:1px solid #63d8d4aa;background:#174253;font-weight:650}
+.auth-google-redirect-result button:disabled{opacity:.58;cursor:not-allowed}
