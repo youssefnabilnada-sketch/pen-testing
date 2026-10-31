@@ -3,9 +3,9 @@ import {useEffect,useState} from 'react';
 import type {FirebaseWebConfig} from '../../lib/firebase-client';
 import {useExperience} from './Experience';
 type API=(path:string,method?:string,data?:unknown)=>Promise<any>;
-export default function FirebasePanel({api,account=false,allowCreate=true,compact=false,onComplete}:{api:API;account?:boolean;allowCreate?:boolean;compact?:boolean;onComplete:()=>Promise<void>}){
+export default function FirebasePanel({api,account=false,allowCreate=true,compact=false,initialMode='login',onComplete}:{api:API;account?:boolean;allowCreate?:boolean;compact?:boolean;initialMode?:'login'|'create';onComplete:()=>Promise<void>}){
  const {t}=useExperience();
- const [config,setConfig]=useState<FirebaseWebConfig|null>(null),[linked,setLinked]=useState(false),[mode,setMode]=useState('login'),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[localPassword,setLocalPassword]=useState(''),[mfaCode,setMfaCode]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+ const [config,setConfig]=useState<FirebaseWebConfig|null>(null),[linked,setLinked]=useState(false),[mode,setMode]=useState(initialMode),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[localPassword,setLocalPassword]=useState(''),[mfaCode,setMfaCode]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
  useEffect(()=>{let active=true;api('/auth/firebase/config').then(r=>{if(active&&r.enabled)setConfig(r.config)}).catch(()=>{if(active)setError('Firebase sign-in settings could not be checked because the account API is unavailable. This does not mean Firebase credentials are missing.')});if(account)api('/auth/firebase/status').then(r=>{if(active)setLinked(r.linked)}).catch(()=>{if(active)setError('Unable to load linked identity.')});return()=>{active=false}},[api,account]);
  async function run(fn:()=>Promise<void>){setBusy(true);setError('');setMessage('');try{await fn()}catch(e){const {friendlyError}=await import('../../lib/firebase-client');setError(friendlyError(e))}finally{setBusy(false);setPassword('');setLocalPassword('');setMfaCode('')}}
  async function signIn(provider:'google'|'email'){
