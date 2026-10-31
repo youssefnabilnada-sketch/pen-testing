@@ -55,3 +55,33 @@ def test_throttle_enforces_configured_cap_fail_closed(monkeypatch):
     with pytest.raises(HTTPException) as error:
         main.throttle("public:identity", limit=12)
     assert error.value.status_code == 429
+
+
+def test_public_registration_closed_in_production_before_database_writes(monkeypatch):
+    from aegis import firebase_identity
+
+    monkeypatch.setenv("AEGIS_ENV", "production")
+    monkeypatch.delenv("AEGIS_PUBLIC_REGISTRATION_ENABLED", raising=False)
+    req = SimpleNamespace(client=SimpleNamespace(host="198.51.100.10"))
+    local = main.Credentials(email="pilot@example.test", password="strong-long-demo-password")
+    firebase = firebase_identity.RegisterInput(
+        id_token="dummy-id-token-long-enough-for-test",
+        recovery_password="strong-long-demo-password",
+    )
+    with pytest.raises(HTTPException) as local_error:
+        main.register(local, req, db=None)
+    assert local_error.value.status_code == 503
+    with pytest.raises(HTTPException) as firebase_error:
+        firebase_identity.register(firebase, req, udb=None)
+    assert firebase_error.value.status_code == 503
+
+
+def test_public_registration_flag_is_explicit_exact_string(monkeypatch):
+    monkeypatch.setenv("AEGIS_ENV", "production")
+    req = SimpleNamespace(client=SimpleNamespace(host="198.51.100.10"))
+    local = main.Credentials(email="pilot@example.test", password="strong-long-demo-password")
+    for disabled in ["TRUE", "1", "yes", "false"]:
+        monkeypatch.setenv("AEGIS_PUBLIC_REGISTRATION_ENABLED", disabled)
+        with pytest.raises(HTTPException) as err:
+            main.register(local, req, db=None)
+        assert err.value.status_code == 503
