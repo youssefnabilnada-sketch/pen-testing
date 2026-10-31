@@ -4,8 +4,8 @@ test('landing leads to real account form with no checkout',async({page})=>{
  await expect(page.getByRole('heading',{name:'See the risk. Own the resolution.'})).toBeVisible();
  await page.getByRole('link',{name:'Start a free assessment'}).click();
  await expect(page.getByLabel('Email address')).toBeVisible();
- await expect(page.getByRole('button',{name:'Sign in →'})).toBeVisible();
- await expect(page.getByText('Testing access is free. Payments are disabled.')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible();
+ await expect(page.getByText('Protected access · No payment required')).toBeVisible();
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
 test('reduced motion retains readable landing content',async({page})=>{
@@ -65,7 +65,7 @@ test('account entry is keyboard operable and retains labelled validation',async(
  await email.focus();
  await page.keyboard.type('owner@example.test');
  await page.keyboard.press('Tab');
- await expect(page.getByLabel('Password · at least 12 characters',{exact:true})).toBeFocused();
- await expect(page.getByLabel('Password · at least 12 characters',{exact:true})).toHaveAttribute('minlength','12');
+ await expect(page.getByLabel('Password',{exact:true})).toBeFocused();
+ await expect(page.getByLabel('Password',{exact:true})).toHaveAttribute('minlength','12');
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
