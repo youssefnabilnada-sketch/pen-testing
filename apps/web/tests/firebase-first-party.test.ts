@@ -6,8 +6,8 @@ import {firebaseHelperProxy} from '../lib/firebase-helper-proxy';
 const enabled={
  NEXT_PUBLIC_AEGIS_FIREBASE_FIRST_PARTY:'true',
  NEXT_PUBLIC_AEGIS_FIREBASE_HELPER_PROJECT_ID:'test-aegis-project',
-} as NodeJS.ProcessEnv;
-const disabled={} as NodeJS.ProcessEnv;
+};
+const disabled={};
 const request=(pathname:string,init?:RequestInit)=>new Request('https://aegis-pentest-eg.vercel.app'+pathname,init);
 
 describe('feature-gated first-party OAuth helpers',()=>{
