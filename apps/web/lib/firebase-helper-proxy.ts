@@ -12,7 +12,7 @@ const HELPER_FILES=new Set([
 const INIT='/__/firebase/init.json';
 
 export async function firebaseHelperProxy(
- request:Request, path:string, env:FirebaseFeatureEnv=process.env,
+ request:Request, path:string, env:FirebaseFeatureEnv=process.env as unknown as FirebaseFeatureEnv,
  fetcher:typeof fetch=fetch
 ):Promise<Response> {
  const project=helperProject(env);
