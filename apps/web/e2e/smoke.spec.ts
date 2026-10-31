@@ -104,3 +104,32 @@ test('premium first-use guides an approved owner from onboarding to a workspace'
  expect(writes).toEqual(['POST /api/organizations']);
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
+
+test('unverified assets show a hosted verification wizard, not technical crawler settings',async({page})=>{
+ const writes:string[]=[];
+ await page.route('**/api/**',async route=>{
+  const path=new URL(route.request().url()).pathname;
+  const method=route.request().method();
+  if(method!=='GET')writes.push(method+' '+path);
+  if(path==='/api/auth/me')return route.fulfill({json:{
+   id:'fixture-user',email:'owner@fixture.test',verified:true,superadmin:false,csrf:'fixture',
+   organizations:[{id:'fixture-org',name:'Fixture Org',role:'owner'}]
+  }});
+  if(path==='/api/organizations/fixture-org/assets')return route.fulfill({json:[{id:'asset-one',origin:'https://fixture.test',verified:false}]});
+  if(path==='/api/assets/asset-one/challenge')return route.fulfill({json:null});
+  if(path.endsWith('/dashboard'))return route.fulfill({json:{assets:1,verified_assets:0,completed:0,active:0,open_findings:0,resolved:0,severity:{},pending_remediation:0,trend:[],activity:[]}});
+  if(path.endsWith('/remediation-page'))return route.fulfill({json:{items:[],total:0}});
+  return route.fulfill({json:[]});
+ });
+ await page.goto('/console');
+ await page.getByRole('button',{name:'My websites',exact:true}).click();
+ await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Verify your website, without the complexity.'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'GitHub / GitHub Pages'})).toBeVisible();
+ await expect(page.getByText('Maximum discovery requests')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Launch assessment'})).toHaveCount(0);
+ await page.getByRole('button',{name:'GitHub / GitHub Pages'}).click();
+ await expect(page.getByText('Recommended proof:',{exact:false})).toBeVisible();
+ expect(writes).toEqual([]);
+ expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
+});
