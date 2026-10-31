@@ -83,3 +83,23 @@ it('localizes the sign-in form while keeping its authentication contract',async(
  expect(screen.getByLabelText('كلمة المرور · 12 حرفًا على الأقل').getAttribute('minlength')).toBe('12');
  localStorage.removeItem('aegis-language');
 });
+
+
+it('guides real pilot login, separates email tokens from MFA and clears stale form errors on navigation',async()=>{
+ vi.stubGlobal('fetch',vi.fn((url:string)=>url.endsWith('/auth/me')?response(401,{}):response(401,{detail:'Invalid email or password.'})));
+ render(<Console/>);
+ await screen.findByRole('heading',{name:'Welcome back.'});
+ expect(screen.getByText(/Enter the exact account email, including any \+alias/)).toBeTruthy();
+ const user=userEvent.setup();
+ await user.type(screen.getByLabelText('Email address'),'pilot+aegis-pilot@gmail.com');
+ await user.type(screen.getByLabelText('Password · at least 12 characters'),'Fixture-only-password123!');
+ await user.type(screen.getByLabelText('Authenticator or recovery code (if enabled)'),'this-is-not-a-mfa-code');
+ await user.click(screen.getByRole('button',{name:'Sign in →'}));
+ expect(await screen.findByText(/Check the exact AEGIS account address/)).toBeTruthy();
+ await user.click(screen.getByRole('button',{name:'Verify email'}));
+ expect(screen.queryByText(/Check the exact AEGIS account address/)).toBeNull();
+ expect(screen.getByText(/not the old mail delivery test/)).toBeTruthy();
+ await user.click(screen.getByRole('button',{name:'Sign in'}));
+ expect((screen.getByLabelText('Authenticator or recovery code (if enabled)') as HTMLInputElement).value).toBe('');
+ expect((screen.getByLabelText('Password · at least 12 characters') as HTMLInputElement).value).toBe('');
+});
