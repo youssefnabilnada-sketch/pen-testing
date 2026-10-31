@@ -10,10 +10,9 @@ test('production account entry and Firebase controls are usable on desktop/mobil
  await expect(page.getByRole('heading',{name:'Welcome back.'})).toBeVisible({timeout:20000});
  await expect(page.getByLabel('Email address')).toBeVisible();
  await expect(page.getByRole('button',{name:'Sign in'})).toBeEnabled();
- await expect(page.getByText('Other sign-in options · Google / Firebase')).toBeVisible({timeout:20000});
- await page.getByText('Other sign-in options · Google / Firebase').click();
- await expect(page.getByRole('heading',{name:'Continue with Firebase'})).toBeVisible({timeout:20000});
- await expect(page.getByRole('button',{name:'Continue with Google'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Sign in with Google'})).toBeVisible({timeout:20000});
+ await expect(page.locator('.google-signin-button .google-mark')).toHaveCount(1);
+ await expect(page.getByText('Continue with Firebase')).toHaveCount(0);
  await expect(page.getByText('Account sign-in is temporarily unavailable',{exact:false})).toHaveCount(0);
  await expect(page.getByText('Firebase sign-in settings could not be checked',{exact:false})).toHaveCount(0);
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
