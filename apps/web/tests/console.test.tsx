@@ -51,6 +51,45 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   expect(screen.getByRole('button',{name:'Sign in'})).toBeTruthy();
   expect(screen.queryByLabelText('Account recovery password')).toBeNull();
  });
+ it('lets an expired-code visitor request a new verification email without signing up again',async()=>{
+  const calls=vi.fn((path:string,options?:RequestInit)=>{
+   if(path.endsWith('/auth/registration-status'))return response(200,{enabled:true});
+   if(path.endsWith('/auth/resend-verification'))return response(202,{message:'If eligible, a new verification email will be sent.'});
+   return response(401,{});
+  });
+  vi.stubGlobal('fetch',calls);
+  render(<Console/>);
+  const user=userEvent.setup();
+  await screen.findByRole('heading',{name:'Welcome back.'});
+  await user.click(screen.getByRole('button',{name:'Verify email'}));
+  expect(await screen.findByRole('heading',{name:'Verify your email.'})).toBeTruthy();
+  expect(screen.getByLabelText('One-time token from email')).toBeTruthy();
+  const resend=screen.getByRole('button',{name:'Resend verification email'}) as HTMLButtonElement;
+  expect(resend.disabled).toBe(true);
+  await user.type(screen.getByLabelText('Account email address'),'pilot@example.test');
+  await user.click(resend);
+  await screen.findByText(/a new verification message will be sent when eligible/i);
+  const requests=calls.mock.calls.filter(([p])=>p==='/api/auth/resend-verification');
+  expect(requests).toHaveLength(1);
+  expect(requests[0][1]?.method).toBe('POST');
+  expect(JSON.parse(String(requests[0][1]?.body))).toEqual({email:'pilot@example.test'});
+  expect(calls.mock.calls.some(([p])=>p==='/api/auth/register')).toBe(false);
+ });
+
+ it('explains a resend rate limit without falsely claiming a new email was sent',async()=>{
+  const calls=vi.fn((path:string)=>{
+   if(path.endsWith('/auth/resend-verification'))return response(429,{detail:'Too many attempts. Try again in one minute.'});
+   return response(401,{});
+  });
+  vi.stubGlobal('fetch',calls);
+  render(<Console/>);
+  const user=userEvent.setup();
+  await screen.findByRole('heading',{name:'Welcome back.'});
+  await user.click(screen.getByRole('button',{name:'Verify email'}));
+  await user.type(screen.getByLabelText('Account email address'),'pilot@example.test');
+  await user.click(screen.getByRole('button',{name:'Resend verification email'}));
+  expect(await screen.findByText('Too many attempts. Try again in one minute.')).toBeTruthy();
+ });
  it('registers and opens verification without pretending email is verified',async()=>{
   const f=vi.fn((url:string)=>url.endsWith('/registration-status')?response(200,{enabled:true}):url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
   await screen.findByRole('heading',{name:'Welcome back.'});const user=userEvent.setup();

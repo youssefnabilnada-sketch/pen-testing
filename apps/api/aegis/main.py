@@ -140,6 +140,45 @@ def verify_email(data: TokenInput, db=Depends(database)):
     db.commit()
     return {'message': 'Email verified. You can sign in.'}
 
+VERIFY_RESEND_COOLDOWN_SECONDS = 120
+
+@app.post('/auth/resend-verification', status_code=202)
+def resend_verification(data: EmailInput, request: Request, db=Depends(database)):
+    """Recover a pending signup without allowing email/account enumeration.
+
+    Serializing on the user row stops concurrent resends from bypassing the
+    cooldown. Only unverified active users receive another token. Issuance is
+    bounded per hashed identity and shared proxy source.
+    """
+    import logging
+    email = data.email.strip().lower()
+    throttle_public_account(request, 'resend-verification', email)
+    result = {
+        'message': 'If this address has an unverified AEGIS account, a new verification email will be sent when eligible. Check your inbox and spam folder.'
+    }
+    user = db.scalar(select(User).where(
+        User.email == email, User.active.is_(True)
+    ).with_for_update())
+    if not user or user.verified:
+        return result
+    existing = db.scalar(select(EmailToken).where(
+        EmailToken.user_id == user.id, EmailToken.purpose == 'verify'
+    ).order_by(EmailToken.expires.desc()).limit(1))
+    now = time.time()
+    if existing and existing.expires > now + 1800 - VERIFY_RESEND_COOLDOWN_SECONDS:
+        return result
+    try:
+        email_token(db, user, 'verify')
+        audit(db, user, 'account.verification_resent', user.id)
+        db.commit()
+    except HTTPException as exc:
+        db.rollback()
+        if exc.status_code != 503:
+            raise
+        # Do not reveal whether this address belongs to an account.
+        logging.getLogger(__name__).warning('Verification resend email service unavailable')
+    return result
+
 @app.post('/auth/login')
 def login(data: Credentials, request: Request, response: Response, db=Depends(database)):
     throttle_public_account(request, 'login', data.email)
