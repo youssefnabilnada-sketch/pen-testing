@@ -15,11 +15,20 @@ export function previewProxyGate(
   actualOrigin: string,
   method: string,
 ): { allowed: true; secret?: string } | { allowed: false; status: 403 | 503 } {
-  const enabled = env.AEGIS_PREVIEW_AUTH_ENABLED === 'true';
-  if (!enabled) return { allowed: true };
-  // Never enable the preview-only shared gate in a production deployment.
-  if (env.VERCEL_ENV !== 'preview') return { allowed: false, status: 503 };
-  const secret = env.AEGIS_PREVIEW_GATEWAY_KEY ?? '';
+  // Fail closed in production. The production gateway must be explicitly
+  // enabled after the public Caddy proxy and server-only secret are verified.
+  // A preview flag or key can never authorize a production deployment.
+  let secret = '';
+  if (env.VERCEL_ENV === 'production') {
+    if (env.AEGIS_PRODUCTION_GATEWAY_ENABLED !== 'true')
+      return { allowed: false, status: 503 };
+    secret = env.AEGIS_PRODUCTION_GATEWAY_KEY ?? '';
+  } else {
+    const enabled = env.AEGIS_PREVIEW_AUTH_ENABLED === 'true';
+    if (!enabled) return { allowed: true };
+    if (env.VERCEL_ENV !== 'preview') return { allowed: false, status: 503 };
+    secret = env.AEGIS_PREVIEW_GATEWAY_KEY ?? '';
+  }
   // Setup error: never send an empty/placeholder token to the API gateway.
   if (secret.length < 48 || !/^[A-Za-z0-9_-]+$/.test(secret)) {
     return { allowed: false, status: 503 };
