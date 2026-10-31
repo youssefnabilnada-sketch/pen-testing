@@ -13,16 +13,13 @@
 ## 2. One-time operator preparation on Windows
 Generate and save a 64-character random URL-safe key using a trusted password manager, or run in PowerShell (the key goes to the clipboard, never appears in the terminal):
 
+**Use the following single PowerShell line, all at once** (avoids partial execution / null variables in Windows PowerShell 5.1). It checks the generated key length before copying and never prints the key:
+
 ```powershell
-$b = New-Object byte[] 48
-$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-$rng.GetBytes($b)
-$key = [Convert]::ToBase64String($b).TrimEnd('=').Replace('+','-').Replace('/','_')
-Set-Clipboard $key
-$rng.Dispose()
-Remove-Variable key,b,rng
-Write-Host "64-character gateway secret copied to clipboard; never send it in chat."
+& { $bytes = New-Object byte[] 48; $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create(); try { $rng.GetBytes($bytes); $secret = [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+','-').Replace('/','_'); if ($secret.Length -ne 64) { throw 'Gateway key generation failed' }; Set-Clipboard -Value $secret; Write-Host 'SUCCESS: 64-character gateway key copied to clipboard' } finally { $rng.Dispose() } }
 ```
+
+If any red PowerShell error appears, **STOP**: discard clipboard contents and do not paste anything into Vercel. The earlier multi-line variant could report a misleading success after null-variable errors.
 
 Keep the key in a secure password manager so the same value can be pasted **privately** into both destinations. Clear the clipboard when finished.
 
