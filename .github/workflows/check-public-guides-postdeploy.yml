@@ -1,0 +1,23 @@
+name: AEGIS official tutorials post-deploy smoke
+on:
+  push:
+    branches:
+      - verification/aegis-live-videos-smoke-20261031
+permissions:
+  contents: read
+jobs:
+  public-video-url-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Verify public AEGIS guides and localized MP4 routes without authentication
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://aegis-pentest-eg.vercel.app"
+          for path in /guides /guides/videos/wordpress-ar.mp4 /guides/videos/wordpress-en.mp4 /guides/videos/file-ar.mp4 /guides/videos/dns-en.mp4 /guides/videos/meta-ar.vtt; do
+            code="$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --connect-timeout 8 --max-time 22 "$base$path")"
+            printf '%s => HTTP %s\n' "$path" "$code"
+            test "$code" = "200"
+          done
+          echo 'Public guide and localized video endpoints returned HTTP 200; no credentials sent.'
