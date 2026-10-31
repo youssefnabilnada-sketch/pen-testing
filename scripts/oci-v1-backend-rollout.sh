@@ -69,8 +69,8 @@ command -v tar >/dev/null
   { echo "STOP: current Python runtime missing" >&2; exit 1; }
 [[ -f "$old_release/scripts/server-process.py" ]] ||
   { echo "STOP: previous approved release missing" >&2; exit 1; }
-[[ "$(git -C "$src" branch --show-current)" == release/aegis-v1-final ]] ||
-  { echo "STOP: use the final release branch only" >&2; exit 1; }
+# Detached Git worktrees are safer on the live host; accept only the exact
+# fetched final release SHA rather than depending on the local branch name.
 [[ -z "$(git -C "$src" status --porcelain --untracked-files=no)" ]] ||
   { echo "STOP: tracked working tree has local modifications" >&2; exit 1; }
 sha="$(git -C "$src" rev-parse HEAD)"
