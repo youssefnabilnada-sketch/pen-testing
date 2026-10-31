@@ -8,6 +8,11 @@ test('public SmartVerify tutorials are reachable without an account on desktop a
  await expect(page.getByRole('button',{name:'WordPress'})).toBeVisible();
  await expect(page.getByRole('button',{name:'Shopify'})).toBeVisible();
  await page.getByRole('button',{name:'WordPress'}).click();
+ await expect(page.locator('.guides-mp4 video source')).toHaveAttribute('src','/guides/videos/wordpress-en.mp4');
+ await page.getByRole('button',{name:'التبديل إلى العربية'}).click();
+ await expect(page.locator('.guides-mp4 video source')).toHaveAttribute('src','/guides/videos/wordpress-ar.mp4');
+ await expect(page.locator('.guides-mp4 video track')).toHaveAttribute('srclang','ar');
+ await page.getByRole('button',{name:'Switch to English'}).click();
  await expect(page.getByText(/Open your WordPress administrator dashboard/)).toBeVisible();
  await page.getByRole('button',{name:'Verification method'}).click();
  await expect(page.getByText('Verify with an HTML meta tag')).toBeVisible();
@@ -17,14 +22,20 @@ test('public SmartVerify tutorials are reachable without an account on desktop a
  expect(await page.locator('body').evaluate(el=>el.scrollWidth>window.innerWidth+2)).toBe(false);
 });
 
-test('all 14 hosted ownership MP4 tutorials are real files playable before login',async({request})=>{
+test('all 28 hosted localized narrated MP4s and captions are available before login',async({request})=>{
  const names=['file','dns','meta','wordpress','shopify','wix','squarespace','cloudflare','vercel','netlify','github','cpanel','google','unsure'];
  for(const name of names){
-  const response=await request.get('/guides/videos/'+name+'.mp4');
-  expect(response.status(),name+' missing video').toBe(200);
-  expect(response.headers()['content-type']).toContain('video/mp4');
-  const data=await response.body();
-  expect(data.length).toBeGreaterThan(10000);
-  expect(data.subarray(4,8).toString('ascii')).toBe('ftyp');
+  for(const lang of ['en','ar']){
+   const id=name+'-'+lang;
+   const response=await request.get('/guides/videos/'+id+'.mp4');
+   expect(response.status(),id+' missing video').toBe(200);
+   expect(response.headers()['content-type']).toContain('video/mp4');
+   const data=await response.body();
+   expect(data.length).toBeGreaterThan(10000);
+   expect(data.subarray(4,8).toString('ascii')).toBe('ftyp');
+   const captions=await request.get('/guides/videos/'+id+'.vtt');
+   expect(captions.status(),id+' missing captions').toBe(200);
+   expect(await captions.text()).toMatch(/^WEBVTT/);
+  }
  }
 });
