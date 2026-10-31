@@ -41,6 +41,10 @@ export default function WorkspaceNavigation({page,onNavigate,superadmin=false}:{
  const {t}=useExperience();
  const isToolsActive=advanced.some(([id])=>id===page)||page==='Administration';
  const [expanded,setExpanded]=useState(isToolsActive);
+ const securityAdvanced=advanced.slice(0,4),businessAdvanced=advanced.slice(4);
+ const securityActive=securityAdvanced.some(([id])=>id===page);
+ const businessActive=businessAdvanced.some(([id])=>id===page);
+ const [securityExpanded,setSecurityExpanded]=useState(securityActive),[businessExpanded,setBusinessExpanded]=useState(businessActive);
  const item=([id,label,Icon]:readonly [string,string,typeof LayoutDashboard])=><button
   key={id}
   type="button"
@@ -64,9 +68,17 @@ export default function WorkspaceNavigation({page,onNavigate,superadmin=false}:{
      <Settings2 size={18} aria-hidden="true"/><span>{t('Tools & settings','الأدوات والإعدادات')}</span>
      <ChevronDown size={16} aria-hidden="true"/>
    </button>
-   <div id="workspace-tools" hidden={!(expanded||isToolsActive)} className="nav-tools">
-    {advanced.map(item)}
-    {superadmin&&item(['Administration','Administration',BarChart3])}
+   <div id="workspace-tools" hidden={!(expanded||isToolsActive)} className="nav-tools nav-tools-organized">
+    <section className="nav-tool-category">
+     <button type="button" className="nav-tool-category-toggle" aria-expanded={securityExpanded||securityActive}
+       onClick={()=>setSecurityExpanded(v=>!v)}><ShieldCheck size={14}/>{t('Security tools','أدوات الأمان')}<ChevronDown size={14}/></button>
+     {(securityExpanded||securityActive)&&<div className="nav-tool-category-items">{securityAdvanced.map(item)}</div>}
+    </section>
+    <section className="nav-tool-category">
+     <button type="button" className="nav-tool-category-toggle" aria-expanded={businessExpanded||businessActive}
+       onClick={()=>setBusinessExpanded(v=>!v)}><Users size={14}/>{t('Workspace & support','إدارة العمل والدعم')}<ChevronDown size={14}/></button>
+     {(businessExpanded||businessActive)&&<div className="nav-tool-category-items">{businessAdvanced.map(item)}{superadmin&&item(['Administration','Administration',BarChart3])}</div>}
+    </section>
    </div>
   </div>
  </nav>;
