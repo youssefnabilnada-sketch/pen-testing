@@ -40,7 +40,7 @@ export function friendlyError(error:unknown){
  const code=(error as {code?:string})?.code;
  if(code==='auth/popup-closed-by-user')return 'Google sign-in was cancelled. You can try again.';
  if(code==='auth/popup-blocked')return 'Allow the Google sign-in popup, then try again.';
- if(code==='auth/unauthorized-domain')return 'This address is not authorized in Firebase. Ask the administrator to configure it.';
+ if(code==='auth/unauthorized-domain')return 'This website domain is not authorized for Firebase sign-in. An administrator must add aegis-pentest-eg.vercel.app under Firebase Console → Authentication → Settings → Authorized domains. Your email address is not the problem.';
  if(code==='auth/invalid-credential')return 'Email or password could not be verified.';
  if(code==='auth/too-many-requests')return 'Too many attempts. Please wait before trying again.';
  if(code)return 'Firebase sign-in could not complete. Check configuration and try again.';

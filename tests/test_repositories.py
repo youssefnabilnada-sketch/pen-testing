@@ -172,3 +172,21 @@ def test_publication_control_read_is_staff_only(client,mail,github):
     assert client.get('/admin/repository-control').json()=={'paused':False}
     assert client.post('/admin/repository-control',json={'accepted':True}).status_code==200
     assert client.get('/admin/repository-control').json()=={'paused':True}
+
+
+@pytest.mark.parametrize('change',['evidence','status','unversioned'])
+def test_publication_requires_the_exact_reviewed_finding_snapshot(client,mail,monkeypatch,github,change):
+    org,rid,cid,pid=patch_setup(client,mail,monkeypatch,github)
+    with Session() as db:
+        if change=='unversioned':
+            patch=db.get(RepositoryPatch,pid)
+            patch.test_evidence={k:v for k,v in patch.test_evidence.items() if k!='finding_snapshot'}
+        else:
+            finding=db.get(Finding,db.get(Remediation,rid).finding_id)
+            setattr(finding,change,'resolved' if change=='status' else 'New contradictory evidence')
+        db.commit()
+    github.clear()
+    response=client.post(f'/repository-patches/{pid}/pull-request',json={'accepted':True,'mfa_code':'123456'})
+    assert response.status_code==409
+    assert 'fresh proposal' in response.json()['detail']
+    assert github==[]

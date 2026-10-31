@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.612
+Copy the unique TXT record name and value from AEGIS.
+
+00:00:05.612 --> 00:00:10.408
+Add the record to your domain's DNS settings.
+
+00:00:10.408 --> 00:00:15.372
+Allow propagation, then verify in AEGIS.

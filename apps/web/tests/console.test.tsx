@@ -18,12 +18,12 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   vi.stubGlobal('fetch',vi.fn(()=>response(401,{})));render(<Console/>);
   expect(await screen.findByRole('heading',{name:'Welcome back.'})).toBeTruthy();
   expect(screen.getByLabelText('Email address')).toBeTruthy();
-  expect(screen.getByText(/Payments are disabled/)).toBeTruthy();
+  expect(screen.getByText(/Protected access · No payment required/)).toBeTruthy();
  });
  it('renders a useful service error instead of success',async()=>{
   vi.stubGlobal('fetch',vi.fn(()=>response(503,{})));render(<Console/>);
   expect(await screen.findByRole('alert')).toBeTruthy();
-  expect(screen.getByText(/Account service unavailable/)).toBeTruthy();
+  expect(screen.getByText(/Account sign-in is temporarily unavailable \(HTTP 503\)/)).toBeTruthy();
  });
  it('registers and opens verification without pretending email is verified',async()=>{
   const f=vi.fn((url:string)=>url.endsWith('/register')?response(201,{message:'Check your email for a verification token.'}):response(401,{}));vi.stubGlobal('fetch',f);render(<Console/>);
@@ -31,7 +31,7 @@ describe('Workspace behavior with isolated API fixtures',()=>{
   await user.click(screen.getByRole('button',{name:'Register'}));
   await user.type(screen.getByLabelText('Email address'),'test@example.test');
   await user.type(screen.getByLabelText(/Password ·/),'Long-password123!');
-  await user.click(screen.getByRole('button',{name:'Continue →'}));
+  await user.click(screen.getByRole('button',{name:'Continue'}));
   expect(await screen.findByRole('heading',{name:'Verify your email.'})).toBeTruthy();
   expect(f.mock.calls.some(c=>c[0]==='/api/auth/register')).toBe(true);
  });
@@ -46,12 +46,11 @@ describe('Workspace behavior with isolated API fixtures',()=>{
    return response(200,[]);
   }));render(<Console/>);const user=userEvent.setup();
   await screen.findByRole('heading',{name:'Your security, in focus.'});
-  await user.click(screen.getByRole('button',{name:'Assets'}));
-  await user.click(await screen.findByRole('button',{name:'Configure'}));
-  const launch=screen.getByRole('button',{name:'Launch assessment'}) as HTMLButtonElement;
-  expect(launch.disabled).toBe(true);
-  await user.click(screen.getByRole('checkbox',{name:/I control this asset/}));
-  expect(launch.disabled).toBe(true);
+  await user.click(screen.getByRole('button',{name:'My websites'}));
+  await user.click(await screen.findByRole('button',{name:'Continue'}));
+  expect(await screen.findByText('Your next step: verify ownership')).toBeTruthy();
+  expect(screen.queryByRole('button',{name:'Start authorized assessment'})).toBeNull();
+  expect(screen.queryByText('Maximum discovery requests')).toBeNull();
  });
 });
 
@@ -70,4 +69,54 @@ it('browses older remediation pages and resets pagination for filters',async()=>
  await waitFor(()=>expect(fetcher.mock.calls.some(([p])=>p.includes('/remediation-page?offset=25'))).toBe(true));
  await user.selectOptions(screen.getByLabelText('Remediation status'),'closed');
  await waitFor(()=>expect(fetcher.mock.calls.some(([p])=>p.includes('/remediation-page?offset=0&limit=25&status=closed'))).toBe(true));
+});
+it('localizes the sign-in form while keeping its authentication contract',async()=>{
+ localStorage.removeItem('aegis-language');
+ vi.stubGlobal('fetch',vi.fn(async()=>new Response('{}',{status:401,headers:{'Content-Type':'application/json'}})));
+ render(<Console/>);
+ await screen.findByLabelText('Email address');
+ await userEvent.click(screen.getByRole('button',{name:'التبديل إلى العربية'}));
+ expect(screen.getByLabelText('البريد الإلكتروني')).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور')).toBeTruthy();
+ expect(screen.getByRole('button',{name:'تسجيل الدخول'})).toBeTruthy();
+ expect(screen.getByLabelText('كلمة المرور').getAttribute('minlength')).toBe('12');
+ localStorage.removeItem('aegis-language');
+});
+
+
+it('shows a branded Google sign-in without Firebase jargon on the primary login screen',async()=>{
+ const f=vi.fn((url:string)=>{
+  if(url.endsWith('/auth/me'))return response(401,{});
+  if(url.endsWith('/auth/firebase/config'))return response(200,{enabled:true,config:{apiKey:'fixture-api-key',authDomain:'test.firebaseapp.com',projectId:'fixture',appId:'1:fixture:web:test'}});
+  return response(401,{});
+ });
+ vi.stubGlobal('fetch',f);
+ const {container}=render(<Console/>);
+ await screen.findByRole('heading',{name:'Welcome back.'});
+ const google=await screen.findByRole('button',{name:'Sign in with Google'});
+ expect(google).toBeTruthy();
+ expect(container.querySelector('.google-signin-button svg.google-mark')).not.toBeNull();
+ expect(screen.queryByText('Continue with Firebase')).toBeNull();
+ await userEvent.click(screen.getByRole('button',{name:'Verify email'}));
+ expect(screen.queryByRole('button',{name:'Sign in with Google'})).toBeNull();
+});
+
+it('guides real pilot login, separates email tokens from MFA and clears stale form errors on navigation',async()=>{
+ vi.stubGlobal('fetch',vi.fn((url:string)=>url.endsWith('/auth/me')?response(401,{}):response(401,{detail:'Invalid email or password.'})));
+ render(<Console/>);
+ await screen.findByRole('heading',{name:'Welcome back.'});
+ expect(screen.getByText(/Use your exact AEGIS account email, including any \+alias/)).toBeTruthy();
+ const user=userEvent.setup();
+ await user.type(screen.getByLabelText('Email address'),'pilot+aegis-pilot@gmail.com');
+ await user.type(screen.getByLabelText('Password'),'Fixture-only-password123!');
+ await user.click(screen.getByText('Using an authenticator? Add your code'));
+ await user.type(screen.getByLabelText('Authenticator or recovery code (if enabled)'),'this-is-not-a-mfa-code');
+ await user.click(screen.getByRole('button',{name:'Sign in'}));
+ expect(await screen.findByText(/Check the exact AEGIS account address/)).toBeTruthy();
+ await user.click(screen.getByRole('button',{name:'Verify email'}));
+ expect(screen.queryByText(/Check the exact AEGIS account address/)).toBeNull();
+ expect(screen.getByText(/Enter the one-time verification token from your new AEGIS email/)).toBeTruthy();
+ await user.click(screen.getByRole('button',{name:'Sign in'}));
+ expect((screen.getByLabelText('Authenticator or recovery code (if enabled)') as HTMLInputElement).value).toBe('');
+ expect((screen.getByLabelText('Password') as HTMLInputElement).value).toBe('');
 });

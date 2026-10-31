@@ -11,7 +11,7 @@ import sys
 
 REQUIRED = frozenset({
     'backend', 'web', 'postgres-migrations',
-    'integrated-postgres-redis', 'browser-health', 'browser-smoke', 'native-runtime', 'wordpress-runtime',
+    'integrated-postgres-redis', 'browser-health', 'browser-smoke', 'native-runtime', 'wordpress-runtime', 'public-repository-history',
 })
 
 
@@ -38,7 +38,7 @@ def main():
     if not approved:
         print('PRE-DEPLOYMENT CI GATE FAILED: ' + '; '.join(issues), file=sys.stderr)
         return 1
-    print('Pre-deployment CI evidence: eight required jobs succeeded.')
+    print('Pre-deployment CI evidence: nine required jobs succeeded.')
     print('This is NOT production certification. Live cloud, identity, mail,')
     print('backups, privacy/security and recovery acceptance remain separate.')
     return 0
