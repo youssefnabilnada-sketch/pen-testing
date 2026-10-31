@@ -12,7 +12,7 @@ it.each([
  const choose=vi.fn();render(<VerificationRecommendation onChoose={choose}/>);const user=userEvent.setup();
  await user.selectOptions(screen.getByLabelText('Website platform or hosting'),platform);
  await user.click(screen.getByRole('button',{name:'Use recommended method'}));
- expect(choose).toHaveBeenCalledWith(method);
+ expect(choose).toHaveBeenCalledWith(method,platform);
  expect(screen.getByText(/optional, explicitly authorized TXT-only Cloudflare publishing/)).toBeTruthy();
 });
 it('lets people choose a popular provider without requiring GitHub',async()=>{
@@ -20,7 +20,7 @@ it('lets people choose a popular provider without requiring GitHub',async()=>{
  await user.click(screen.getByRole('button',{name:'Shopify'}));
  expect(screen.getByText('Add a tag to your store theme')).toBeTruthy();
  await user.click(screen.getByRole('button',{name:'Use recommended method'}));
- expect(onChoose).toHaveBeenCalledWith('meta');
+ expect(onChoose).toHaveBeenCalledWith('meta','shopify');
 });
 it('does not imply that Google login alone confirms ownership',async()=>{
  render(<VerificationRecommendation onChoose={vi.fn()}/>);
