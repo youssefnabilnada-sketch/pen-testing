@@ -31,6 +31,7 @@ test('isolated workspace fixture supports primary navigation, reports and Arabic
  await page.getByRole('button',{name:'النتائج والإصلاحات',exact:true}).click();
  await expect(page.getByRole('heading',{name:/من الدليل إلى إصلاح تم التحقق منه/})).toBeVisible();
  await page.getByRole('button',{name:/الأدوات والإعدادات/}).click();
+ await page.getByRole('button',{name:'إدارة العمل والدعم'}).click();
  await expect(page.getByRole('button',{name:'أمان الحساب',exact:true})).toBeVisible();
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
