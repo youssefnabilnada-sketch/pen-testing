@@ -34,29 +34,33 @@ jobs:
       - name: Install video and text rendering dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-noto-core
-          python -m pip install --disable-pip-version-check Pillow==11.3.0
-      - name: Render bilingual original MP4 explainer clips
+          sudo apt-get install -y -qq ffmpeg fonts-noto-core espeak-ng
+          python -m pip install --disable-pip-version-check Pillow==11.3.0 edge-tts
+      - name: Render separate narrated Arabic and English MP4 lessons
         run: |
           python scripts/render_ownership_videos.py
-          test "$(find apps/web/public/guides/videos -name '*.mp4' | wc -l)" -eq 14
+          test "$(find apps/web/public/guides/videos -name '*.mp4' | wc -l)" -eq 28
+          test "$(find apps/web/public/guides/videos -name '*.vtt' | wc -l)" -eq 28
           for file in apps/web/public/guides/videos/*.mp4; do
             ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 "$file"
+            ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$file" | grep -qx audio
+            ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$file" | grep -qx video
           done
       - name: Commit generated public video assets to feature branch only
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p /tmp/aegis-rendered-videos
-          cp apps/web/public/guides/videos/*.mp4 /tmp/aegis-rendered-videos/
+          cp apps/web/public/guides/videos/*.{mp4,vtt} /tmp/aegis-rendered-videos/
           git fetch origin feature/aegis-v1-integrated-launch-candidate-20261031
           git checkout -B feature/aegis-v1-integrated-launch-candidate-20261031 FETCH_HEAD
           mkdir -p apps/web/public/guides/videos
-          cp /tmp/aegis-rendered-videos/*.mp4 apps/web/public/guides/videos/
-          git add apps/web/public/guides/videos
+          find apps/web/public/guides/videos -maxdepth 1 -name '*.mp4' ! -name '*-ar.mp4' ! -name '*-en.mp4' -delete
+          cp /tmp/aegis-rendered-videos/*.{mp4,vtt} apps/web/public/guides/videos/
+          git add -A apps/web/public/guides/videos
           if git diff --cached --quiet; then
             echo "Video assets already current"
           else
-            git commit -m "build(guides): generated bilingual MP4 tutorial library [skip ci]"
+            git commit -m "build(guides): separate narrated Arabic and English MP4 library [skip ci]"
             git push origin HEAD:feature/aegis-v1-integrated-launch-candidate-20261031
           fi
