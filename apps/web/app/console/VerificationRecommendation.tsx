@@ -20,7 +20,7 @@ const platforms:Record<string,Platform>={
 };
 const popular=['wordpress','shopify','wix','cloudflare','vercel','netlify','google','custom'];
 const methodNames:Record<ProofMethod,{en:string;ar:string}>={file:{en:'Verification file',ar:'ملف التحقق'},dns:{en:'DNS TXT record',ar:'سجل DNS TXT'},meta:{en:'HTML meta tag',ar:'وسم HTML'}};
-export default function VerificationRecommendation({onChoose}:{onChoose:(method:string)=>void}){
+export default function VerificationRecommendation({onChoose}:{onChoose:(method:string,platform?:string)=>void}){
  const [platform,setPlatform]=useState('custom'),[arabic,setArabic]=useState(false);
  const g=platforms[platform];
  const a=(en:string,ar:string)=>arabic?ar:en;
@@ -37,7 +37,7 @@ export default function VerificationRecommendation({onChoose}:{onChoose:(method:
    <p className="smartverify-guidance-summary">{a(g.en,g.ar)}</p>
    <ol>{(arabic?g.arabic:g.steps).map(s=><li key={s}>{s}</li>)}</ol>
    {g.note&&<p className="smartverify-small-note"><Info size={15}/>{a(g.note,g.noteAr||g.note)}</p>}
-   <button type="button" className="primary" onClick={()=>onChoose(g.method)}>{a('Use recommended method','استخدام هذه الطريقة')}<ArrowRight size={16}/></button>
+   <button type="button" className="primary" onClick={()=>onChoose(g.method,platform)}>{a('Use recommended method','استخدام هذه الطريقة')}<ArrowRight size={16}/></button>
   </div>
   <p className="smartverify-trust"><HelpCircle size={14}/>{a('Guided manual setup; optional, explicitly authorized TXT-only Cloudflare publishing is available. Verification grants neither assessment nor website-editing permission.','إعداد يدوي موجه، مع خيار نشر سجل Cloudflare TXT فقط بعد الموافقة الصريحة. إثبات الملكية لا يعطي إذنًا بفحص أو تعديل الموقع.')}</p>
  </section>
