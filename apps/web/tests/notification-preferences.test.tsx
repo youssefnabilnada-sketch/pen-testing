@@ -19,7 +19,7 @@ it('reports save failure without claiming success',async()=>{
 it('does not show a previous workspace save result after switching organizations',async()=>{
  let finish!:()=>void;
  const api=vi.fn(async(_p:string,m?:string)=>{if(m==='PUT')await new Promise<void>(r=>finish=r);return {enabled_kinds:[]}});
- const props={api,onSaved:async()=>{}};
+ const props={api,onSaved:vi.fn(async()=>{})};
  const view=render(<NotificationPreferences {...props} org="first"/>);
  await userEvent.click(await screen.findByText('Save notification preferences'));
  view.rerender(<NotificationPreferences {...props} org="second"/>);
@@ -27,5 +27,6 @@ it('does not show a previous workspace save result after switching organizations
  finish();
  await new Promise(r=>setTimeout(r,0));
  expect(screen.queryByText('Your notification preferences were saved.')).toBeNull();
+ expect(props.onSaved).not.toHaveBeenCalled();
  expect(api).not.toHaveBeenCalledWith('/organizations/second/notification-preferences','PUT',expect.anything());
 });

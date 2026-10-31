@@ -44,3 +44,4 @@ RELEASE READY: NO. No current complete launch acceptance or production approval.
 - Run 41186813891: integrated PostgreSQL/Redis, PostgreSQL migrations + disposable restore, web, WordPress, browser-health and repository-history jobs passed. Backend/native jobs were still running when inspected.
 - Smoke: 8 passed, 2 failed in the newly added keyboard test because its exact accessible-name locator omitted the existing “at least 12 characters” text. Corrected the locator to the actual full label; focus/minlength assertions retained. Browser rerun required, not marked passed.
 - npm audit --omit=dev: 0 reported vulnerabilities in production frontend dependencies. This does not cover Python or all security risks.
+- Alert save continuation also checks component lifetime before refreshing parent data; an old workspace request cannot invoke its refresh callback after switching. Targeted 3 tests and TypeScript passed after this correction.
