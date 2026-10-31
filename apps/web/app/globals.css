@@ -91,3 +91,12 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .smartverify-providers{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
 .smartverify-method-grid{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}
 @media(max-width:950px){.assets-onboarding-layout{grid-template-columns:1fr}}
+
+.smartverify-status{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid #ffc9853d;border-radius:50px;background:#e3a55313;color:#f4d6a6;font-size:10px;font-weight:700;margin:3px 0 9px}
+.smartverify-status.is-verified{border-color:#6de4df52;background:#6de4df15;color:#a9f5dd}
+.smartverify-progress span.completed{color:#b5ecd9;border-color:#6de4df35}
+.smartverify-progress span.completed b{background:#6de4df24;color:#abf4dd}
+.smartverify-advanced{padding:12px 14px;border:1px solid #acbfd02a;border-radius:11px;background:#0c1b2a8c}
+.smartverify-advanced summary{font-size:11px;color:#b9cbdb;cursor:pointer}
+.smartverify-advanced label{margin-top:13px}
+.smartverify-advanced select{width:100%}
