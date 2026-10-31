@@ -61,6 +61,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Video assets already current"
           else
-            git commit -m "build(guides): separate narrated Arabic and English MP4 library [skip ci]"
+            git commit -m "build(guides): separate narrated Arabic and English MP4 library"
             git push origin HEAD:feature/aegis-v1-integrated-launch-candidate-20261031
           fi
