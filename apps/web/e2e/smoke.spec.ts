@@ -65,7 +65,7 @@ test('account entry is keyboard operable and retains labelled validation',async(
  await email.focus();
  await page.keyboard.type('owner@example.test');
  await page.keyboard.press('Tab');
- await expect(page.getByLabel('Password',{exact:true})).toBeFocused();
- await expect(page.getByLabel('Password',{exact:true})).toHaveAttribute('minlength','12');
+ await expect(page.getByLabel('Password · at least 12 characters',{exact:true})).toBeFocused();
+ await expect(page.getByLabel('Password · at least 12 characters',{exact:true})).toHaveAttribute('minlength','12');
  expect(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth)).toBe(true);
 });
