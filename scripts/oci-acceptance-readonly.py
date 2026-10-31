@@ -11,7 +11,31 @@ import subprocess
 import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.request import urlopen
+from urllib.request import HTTPRedirectHandler, build_opener
+
+class DenyRedirect(HTTPRedirectHandler):
+    """Keep readiness requests on the exact approved origin; never follow redirects."""
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+def valid_public_firebase(body):
+    """Accept public Firebase metadata only; never log configuration values."""
+    try:
+        payload = json.loads(body)
+    except (TypeError, ValueError):
+        return False
+    if not isinstance(payload, dict) or payload.get("enabled") is not True:
+        return False
+    config = payload.get("config")
+    if not isinstance(config, dict):
+        return False
+    return (config.get("projectId") == "aegis-d034c"
+            and all(isinstance(config.get(key), str) and config[key]
+                    for key in ("apiKey", "appId", "authDomain"))
+            and "private_key" not in config
+            and "client_email" not in config
+            and not config.get("emulatorUrl"))
+
 
 API_URL = "http://127.0.0.1:8000"
 PUBLIC_URL = "https://aegis-pentest-eg-api.duckdns.org"
@@ -25,7 +49,7 @@ def out(label, ok, detail=""):
 
 def status(url):
     try:
-        with urlopen(url, timeout=9) as response:
+        with build_opener(DenyRedirect).open(url, timeout=9) as response:
             return response.status, response.read(4096)
     except HTTPError as exc:
         return exc.code, exc.read(4096)
@@ -46,9 +70,13 @@ def main():
     for service in ("postgresql", "redis-server", "caddy",
                     "aegis@api", "aegis@scanner",
                     "aegis@intelligence", "aegis@notifier"):
-        proc = subprocess.run(["systemctl", "is-active", "--quiet", service],
-                              capture_output=True, timeout=8)
-        checks.append(out(service, proc.returncode == 0))
+        try:
+            proc = subprocess.run(["systemctl", "is-active", "--quiet", service],
+                                  capture_output=True, timeout=8)
+            active = proc.returncode == 0
+        except (OSError, subprocess.TimeoutExpired):
+            active = False
+        checks.append(out(service, active))
 
     try:
         code, data = status(API_URL+"/ready")
@@ -60,7 +88,8 @@ def main():
     # HTTPS checks restricted to AEGIS's own domain and explicitly selected routes.
     expected = {
         "/health": 200,
-        "/auth/me": 503,
+        "/auth/me": 401,
+        "/auth/firebase/config": 200,
         "/auth/firebase/login": 503,
         "/openapi.json": 503,
     }
@@ -69,7 +98,10 @@ def main():
             got, data = status(PUBLIC_URL+path)
             ok = got == wanted
             if path == "/health" and got == 200:
-                ok = ok and json.loads(data).get("database") == "reachable"
+                health = json.loads(data)
+                ok = ok and isinstance(health, dict) and health.get("database") == "reachable"
+            if path == "/auth/firebase/config" and got == 200:
+                ok = ok and valid_public_firebase(data)
             checks.append(out("Public HTTPS "+path, ok, f"HTTP {got} (expected {wanted})"))
         except (ValueError, URLError, OSError, TimeoutError) as exc:
             checks.append(out("Public HTTPS "+path, False, type(exc).__name__))
@@ -96,9 +128,9 @@ def main():
 
     # Drop privileges for the subprocess. The complete environment is passed
     # directly (never through argv, a shell, logs or GitHub).
-    svc = pwd.getpwnam("aegis-api")
-    env["HOME"] = svc.pw_dir
     try:
+        svc = pwd.getpwnam("aegis-api")
+        env["HOME"] = svc.pw_dir
         task = subprocess.run(
             [PYTHON, "-m", MODULE], cwd="/srv/aegis",
             env=env, user=svc.pw_uid, group=svc.pw_gid, extra_groups=[],
@@ -106,6 +138,8 @@ def main():
         )
         # Do not dump stderr or unparsed stdout: they may contain secrets.
         report = json.loads(task.stdout)
+        if not isinstance(report, dict):
+            raise ValueError("diagnostic response is not an object")
         checkset = [
             ("Database/schema", report.get("database", {}).get("status") == "ready"),
             ("Redis queue", report.get("queue", {}).get("status") == "ready"),
@@ -119,12 +153,16 @@ def main():
         for label, ok in checkset:
             checks.append(out(label, ok))
         checks.append(out("Diagnostic subprocess", task.returncode == 0))
-    except (ValueError, OSError, subprocess.TimeoutExpired, KeyError) as exc:
+    except (ValueError, OSError, subprocess.TimeoutExpired, KeyError, TypeError, AttributeError) as exc:
         checks.append(out("Protected connection diagnostics", False, type(exc).__name__))
 
-    scheduler=subprocess.run(["systemctl", "is-active", "--quiet", "aegis@scheduler"],
-                            capture_output=True, timeout=8)
-    print("INFO Recurring scheduler: " + ("running" if scheduler.returncode==0 else "not running"))
+    try:
+        scheduler=subprocess.run(["systemctl", "is-active", "--quiet", "aegis@scheduler"],
+                                capture_output=True, timeout=8)
+        scheduler_active = scheduler.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        scheduler_active = False
+    print("INFO Recurring scheduler: " + ("running" if scheduler_active else "not running"))
     print("INFO NOT TESTED: actual email delivery, Firebase customer login, authorization,")
     print("INFO live customer journey, independent security audit, backups or restore.")
     print("INFO No services, deployment, environment or customer records were changed.")
