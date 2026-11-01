@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import {afterEach,it,expect,vi} from 'vitest';
 import AboutExperience from '../app/about/AboutExperience';
 import Landing from '../app/page';
+// The homepage 3D hero is not the subject of this content test. Avoid WebGL/media mocks.
+vi.mock('../app/Shield',()=>({default:()=> <div data-testid="mock-hero-shield"/>}));
 
 afterEach(()=>{cleanup();localStorage.removeItem('aegis-language');vi.unstubAllGlobals()});
 
@@ -39,7 +41,7 @@ it('switches the public about page to Arabic and keeps navigation accessible',as
  expect(screen.getByRole('heading',{name:'Make security easier to act on.'})).toBeTruthy();
 });
 
-it('links the existing landing page to About and exposes mission and vision before signup',()=>{
+it('links the landing page to the comprehensive platform guide and exposes mission and vision',()=>{
  render(<Landing/>);
  expect(screen.getByRole('link',{name:'What AEGIS does'}).getAttribute('href')).toBe('/platform');
  expect(screen.getByRole('heading',{name:'Our mission'})).toBeTruthy();
