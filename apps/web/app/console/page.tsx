@@ -19,6 +19,7 @@ import RepositoryPanel from './RepositoryPanel';
 import OwnershipGuide from './OwnershipGuide';
 import FirebasePanel from './FirebasePanel';
 import GuestAuth from './GuestAuth';
+import GuidedAssistant from './GuidedAssistant';
 import ConnectionsPanel from './ConnectionsPanel';
 import OperationsPanel from './OperationsPanel';
 import RepositoryControl from './RepositoryControl';
@@ -75,10 +76,10 @@ function ConsoleContent(){
  const empty=(title:string,text:string)=><div className="empty"><ShieldCheck size={28}/><strong>{title}</strong>{text}</div>;
  const feedback=<>{error&&<div role="alert" className="error">{error}</div>}{notice&&<div role="status" className="notice">{notice}</div>}</>;
  if(!ready)return <main className="auth"><div className="loading">Opening your security workspace…</div></main>;
- if(!me)return <GuestAuth mode={mode} email={email} password={password} mfaCode={mfaCode} token={token}
+ if(!me)return <><GuestAuth mode={mode} email={email} password={password} mfaCode={mfaCode} token={token}
   busy={busy} error={error} notice={notice} setEmail={setEmail} setPassword={setPassword} setMfaCode={setMfaCode} setToken={setToken}
   onNavigate={next=>{setMode(next);setError('');setNotice('');setMfaCode('');setPassword('');setToken('')}}
-  onSubmit={auth} api={api} onComplete={identity}/>;
+  onSubmit={auth} api={api} onComplete={identity}/><GuidedAssistant guest onAuthNavigate={next=>{setMode(next);setError('');setNotice('');setToken('')}}/></>;
 
  const pageTitle=({Assets:'My websites',Assessments:'Security assessments',Findings:'Findings & fixes','Website Health':'Monitoring'} as Record<string,string>)[page]||page;
 
@@ -199,5 +200,7 @@ function ConsoleContent(){
 {page==='Launch Guard'&&<LaunchPanel key={org} api={api} org={org}/>}
 {page==='Website Health'&&<HealthPanel key={org} api={api} org={org} assets={assets} canManage={['owner','admin','analyst'].includes(me.organizations.find(o=>o.id===org)?.role||'')}/>}
 {page==='Administration'&&me.superadmin&&<><CrmPanel api={api} org={org} staff/><RepositoryControl api={api}/><OperationsPanel api={api}/><ConnectionsPanel api={api}/><SupportPanel api={api} orgId={org} role="admin" staff/><div className="stats">{[['Organizations',admin?.organizations.length],['Accounts',admin?.users],['Completed jobs',admin?.jobs.completed],['Reports',admin?.reports]].map(([n,v])=><div className="stat glass" key={String(n)}><span>{n}</span><strong>{v??'—'}</strong></div>)}</div><section className="glass panel"><h3>Assessment control</h3><p>State: {admin?.scans_paused?'Paused':'Accepting authorized jobs'}. Active requests stop at their next safety checkpoint.</p><div className="actions"><button onClick={()=>action(async()=>{await api('/admin/assessment-control','POST',{paused:!admin?.scans_paused});setAdmin(await api('/admin/overview'))})}>{admin?.scans_paused?'Resume assessments':'Pause & cancel assessments'}</button><button onClick={()=>action(async()=>setHealth(JSON.stringify(await api('/admin/health'),null,2)))}>Check services</button><button onClick={()=>action(async()=>{const r=await api('/admin/recover-stale-jobs','POST');setNotice(`${r.recovered} stale jobs marked failed.`);setAdmin(await api('/admin/overview'))})}>Recover stale jobs</button></div>{health&&<pre className="code">{health}</pre>}</section><div className="grid-two"><section className="glass panel"><h3>Remediation review</h3>{admin?.remediations.map(r=><div className="row" key={r.id}><div className="grow"><strong>{r.id.slice(0,8)}</strong><small>{r.status} · {admin.organizations.find(o=>o.id===r.org_id)?.name}</small></div><button onClick={()=>{setQuoteId(r.id);setScope(r.scope||'')}}>Prepare scope</button></div>)}</section><section className="glass panel"><h3>Remediation scope · pricing disabled</h3>{quoteId?<form className="form" onSubmit={e=>{e.preventDefault();action(async()=>{await api(`/admin/remediations/${quoteId}/quote`,'POST',{scope,amount_minor:0});setAdmin(await api('/admin/overview'));setNotice('Scope issued. Pricing and payments are disabled.')})}}><label>Scope, exclusions, engineering effort and retest plan<textarea minLength={20} required value={scope} onChange={e=>setScope(e.target.value)}/></label><button disabled={busy}>Issue scope for approval</button></form>:empty('Select a request.','The customer must accept the proposed scope before work begins.')}</section></div><section className="glass panel"><h3>Platform audit</h3>{admin?.audit.slice(0,20).map((a,i)=><div className="row log" key={i}>{date(a.created)} / {a.action}</div>)}</section></>}
-</>}</main></div></div>
+</>}</main></div>
+  <GuidedAssistant verified={me.verified} hasOrg={Boolean(org)} assets={assets.length} verifiedAssets={assets.filter(asset=>asset.verified).length} completed={jobs.filter(job=>job.status==='completed'||job.status==='partially_completed').length} onNavigate={next=>{setPage(next);setError('');setNotice('')}}/>
+ </div>
 }
