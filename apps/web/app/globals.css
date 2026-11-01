@@ -361,12 +361,12 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
 .support-contact-email a{color:#8cf6ec;overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:3px}
 
 /* Guided Assistant: persistent across console navigation, no account data stored. */
-.aegis-guide-root{position:fixed;bottom:calc(19px + env(safe-area-inset-bottom,0px));right:20px;z-index:90;width:auto;max-width:calc(100vw - 24px);font-family:'DM Sans',system-ui,sans-serif}
+.aegis-guide-root{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom,0px));right:20px;z-index:90;width:auto;max-width:calc(100vw - 24px);font-family:'DM Sans',system-ui,sans-serif}
 .aegis-guide-launch{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 17px 8px 9px;background:linear-gradient(115deg,#7be6dc,#58dcd0);border:1px solid #a4ffef;border-radius:999px;color:#06312d;font-size:13px;font-weight:800;box-shadow:0 12px 43px #0008,0 0 35px #65e4da23;max-width:100%}
 .aegis-guide-launch:hover{background:linear-gradient(115deg,#a0f6ef,#68e9de);transform:translateY(-2px)}
 .aegis-guide-launch:focus-visible,.aegis-guide-panel button:focus-visible,.aegis-guide-panel a:focus-visible,.contact-grid a:focus-visible{outline:2px solid #a9fff1;outline-offset:3px}
 .aegis-guide-launch-icon{width:39px;height:39px;display:grid;place-items:center;flex:none;border-radius:50%;background:#113c3f;color:#a8fff7}
-.aegis-guide-panel{width:min(448px,calc(100vw - 24px));height:min(735px,calc(100dvh - 40px));min-height:290px;border-radius:21px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #80eee35b;background:linear-gradient(154deg,#182f40,#0c1728 60%,#101b30);box-shadow:0 23px 95px #000c,0 0 50px #70eadd12;backdrop-filter:blur(18px);color:#edf9ff}
+.aegis-guide-panel{width:min(448px,calc(100vw - 24px));height:min(735px,calc(100dvh - 115px));min-height:290px;border-radius:21px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #80eee35b;background:linear-gradient(154deg,#182f40,#0c1728 60%,#101b30);box-shadow:0 23px 95px #000c,0 0 50px #70eadd12;backdrop-filter:blur(18px);color:#edf9ff}
 .aegis-guide-header{padding:17px 17px;display:flex;align-items:center;justify-content:space-between;gap:15px;background:linear-gradient(90deg,#76e4d619,#8a8dfe08);border-bottom:1px solid #a1c6d429;flex:none}
 .aegis-guide-identity{display:flex;gap:11px;align-items:center;min-width:0}
 .aegis-guide-identity>div{min-width:0}
@@ -430,10 +430,10 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
  .contact-actions>a,.contact-actions>button{width:100%;justify-content:center}
  .contact-address{font-size:18px}
  .contact-security-tip{padding:15px}
- .aegis-guide-root{bottom:calc(11px + env(safe-area-inset-bottom,0px));right:12px;max-width:calc(100vw - 24px)}
+ .aegis-guide-root{bottom:calc(78px + env(safe-area-inset-bottom,0px));right:12px;max-width:calc(100vw - 24px)}
  .aegis-guide-launch{min-height:50px;font-size:12px;padding:6px 13px 6px 7px}
  .aegis-guide-launch-icon{height:35px;width:35px}
- .aegis-guide-panel{height:min(780px,calc(100dvh - 24px));width:calc(100vw - 24px);border-radius:17px}
+ .aegis-guide-panel{height:min(780px,calc(100dvh - 100px));min-height:0;width:calc(100vw - 24px);border-radius:17px}
  .aegis-guide-body{padding:14px 15px 19px}
  .aegis-guide-header{padding:12px 14px}
  .aegis-guide-step-pills{gap:4px}
