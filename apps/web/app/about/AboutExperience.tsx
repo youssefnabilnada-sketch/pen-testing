@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import PlatformExplainer from './PlatformExplainer';
 import {useEffect,useState} from 'react';
 import {
  ArrowUpRight,ArrowRight,ShieldCheck,Target,Eye,ScanLine,
@@ -33,18 +34,18 @@ export default function AboutExperience(){
  const toggle=()=>{const next=language==='en'?'ar':'en';setLanguage(next);try{localStorage.setItem('aegis-language',next)}catch{}};
  return <main className="landing about-landing" dir={language==='ar'?'rtl':'ltr'} lang={language}>
   <a href="#about-main" className="about-skip">{t('Skip to main content','انتقل إلى المحتوى')}</a>
-  <nav className="landing-nav about-nav" aria-label={t('About AEGIS navigation','قائمة التعريف بمنصة AEGIS')}>
+  <nav className="landing-nav about-nav" aria-label={t('AEGIS platform navigation','قائمة منصة AEGIS')}>
    <Link className="brand" href="/"><ShieldCheck size={22}/> AEGIS <small>SECURITY CLOUD</small></Link>
-   <div className="about-nav-links"><a href="#mission">{t('Mission & vision','الرسالة والرؤية')}</a><a href="#how-it-works">{t('How it works','كيف تعمل')}</a><Link href="/trust">{t('Trust','الأمان')}</Link></div>
+   <div className="about-nav-links"><a href="#what-it-does">{t('What it does','ماذا تقدم؟')}</a><a href="#how-it-works">{t('How it works','كيف تعمل؟')}</a><a href="#mission">{t('Mission & vision','الرسالة والرؤية')}</a><Link href="/trust">{t('Trust','الأمان')}</Link></div>
    <div className="about-nav-actions"><button type="button" className="about-language" onClick={toggle} aria-label={language==='en'?'التبديل إلى العربية':'Switch to English'}>{language==='en'?'العربية':'English'}</button><Link className="button ghost" href="/console">{t('Open workspace','دخول المنصة')} <ArrowUpRight size={16}/></Link></div>
   </nav>
   <div id="about-main">
    <section className="about-hero">
     <div className="about-hero-copy">
-     <p className="eyebrow"><span className="dot"/>{t('ABOUT AEGIS SECURITY CLOUD','تعرف على AEGIS SECURITY CLOUD')}</p>
-     <h1>{t('Understand the risk.','افهم المخاطر.')}<span>{t('Take the next step.','واتخذ الخطوة التالية بثقة.')}</span></h1>
-     <p className="lead">{t('AEGIS connects authorized website security checks, understandable findings, and a controlled path to remediation—all in one workspace.', 'تجمع AEGIS بين فحص أمان المواقع المصرح به، وشرح النتائج بوضوح، ومسار منظم للإصلاح تحت سيطرتك، في مساحة عمل واحدة.')}</p>
-     <div className="actions"><Link href="/console" className="button primary">{t('Explore your workspace','ابدأ من مساحة العمل')} <ArrowUpRight size={17}/></Link><a href="#how-it-works" className="button ghost">{t('See how AEGIS works','اكتشف طريقة العمل')} <ArrowRight size={17}/></a></div>
+     <p className="eyebrow"><span className="dot"/>{t('AEGIS SECURITY CLOUD — THE PLATFORM EXPLAINED','AEGIS SECURITY CLOUD — دليل المنصة')}</p>
+     <h1>{t('What AEGIS does.','ماذا تفعل AEGIS؟')}<span>{t('How you stay in control.','وكيف تظل أنت المتحكم.')}</span></h1>
+     <p className="lead">{t('Explore how AEGIS helps you add and verify your website, authorize a safe assessment, understand findings, plan fixes and validate progress — without giving up control.', 'اكتشف كيف تساعدك AEGIS على إضافة موقعك وإثبات ملكيته، والسماح بفحص آمن، وفهم النتائج، وتخطيط الإصلاحات، والتحقق من التحسن — وأنت المتحكم في كل خطوة.')}</p>
+     <div className="actions"><Link href="/console" className="button primary">{t('Explore your workspace','ابدأ من مساحة العمل')} <ArrowUpRight size={17}/></Link><a href="#what-it-does" className="button ghost">{t('Explore every feature','اكتشف كل إمكانيات المنصة')} <ArrowRight size={17}/></a></div>
      <p className="about-hero-caveat"><LockKeyhole size={15}/>{t('Authorized, bounded configuration checks—not a promise that any website is vulnerability-free.', 'فحوصات إعدادات محدودة ومصرح بها، وليست ضمانًا لخلو أي موقع من الثغرات.')}</p>
     </div>
     <div className="about-hero-visual" aria-hidden="true"><div className="about-visual-orbit"><ShieldCheck size={110} strokeWidth={1.15}/></div><div className="about-visual-note"><CheckCircle2 size={16}/>{t('Verify • Assess • Improve','تحقق • افحص • حسّن')}</div><div className="about-visual-caption">{t('SECURITY WITH PERMISSION & PROOF','أمان مبني على التصريح والدليل')}</div></div>
@@ -82,6 +83,7 @@ export default function AboutExperience(){
      <article className="glass"><RefreshCw size={24}/><h3>{t('Follow-up and retesting','المتابعة وإعادة الفحص')}</h3><p>{t('Track remediation requests and repeat supported checks to compare evidence after an approved change.', 'تابع طلبات الإصلاح وأعد الاختبارات المدعومة للمقارنة بين الأدلة بعد إجراء التغييرات المعتمدة.')}</p></article>
     </div>
    </section>
+   <PlatformExplainer language={language} t={t}/>
    <section className="about-disclaimer" aria-label={t('Assessment limitations','حدود التقييم')}>
     <ShieldCheck size={24}/><div><h3>{t('What AEGIS does not promise','ما الذي لا تعدك به AEGIS؟')}</h3><p>{t('An automated configuration assessment is not a comprehensive penetration test. No scan can prove a website is completely secure. AEGIS does not alter production code automatically, and a proposed fix is not considered verified until it is applied and retested.', 'تقييم الإعدادات الآلي ليس اختبار اختراق شاملًا. ولا يمكن لأي فحص إثبات أن الموقع آمن تمامًا. لا تعدل AEGIS كود الإنتاج تلقائيًا، ولا يعتبر الإصلاح ناجحًا لمجرد اقتراحه، بل بعد تطبيقه وإعادة التحقق.')}</p></div>
    </section>
