@@ -1,0 +1,17 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> aegis-web@0.1.0 test
+> vitest run
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.12 /workspace/scratch/1f23d267138b/aegis-ux/apps/web
+
+
+ Test Files  31 passed (31)
+      Tests  93 passed (93)
+   Start at  16:27:32
+   Duration  21.30s (transform 4.57s, setup 0ms, import 18.83s, tests 40.62s, environment 64.20s)
+

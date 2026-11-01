@@ -8,6 +8,7 @@ from .db import Session
 from .models import Job, Asset, Authorization, Finding, FindingHistory, Report, Organization, Setting, Audit, AssessmentSchedule
 from .safety import fetch
 from .checks import analyze
+from .assessment_failures import NonSuccessResponse, assessment_failure
 from .runtime import validate_runtime
 
 validate_runtime()
@@ -82,7 +83,7 @@ def assess(job_id):
                 with authorization_guard(guard):
                     guard()
                     response=fetch(a.origin) if scope['paths']==['/'] else fetch(a.origin,path,assessment_scope=scope)
-                if not 200<=response.status<300:raise ValueError('Non-success response; no clean result implied.')
+                if not 200<=response.status<300:raise NonSuccessResponse(response.status)
                 if scope['type']=='api-response-configuration':
                     from .api_assessment import profile as api_profile
                     found,manifest=api_profile(a.origin,response)
@@ -135,7 +136,8 @@ def assess(job_id):
             db.rollback();job=db.get(Job,job_id)
             if job.status in TERMINAL:return
             job.status='cancelled' if isinstance(exc,Cancelled) else 'failed'
-            job.error=None if isinstance(exc,Cancelled) else ('Assessment failed: '+type(exc).__name__+'. No clean result is implied.')
+            failure_code, safe_explanation=assessment_failure(exc)
+            job.error=None if isinstance(exc,Cancelled) else safe_explanation
             from .models import Retest
             from .intelligence.service import notify
             r=db.scalar(select(Retest).where(Retest.job_id==job.id))
@@ -144,4 +146,4 @@ def assess(job_id):
             notify(db,job.org_id,'assessment_failed','job-failure:'+job.id,'Assessment '+job.status,'No clean result or verified fix is implied.',job.id)
             for schedule in db.scalars(select(AssessmentSchedule).where(AssessmentSchedule.last_job_id==job.id)):schedule.status=job.status
             job.finished=time.time();db.add(Audit(org_id=job.org_id,action='assessment.'+job.status,target=job.id));db.commit()
-            logger.warning('assessment_stopped',extra={'job_id':job_id,'error_type':type(exc).__name__})
+            logger.warning('assessment_stopped',extra={'job_id':job_id,'error_type':type(exc).__name__,'failure_code':failure_code})

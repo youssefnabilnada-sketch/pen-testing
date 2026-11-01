@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.988
+Download the AEGIS proof file or use the Git helper.
+
+00:00:04.988 --> 00:00:09.616
+Commit the file and deploy the real website.
+
+00:00:09.616 --> 00:00:15.324
+AEGIS checks the live website, not the repository account.

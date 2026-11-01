@@ -31,7 +31,8 @@ def test_worker_never_fetches_outside_window(client,mail,monkeypatch):
     result=client.get(f'/organizations/{org}/assessments').json()[0]
     assert result['status']=='failed'
     assert called==[]
-    assert 'No clean result' in result['error']
+    assert 'outside its approved time window' in result['error']
+    assert 'No security assessment result was produced.' in result['error']
 
 def test_scheduler_waits_and_scope_is_persisted(client,mail,monkeypatch):
     org,asset,_=authorized(client,mail,monkeypatch)

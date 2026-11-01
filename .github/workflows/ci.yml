@@ -75,6 +75,10 @@ jobs:
           assert not (required - tables), f'Missing tables: {sorted(required - tables)}'
           print('PostgreSQL migrations 014-017: schema present after round-trip')
           PYPOSTGRES
+      - name: Rehearse backup and restore with disposable synthetic data
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: docker exec -i -e AEGIS_DISPOSABLE_RESTORE=ci-fixture-only "$POSTGRES_CONTAINER" sh < scripts/ci-postgres-restore.sh
 
   integrated-postgres-redis:
     runs-on: ubuntu-latest
@@ -191,7 +195,7 @@ jobs:
           exit 1
       - name: Verify real Chromium desktop and mobile landing journeys
         env: {E2E_BASE_URL: 'http://127.0.0.1:3000'}
-        run: npx playwright test e2e/smoke.spec.ts --project=desktop --project=mobile --reporter=line
+        run: npx playwright test e2e/smoke.spec.ts e2e/public-guides.spec.ts --project=desktop --project=mobile --reporter=line
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: browser-smoke-evidence, path: apps/web/test-results/}
@@ -243,14 +247,42 @@ jobs:
             exit 1
           fi
 
+  public-repository-history:
+    # This detects selected historical secret indicators before publishing code.
+    # Passing is NOT full privacy/secret review or production authorization.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify historical exposure guard with isolated fixtures
+        run: python -m unittest discover -s tests -p 'test_public_repository_audit.py' -v
+      - name: Examine all reachable Git history before public visibility
+        run: python scripts/check_public_repo_history.py
+
   predeploy-ci-evidence:
     # Configure as a required branch-protection check after reviewing CI.
     # This checks the disposable CI environment, NOT a live production release.
     if: ${{ always() }}
-    needs: [backend, web, postgres-migrations, integrated-postgres-redis, browser-health, browser-smoke, native-runtime, wordpress-runtime]
+    needs: [backend, web, postgres-migrations, integrated-postgres-redis, browser-health, browser-smoke, native-runtime, wordpress-runtime, public-repository-history]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check Oracle protected rollout shell syntax
+        run: bash -n scripts/oci-guarded-backend-rollout.sh
+      - name: Validate final Production gateway Caddy syntax and operator safety script
+        run: |
+          set -euo pipefail
+          bash -n scripts/oci-production-gateway.sh
+          bash -n scripts/oci-rotate-production-gateway.sh
+          bash -n scripts/oci-live-web-smoke.sh
+          bash -n scripts/oci-protected-email-acceptance.sh
+          python3 -m py_compile scripts/oci-brevo-delivery-probe.py scripts/oci-acceptance-readonly.py scripts/oci-provision-pilot-account.py
+          bash -n scripts/oci-v1-backend-rollout.sh
+          docker run --rm -e AEGIS_PRODUCTION_GATEWAY_KEY=ci-only-placeholder-not-for-any-production-use-123456789012345678901234567890 \
+            -v "$PWD/infrastructure/deployment/Caddyfile.production-gated:/etc/caddy/Caddyfile:ro" \
+            caddy:2 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
       - name: Require all pre-deployment test jobs to succeed
         env:
           AEGIS_CI_NEEDS_JSON: ${{ toJSON(needs) }}

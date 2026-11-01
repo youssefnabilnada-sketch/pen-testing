@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.196
+Download the unique AEGIS proof file.
+
+00:00:04.196 --> 00:00:09.376
+Add it to .well-known inside your published site's output.
+
+00:00:09.376 --> 00:00:14.532
+Deploy, open the file URL, and verify.

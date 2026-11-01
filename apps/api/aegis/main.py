@@ -13,6 +13,7 @@ from .historical_records import asset_origin
 from .models import User, LoginSession, EmailToken, Organization, Membership, Asset, Challenge, Authorization, Job, Finding, FindingHistory, Report, Remediation, Message, Audit, Setting
 from .auth import current, member, admin, audit, digest, hasher, send_token
 from .runtime import validate_runtime
+from .request_origins import allowed_request_origins
 
 validate_runtime('api')
 
@@ -22,7 +23,7 @@ app = FastAPI(title='AEGIS Security Cloud', version='0.1.0', description='Author
 async def security_headers(request: Request, call_next):
     if request.method not in ('GET', 'HEAD', 'OPTIONS'):
         origin = request.headers.get('origin')
-        if origin and origin != os.getenv('WEB_ORIGIN', 'http://localhost:3000'):
+        if origin and origin not in allowed_request_origins():
             return Response(status_code=403, content='Untrusted origin')
     result = await call_next(request)
     result.headers['X-Content-Type-Options'] = 'nosniff'
@@ -47,7 +48,7 @@ class ResetInput(TokenInput):
 class OrgInput(BaseModel):
     name: str = Field(min_length=2, max_length=120)
 
-def throttle(key):
+def throttle(key, limit=12):
     if os.getenv('TESTING') == '1':
         return
     import redis
@@ -56,10 +57,23 @@ def throttle(key):
         r = redis.Redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379/0'))
         # Atomic counter/expiry; fixed window, fail closed when coordination is unavailable.
         n = r.eval("local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],60) end; return n", 1, 'rate:'+key)
-        if n > 12:
+        if n > limit:
             raise HTTPException(429, 'Too many attempts. Try again in one minute.')
     except RedisError:
         raise HTTPException(503, 'Authentication coordination unavailable.')
+
+def throttle_public_account(request, action, email):
+    """Bound credential stuffing without treating shared reverse-proxy IPs as a single user.
+
+    The source cap guards abusive high-cardinality attempts; the hashed account
+    key provides a much tighter per-identity cap. Untrusted X-Forwarded-For is
+    deliberately ignored rather than granting clients control of rate keys.
+    """
+    normalized = email.strip().lower()
+    identity = digest(normalized)
+    throttle('public:'+action+':source:'+request.client.host, limit=240)
+    throttle('public:'+action+':identity:'+identity)
+
 
 def email_token(db, user, purpose):
     token = secrets.token_urlsafe(32)
@@ -88,10 +102,18 @@ def connections(u=Depends(current)):
     from .connections import diagnose
     return diagnose()
 
+@app.get('/auth/registration-status')
+def registration_status():
+    """Non-sensitive launch signal for the public signup UI; production fails closed."""
+    return {'enabled': os.getenv('AEGIS_ENV') != 'production' or os.getenv('AEGIS_PUBLIC_REGISTRATION_ENABLED') == 'true'}
+
+
 @app.post('/auth/register', status_code=201)
 def register(data: Credentials, request: Request, db=Depends(database)):
-    throttle(request.client.host)
+    if os.getenv('AEGIS_ENV') == 'production' and os.getenv('AEGIS_PUBLIC_REGISTRATION_ENABLED') != 'true':
+        raise HTTPException(503, 'Registration is unavailable until launch approval.')
     email = data.email.strip().lower()
+    throttle_public_account(request, 'register', email)
     if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', email):
         raise HTTPException(422, 'Enter a valid email address.')
     if db.scalar(select(User).where(User.email == email)):
@@ -118,9 +140,48 @@ def verify_email(data: TokenInput, db=Depends(database)):
     db.commit()
     return {'message': 'Email verified. You can sign in.'}
 
+VERIFY_RESEND_COOLDOWN_SECONDS = 120
+
+@app.post('/auth/resend-verification', status_code=202)
+def resend_verification(data: EmailInput, request: Request, db=Depends(database)):
+    """Recover a pending signup without allowing email/account enumeration.
+
+    Serializing on the user row stops concurrent resends from bypassing the
+    cooldown. Only unverified active users receive another token. Issuance is
+    bounded per hashed identity and shared proxy source.
+    """
+    import logging
+    email = data.email.strip().lower()
+    throttle_public_account(request, 'resend-verification', email)
+    result = {
+        'message': 'If this address has an unverified AEGIS account, a new verification email will be sent when eligible. Check your inbox and spam folder.'
+    }
+    user = db.scalar(select(User).where(
+        User.email == email, User.active.is_(True)
+    ).with_for_update())
+    if not user or user.verified:
+        return result
+    existing = db.scalar(select(EmailToken).where(
+        EmailToken.user_id == user.id, EmailToken.purpose == 'verify'
+    ).order_by(EmailToken.expires.desc()).limit(1))
+    now = time.time()
+    if existing and existing.expires > now + 1800 - VERIFY_RESEND_COOLDOWN_SECONDS:
+        return result
+    try:
+        email_token(db, user, 'verify')
+        audit(db, user, 'account.verification_resent', user.id)
+        db.commit()
+    except HTTPException as exc:
+        db.rollback()
+        if exc.status_code != 503:
+            raise
+        # Do not reveal whether this address belongs to an account.
+        logging.getLogger(__name__).warning('Verification resend email service unavailable')
+    return result
+
 @app.post('/auth/login')
 def login(data: Credentials, request: Request, response: Response, db=Depends(database)):
-    throttle(request.client.host)
+    throttle_public_account(request, 'login', data.email)
     u = db.scalar(select(User).where(User.email == data.email.strip().lower()))
     try:
         hasher.verify(u.password if u else DUMMY_HASH, data.password)
@@ -155,7 +216,7 @@ def logout(request: Request, response: Response, u=Depends(current), db=Depends(
 
 @app.post('/auth/reset-request')
 def reset_request(data: EmailInput, request: Request, db=Depends(database)):
-    throttle(request.client.host)
+    throttle_public_account(request, 'reset-request', data.email)
     u = db.scalar(select(User).where(User.email == data.email.strip().lower(), User.active.is_(True)))
     if u:
         email_token(db, u, 'reset')
@@ -754,3 +815,6 @@ from .crm import router as crm_router
 from .evidence_vault import router as evidence_vault_router
 app.include_router(crm_router)
 app.include_router(evidence_vault_router)
+
+from .fastfix import router as fastfix_router
+app.include_router(fastfix_router)

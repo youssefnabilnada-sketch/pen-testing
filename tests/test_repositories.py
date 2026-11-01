@@ -172,3 +172,52 @@ def test_publication_control_read_is_staff_only(client,mail,github):
     assert client.get('/admin/repository-control').json()=={'paused':False}
     assert client.post('/admin/repository-control',json={'accepted':True}).status_code==200
     assert client.get('/admin/repository-control').json()=={'paused':True}
+
+
+@pytest.mark.parametrize('change',['evidence','status','unversioned'])
+def test_publication_requires_the_exact_reviewed_finding_snapshot(client,mail,monkeypatch,github,change):
+    org,rid,cid,pid=patch_setup(client,mail,monkeypatch,github)
+    with Session() as db:
+        if change=='unversioned':
+            patch=db.get(RepositoryPatch,pid)
+            patch.test_evidence={k:v for k,v in patch.test_evidence.items() if k!='finding_snapshot'}
+        else:
+            finding=db.get(Finding,db.get(Remediation,rid).finding_id)
+            setattr(finding,change,'resolved' if change=='status' else 'New contradictory evidence')
+        db.commit()
+    github.clear()
+    response=client.post(f'/repository-patches/{pid}/pull-request',json={'accepted':True,'mfa_code':'123456'})
+    assert response.status_code==409
+    assert 'fresh proposal' in response.json()['detail']
+    assert github==[]
+
+
+@pytest.mark.parametrize('invalid_backup',['missing','wrong_digest','invalid_ciphertext'])
+def test_publication_rechecks_encrypted_restore_before_any_repository_write(
+    client,mail,monkeypatch,github,invalid_backup
+):
+    from aegis.models import PatchBackup
+    org,rid,cid,pid=patch_setup(client,mail,monkeypatch,github)
+    with Session() as db:
+        c=db.get(GitHubConnection,cid)
+        db.add(MfaState(user_id=c.user_id,secret='fixture',enrollment_session='fixture-session',
+                        enabled=True,expires=time.time()+300,last_counter=-1))
+        backup=db.scalar(select(PatchBackup).where(PatchBackup.patch_id==pid))
+        assert backup is not None
+        if invalid_backup=='missing':
+            db.delete(backup)
+        elif invalid_backup=='wrong_digest':
+            backup.sha256='0'*64
+            patch=db.get(RepositoryPatch,pid)
+            patch.test_evidence={**patch.test_evidence,'backup_sha256':backup.sha256}
+        else:
+            backup.encrypted_content='not-a-valid-encrypted-backup'
+        db.commit()
+    monkeypatch.setattr('aegis.mfa.enforce',lambda *args:None)
+    github.clear()
+    result=client.post(f'/repository-patches/{pid}/pull-request',
+                       json={'accepted':True,'mfa_code':'123456'})
+    assert result.status_code==409
+    assert github==[]
+    with Session() as db:
+        assert db.get(RepositoryPatch,pid).status=='review_required'

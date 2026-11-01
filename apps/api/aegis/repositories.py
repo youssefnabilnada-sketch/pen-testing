@@ -1,8 +1,13 @@
 """Explicit GitHub consent, bounded configuration proposals and reviewed PRs."""
+import hashlib
 import base64
 import difflib
 import json
+import math
 import re
+from decimal import Decimal
+from typing import Literal
+from .fastfix_adapters import FILES,patch_file,propose_netlify_nosniff
 import secrets
 import time
 from urllib.parse import quote
@@ -12,7 +17,7 @@ from sqlalchemy import select,update
 from . import github_client as gh
 from .auth import current,member,audit,digest,admin
 from .db import database
-from .models import GitHubState,GitHubConnection,RepositoryPatch,Remediation,Finding,MfaState,Setting
+from .models import GitHubState,GitHubConnection,RepositoryPatch,PatchBackup,Remediation,Finding,MfaState,Setting
 router=APIRouter(tags=['Authorized repositories'])
 
 def call(path,token,method='GET',body=None):
@@ -93,8 +98,22 @@ def repositories(cid:str,page:int=1,u=Depends(current),db=Depends(database)):
 
 def propose_nosniff(content):
     """Single reviewed transformation. Never evaluates JS or executes repo scripts."""
-    if len(content)>65536:raise ValueError('Configuration too large.')
-    config=json.loads(content or '{}')
+    if not isinstance(content,str) or len(content.encode('utf-8'))>65536:raise ValueError('Configuration too large.')
+    def unique_object(pairs):
+        obj={}
+        for key,value in pairs:
+            if key in obj:raise ValueError('Duplicate JSON keys require manual review.')
+            obj[key]=value
+        return obj
+    def reject_constant(value):raise ValueError('Non-finite JSON values require manual review.')
+    def exact_float(value):
+        # JSON can overflow to Infinity or silently lose decimal precision.
+        number=float(value)
+        if not math.isfinite(number) or Decimal(str(number))!=Decimal(value):
+            raise ValueError('Non-round-trippable JSON numbers require manual review.')
+        return number
+    parse_options={'object_pairs_hook':unique_object,'parse_constant':reject_constant,'parse_float':exact_float}
+    config=json.loads(content,**parse_options)
     if not isinstance(config,dict):raise ValueError('Expected a JSON object.')
     headers=config.setdefault('headers',[])
     if not isinstance(headers,list):raise ValueError('Invalid headers configuration.')
@@ -104,18 +123,26 @@ def propose_nosniff(content):
             if not isinstance(header,dict) or not isinstance(header.get('key'),str):raise ValueError('Invalid header entry.')
             if header['key'].lower()=='x-content-type-options':raise ValueError('Existing policy requires manual review; no overwrite proposed.')
     headers.append({'source':'/(.*)','headers':[{'key':'X-Content-Type-Options','value':'nosniff'}]})
-    result=json.dumps(config,ensure_ascii=False,indent=2)+'\n'
+    result=json.dumps(config,ensure_ascii=False,indent=2,allow_nan=False)+'\n'
+    if len(result.encode('utf-8'))>65536:
+        raise ValueError('Proposed configuration exceeds the safe size limit.')
     # Structural regression check: removing our exact addition restores every original field.
-    verified=json.loads(result);verified['headers'].pop()
-    before=json.loads(content or '{}');before.setdefault('headers',[])
+    verified=json.loads(result,**parse_options);verified['headers'].pop()
+    before=json.loads(content,**parse_options);before.setdefault('headers',[])
     if verified!=before:raise ValueError('Configuration preservation test failed.')
     return result
 
 class Proposal(BaseModel):
+    adapter:Literal["vercel","netlify"]="vercel"
     connection_id:str
     repository:str
     remediation_id:str
     accepted:bool
+
+def finding_snapshot(finding):
+    """Bind review to stored evidence, never to untrusted instructions in evidence."""
+    fields = ('id', 'org_id', 'asset_id', 'job_id', 'rule', 'evidence', 'confidence', 'status', 'last_observed')
+    return hashlib.sha256(json.dumps({key: getattr(finding, key) for key in fields}, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 @router.post('/repository-patches')
 def propose(data:Proposal,u=Depends(current),db=Depends(database)):
@@ -125,17 +152,24 @@ def propose(data:Proposal,u=Depends(current),db=Depends(database)):
     if not data.accepted:raise HTTPException(422,'Repository analysis consent required.')
     if r.status not in ('accepted','in_progress','ready_for_retest'):raise HTTPException(409,'Accept the remediation scope before proposing a patch.')
     finding=db.get(Finding,r.finding_id)
+    if not finding or finding.org_id!=r.org_id:raise HTTPException(409,'Original finding is unavailable in this workspace.')
+    filename=FILES[data.adapter]
     if finding.rule.split('@')[0]!='header.nosniff':raise HTTPException(409,'This finding has no supported automatic patch generator; engineer review required.')
     root=repo_path(data.repository);repo=call(root,token)
-    if not repo.get('permissions',{}).get('push') or repo.get('archived'):raise HTTPException(403,'Repository write authorization required.')
-    branch=repo['default_branch'];head=call(root+'/git/ref/heads/'+quote(branch,safe=''),token)['object']['sha']
-    file=call(root+'/contents/vercel.json?ref='+quote(head,safe=''),token)
-    if file.get('type')!='file' or file.get('encoding')!='base64' or file.get('size',65537)>65536:raise HTTPException(409,'Only an existing bounded vercel.json is supported.')
+    if not isinstance(repo,dict) or not isinstance(repo.get('permissions'),dict):raise HTTPException(502,'Invalid repository metadata.')
+    if repo['permissions'].get('push') is not True or repo.get('archived'):raise HTTPException(403,'Repository write authorization required.')
+    branch=repo.get('default_branch')
+    if not isinstance(branch,str) or not branch or len(branch)>200:raise HTTPException(502,'Invalid repository branch.')
+    ref=call(root+'/git/ref/heads/'+quote(branch,safe=''),token)
+    head=ref.get('object',{}).get('sha') if isinstance(ref,dict) and isinstance(ref.get('object'),dict) else None
+    if not isinstance(head,str) or not re.fullmatch(r'[0-9a-f]{40}',head):raise HTTPException(502,'Invalid repository revision.')
+    file=call(root+'/contents/'+filename+'?ref='+quote(head,safe=''),token)
+    if not isinstance(file,dict) or file.get('type')!='file' or file.get('encoding')!='base64' or type(file.get('size')) is not int or not 0<=file['size']<=65536 or not isinstance(file.get('content'),str) or len(file['content'])>90000 or not isinstance(file.get('sha'),str) or not re.fullmatch(r'[0-9a-f]{40}',file['sha']):raise HTTPException(409,'Only an existing bounded '+filename+' is supported.')
     try:
-        original=base64.b64decode(file['content']).decode('utf-8');proposed=propose_nosniff(original)
+        original=base64.b64decode(''.join(file['content'].split()),validate=True).decode('utf-8');proposed=(propose_nosniff if data.adapter=='vercel' else propose_netlify_nosniff)(original)
     except (ValueError,KeyError,UnicodeError):raise HTTPException(409,'Configuration needs engineer review; no change proposed.')
-    diff=''.join(difflib.unified_diff(original.splitlines(True),proposed.splitlines(True),fromfile='a/vercel.json',tofile='b/vercel.json',n=0))
-    patch=RepositoryPatch(org_id=c.org_id,connection_id=c.id,remediation_id=r.id,repository=data.repository,base_branch=branch,base_sha=head,file_sha=file['sha'],proposed_content=gh.cipher().encrypt(proposed.encode()).decode(),diff=gh.cipher().encrypt(diff.encode()).decode(),test_evidence={'configuration_preserved':True,'json_valid':True,'application_tests':'not run','staging':'not verified'})
+    diff=''.join(difflib.unified_diff(original.splitlines(True),proposed.splitlines(True),fromfile='a/'+filename,tofile='b/'+filename,n=0))
+    patch=RepositoryPatch(org_id=c.org_id,connection_id=c.id,remediation_id=r.id,repository=data.repository,base_branch=branch,base_sha=head,file_sha=file['sha'],proposed_content=gh.cipher().encrypt(proposed.encode()).decode(),diff=gh.cipher().encrypt(diff.encode()).decode(),test_evidence={'finding_snapshot':finding_snapshot(finding),'adapter':data.adapter,'file':filename,'configuration_preserved':True,'configuration_valid':True,'json_valid':data.adapter=='vercel','limitations':'Netlify static responses only; functions, SSR, proxy responses and competing _headers require separate review.' if data.adapter=='netlify' else 'Vercel configuration only; deployment unverified.','application_tests':'not run','staging':'not verified'})
     db.add(patch);db.flush()
     from .autofix_recovery import create_backup
     create_backup(db,patch,original,proposed)
@@ -164,8 +198,25 @@ def create_pr(patch_id:str,data:Approval,u=Depends(current),db=Depends(database)
     member(db,u,p.org_id,roles=['owner','admin'])
     remediation=db.get(Remediation,p.remediation_id)
     paused=db.get(Setting,'repository_writes_paused')
-    if (paused and paused.value) or remediation.status not in ('accepted','in_progress','ready_for_retest'):raise HTTPException(409,'Repository publication is paused or remediation scope is inactive.')
+    if (paused and paused.value) or not remediation or remediation.org_id!=p.org_id or remediation.status not in ('accepted','in_progress','ready_for_retest'):raise HTTPException(409,'Repository publication is paused or remediation scope is inactive.')
+    finding=db.get(Finding,remediation.finding_id)
+    if not finding or finding.org_id!=p.org_id or p.test_evidence.get('finding_snapshot')!=finding_snapshot(finding):
+        raise HTTPException(409,'Finding evidence changed or is unversioned; generate and review a fresh proposal.')
     if not data.accepted or p.status!='review_required':raise HTTPException(409,'Explicit approval of a pending diff is required.')
+    # Before even attempting a provider write, independently verify the exact
+    # encrypted original retained for this proposal. Old/unversioned proposals
+    # without a valid restorable backup are never publishable.
+    backup=db.scalar(select(PatchBackup).where(PatchBackup.patch_id==p.id))
+    if (not backup or not backup.restore_verified or
+        not isinstance(p.test_evidence,dict) or
+        p.test_evidence.get('backup_sha256')!=backup.sha256):
+        raise HTTPException(409,'Verified original configuration backup required; regenerate the proposal.')
+    try:
+        from .autofix_recovery import restore_rehearsal
+        preview=gh.cipher().decrypt(p.proposed_content.encode()).decode('utf-8')
+        restore_rehearsal(backup.encrypted_content,backup.sha256,preview,patch_file(p))
+    except Exception as exc:
+        raise HTTPException(409,'Rollback backup failed integrity verification; no repository change authorized.') from exc
     mfa=db.get(MfaState,u.id)
     if not mfa or not mfa.enabled:raise HTTPException(403,'Enable authenticator MFA before authorizing repository writes.')
     from .mfa import enforce
@@ -173,13 +224,15 @@ def create_pr(patch_id:str,data:Approval,u=Depends(current),db=Depends(database)
     _,token=connection(db,u,p.connection_id,write=True);root=repo_path(p.repository)
     head=call(root+'/git/ref/heads/'+quote(p.base_branch,safe=''),token)['object']['sha']
     if head!=p.base_sha:raise HTTPException(409,'Base branch changed; generate and review a fresh proposal.')
+    try:filename=patch_file(p)
+    except ValueError as exc:raise HTTPException(409,str(exc)) from exc
     # Persist intent before external writes. An ambiguous failure is never retried silently.
     p.status='publishing';p.approved_by=u.id;audit(db,u,'github.pr_approved',p.id,p.org_id);db.commit()
     branch='aegis/review-'+p.id
     try:
         call(root+'/git/refs',token,'POST',{'ref':'refs/heads/'+branch,'sha':p.base_sha})
-        call(root+'/contents/vercel.json',token,'PUT',{'message':'Propose reviewed browser content-type protection','branch':branch,'sha':p.file_sha,'content':base64.b64encode(gh.cipher().decrypt(p.proposed_content.encode())).decode()})
-        result=call(root+'/pulls',token,'POST',{'title':'Review browser content-type protection','head':branch,'base':p.base_branch,'draft':True,'body':'AEGIS reviewed configuration proposal. JSON and field-preservation checks passed. Application CI and staging validation remain required. No merge, deployment, or verified remediation is implied.'})
+        call(root+'/contents/'+filename,token,'PUT',{'message':'Propose reviewed browser content-type protection','branch':branch,'sha':p.file_sha,'content':base64.b64encode(gh.cipher().decrypt(p.proposed_content.encode())).decode()})
+        result=call(root+'/pulls',token,'POST',{'title':'Review browser content-type protection','head':branch,'base':p.base_branch,'draft':True,'body':'AEGIS reviewed configuration proposal. Configuration syntax and field-preservation checks passed. Application CI and staging validation remain required. No merge, deployment, or verified remediation is implied.'})
         p.pull_number=int(result['number']);p.status='pull_request_open';audit(db,u,'github.pr_created',p.id,p.org_id);db.commit()
     except Exception:
         p.status='publication_unverified';db.commit()
