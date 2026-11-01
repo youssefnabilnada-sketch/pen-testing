@@ -281,7 +281,7 @@ summary{cursor:pointer;padding:16px 0;font-weight:600}
  .about-values-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:860px){
- .about-nav-links{display:none}
+ .about-nav{flex-wrap:wrap}.about-nav-links{display:flex;order:3;width:100%;flex-basis:100%;gap:19px;overflow-x:auto;padding:6px 1px 9px;scrollbar-width:thin}.about-nav-links a{flex:none}
  .about-hero{grid-template-columns:1fr;gap:24px;padding:45px 0;min-height:unset}
  .about-hero-visual{min-height:270px}
  .about-hero-visual:before{width:220px}
