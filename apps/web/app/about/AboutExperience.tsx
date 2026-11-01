@@ -36,7 +36,7 @@ export default function AboutExperience(){
   <a href="#about-main" className="about-skip">{t('Skip to main content','انتقل إلى المحتوى')}</a>
   <nav className="landing-nav about-nav" aria-label={t('AEGIS platform navigation','قائمة منصة AEGIS')}>
    <Link className="brand" href="/"><ShieldCheck size={22}/> AEGIS <small>SECURITY CLOUD</small></Link>
-   <div className="about-nav-links"><a href="#what-it-does">{t('What it does','ماذا تقدم؟')}</a><a href="#how-it-works">{t('How it works','كيف تعمل؟')}</a><a href="#mission">{t('Mission & vision','الرسالة والرؤية')}</a><Link href="/trust">{t('Trust','الأمان')}</Link></div>
+   <div className="about-nav-links"><a href="#what-it-does">{t('What it does','ماذا تقدم؟')}</a><a href="#how-it-works">{t('How it works','كيف تعمل؟')}</a><a href="#mission">{t('Mission & vision','الرسالة والرؤية')}</a><Link href="/trust">{t('Trust','الأمان')}</Link><Link href="/contact">{t('Contact','تواصل معنا')}</Link></div>
    <div className="about-nav-actions"><button type="button" className="about-language" onClick={toggle} aria-label={language==='en'?'التبديل إلى العربية':'Switch to English'}>{language==='en'?'العربية':'English'}</button><Link className="button ghost" href="/console">{t('Open workspace','دخول المنصة')} <ArrowUpRight size={16}/></Link></div>
   </nav>
   <div id="about-main">
@@ -92,6 +92,6 @@ export default function AboutExperience(){
     <Link className="button primary" href="/console">{t('Create your workspace','أنشئ مساحة العمل')}<ArrowUpRight size={19}/></Link>
    </section>
   </div>
-  <footer className="about-footer"><Link className="brand" href="/"><ShieldCheck/> AEGIS</Link><p>{t('Understand. Authorize. Improve.','افهم. صرّح. حسّن.')}</p><div><Link href="/trust">{t('Trust Center','مركز الثقة')}</Link><Link href="/guides">{t('Verification guides','إرشادات التحقق')}</Link><Link href="/">{t('Home','الرئيسية')}</Link></div></footer>
+  <footer className="about-footer"><Link className="brand" href="/"><ShieldCheck/> AEGIS</Link><p>{t('Understand. Authorize. Improve.','افهم. صرّح. حسّن.')}</p><div><Link href="/trust">{t('Trust Center','مركز الثقة')}</Link><Link href="/guides">{t('Verification guides','إرشادات التحقق')}</Link><Link href="/contact">{t('Contact us','تواصل معنا')}</Link><Link href="/">{t('Home','الرئيسية')}</Link></div></footer>
  </main>;
 }
