@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
-import {ArrowRight,BookOpen,CheckCircle2,FileCode2,FileText,Globe2,PlayCircle,ShieldCheck} from 'lucide-react';
+import {ArrowRight,BookOpen,CheckCircle2,FileCode2,FileText,Globe2,PlayCircle,ShieldCheck,Mail} from 'lucide-react';
 import SmartVerifyVideoGuide from '../console/SmartVerifyVideoGuide';
 import {Experience,useExperience} from '../console/Experience';
 
@@ -45,7 +45,7 @@ function GuidesContent(){
  return <main className="guides-public">
   <nav className="guides-nav">
    <Link href="/" className="brand"><ShieldCheck size={24}/> AEGIS <small>SECURITY CLOUD</small></Link>
-   <Link href="/console" className="guides-nav-cta">{t('Open workspace','افتح لوحة التحكم')}<ArrowRight size={16}/></Link>
+   <Link href="/contact" className="guides-nav-cta">{t('Contact AEGIS','تواصل مع AEGIS')}<Mail size={16}/></Link><Link href="/console" className="guides-nav-cta">{t('Open workspace','افتح لوحة التحكم')}<ArrowRight size={16}/></Link>
   </nav>
   <header className="guides-hero">
    <span className="guides-kicker"><BookOpen size={16}/>{t('SMARTVERIFY LEARNING CENTER','مركز شرح إثبات الملكية')}</span>
